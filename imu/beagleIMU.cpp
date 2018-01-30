@@ -1,4 +1,4 @@
-#include "ARM_IMU.h"
+#include "beagleIMU.h"
 
 
 void beagle_imu::set_configuration_default(rc_imu_config_t* config){
@@ -85,15 +85,15 @@ void beagle_imu::set_operation_mode(imu_mode* mode, imu_mode choice){
 
 				//check if mode chosen is appropriate
 				if(choice == RANDOM_MODE || choice == DMP_MODE){
-							mode = choice;
+							*mode = choice;
 					}
 
 				else printf("Invalid imu mode chosen!\n");
 
 	}
 
-void debug_print_vals(rc_imu_data_t* data){
+void beagle_imu::debug_print_vals(rc_imu_data_t* data){
 
-			printf("Accel: [	%f	%f	%f	]	Gyro:	[	%f	%f	%f	]	Mag: [	%f	%f	%f	]", accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
+			printf("Accel: [	%f	%f	%f	]	Gyro:	[	%f	%f	%f	]	Mag: [	%f	%f	%f	]", data->accel[0], data->accel[1], data->accel[2], data->gyro[0], data->gyro[1], data->gyro[2], data->mag[0], data->mag[1], data->mag[2]);
 
 	}

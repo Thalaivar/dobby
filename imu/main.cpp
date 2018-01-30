@@ -1,6 +1,6 @@
-#include "ARM_IMU.h"
+#include "beagleIMU.h"
 
-armIMU imu;
+beagle_imu imu;
 
 int main() {
 		rc_initialize();

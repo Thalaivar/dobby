@@ -1,0 +1,25 @@
+Index: Robotics_Cape_Installer/libraries/roboticscape.h
+===================================================================
+--- Robotics_Cape_Installer.orig/libraries/roboticscape.h
++++ Robotics_Cape_Installer/libraries/roboticscape.h
+@@ -15,7 +15,7 @@
+ // library version, can also be printed from the command line with the included
+ // example program rc_version
+ #define RC_LIB_VERSION_FLOAT	0.34
+-#define RC_LIB_VERSION_STRING	0.3.4
++#define RC_LIB_VERSION_STRING	0.3.4-bs
+ 
+ // necessary types for function prototypes
+ #include <stdint.h> // for uint8_t types etc
+Index: Robotics_Cape_Installer/debian/control
+===================================================================
+--- Robotics_Cape_Installer.orig/debian/control
++++ Robotics_Cape_Installer/debian/control
+@@ -11,6 +11,7 @@ Maintainer: James Strawson <james@straws
+ Homepage: http://www.strawsondesign.com/
+ 
+ Package: roboticscape-bs
++Conflicts: roboticscape
+ Architecture: armhf
+ Description: Robotics Cape Library and Examples
+ 	Supporting library and example programs for the Robotics Cape and Beaglebone Blue

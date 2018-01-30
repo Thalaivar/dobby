@@ -20,7 +20,10 @@ class armIMU {
 		void init_random(rc_imu_data_t* data, rc_imu_config_t config);
 	
 		// enable magnetometer, to be called after set_configuraton_default and before init_random //
-		void enable_mag(rc_imu_data_t* config);
+		void enable_mag(rc_imu_config_t* config);
+		
+		//to print out imu configuration settings
+		void print_config(rc_imu_config_t* config);
 };
 
 

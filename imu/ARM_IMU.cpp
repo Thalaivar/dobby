@@ -23,7 +23,32 @@ void armIMU::init_random(rc_imu_data_t* data, rc_imu_config_t config){
 
 	}
 
-void armIMU::enable_mag(rc_imu_data_t* config){
+void armIMU::enable_mag(rc_imu_config_t* config){
+	
+		config->enable_magnetometer = 1;
+		
+	}
 
-		config
+void armIMU::print_config(rc_imu_config_t* config){
+	
+		printf("The accel full scale range is:	");
+		switch(config->accel_fsr)
+			{
+				case A_FSR_2G:
+					printf("2G\n");
+					break;
+
+				case A_FSR_4G:
+					printf("4G\n");
+					break;
+
+				case A_FSR_8G:
+					printf("8G\n");
+					break;
+ 
+				case A_FSR_16G:
+					printf("16G\n");
+					break;
+			}
+
 	}

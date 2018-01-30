@@ -12,5 +12,6 @@ int main() {
 		for(int i = 0; i <= 100; i++) {
 			imu.update_random(&imu.data);
 		}
-
+	
+		imu.print_config(&imu.config);
 	}	

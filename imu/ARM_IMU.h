@@ -2,6 +2,9 @@
 //*******		IMU	LIBRARY			********//
 //******************************************//
 
+//need to add the flow control, refer to http://www.strawsondesign.com/#!manual-init-cleanup
+//and also http://www.strawsondesign.com/#!manual-flow-state
+
 #include <roboticscape.h>
 #include <iostream>
 

@@ -12,6 +12,7 @@ Current to-do list:
 * pre-arm checks to be made, also failsafes
 * AHRS to be set up along with filtering
 * **Need to evaluate the real time capabilities of PREEMPT_RT kernel currently on BeagleBone.** Learrning and          implimenting pthreading and priority control?
+* Parameter handling???
 
 PPM with PRU
 ------------

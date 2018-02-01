@@ -13,7 +13,7 @@ typedef enum imu_mode {
 			DMP_MODE
 	} mode;
 
-class armIMU {
+class beagle_imu {
 
 	public:
 		rc_imu_data_t data;

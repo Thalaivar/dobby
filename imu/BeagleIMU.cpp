@@ -1,12 +1,12 @@
 #include "ARM_IMU.h"
 
 
-void armIMU::set_configuration_default(rc_imu_config_t* config){
+void beagle_imu::set_configuration_default(rc_imu_config_t* config){
 
 		rc_set_imu_config_to_defaults(config);
 	}
 
-void armIMU::update_random(rc_imu_data_t* data){
+void beagle_imu::update_random(rc_imu_data_t* data){
 
 		// some checks in here??
 		rc_read_accel_data(data);
@@ -14,7 +14,7 @@ void armIMU::update_random(rc_imu_data_t* data){
 		rc_read_mag_data(data);
 	}
 
-void armIMU::init_random(rc_imu_data_t* data, rc_imu_config_t config){
+void beagle_imu::init_random(rc_imu_data_t* data, rc_imu_config_t config){
 
 		//check if init was successful
 		printf("Initializing IMU for random mode operation....\n");
@@ -23,13 +23,13 @@ void armIMU::init_random(rc_imu_data_t* data, rc_imu_config_t config){
 
 	}
 
-void armIMU::enable_mag(rc_imu_config_t* config){
+void beagle_imu::enable_mag(rc_imu_config_t* config){
 
 		config->enable_magnetometer = 1;
 
 	}
 
-void armIMU::print_config(rc_imu_config_t* config){
+void beagle_imu::print_config(rc_imu_config_t* config){
 
 	//get the accel scales
 		printf("The accel full scale range is:	");
@@ -81,7 +81,7 @@ void armIMU::print_config(rc_imu_config_t* config){
 
 	}
 
-void armIMU::set_operation_mode(imu_mode* mode, imu_mode choice){
+void beagle_imu::set_operation_mode(imu_mode* mode, imu_mode choice){
 
 				//check if mode chosen is appropriate
 				if(choice == RANDOM_MODE || choice == DMP_MODE){
@@ -95,5 +95,5 @@ void armIMU::set_operation_mode(imu_mode* mode, imu_mode choice){
 void debug_print_vals(rc_imu_data_t* data){
 
 			printf("Accel: [	%f	%f	%f	]	Gyro:	[	%f	%f	%f	]	Mag: [	%f	%f	%f	]", accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2], mag[0], mag[1], mag[2]);
-			
+
 	}

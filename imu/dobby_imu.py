@@ -26,7 +26,7 @@ class MPU9250:
 	__SELF_TEST_X_GYRO =  0x00
 	__SELF_TEST_Y_GYRO =  0x01
 	__SELF_TEST_Z_GYRO =  0x02
-	
+
 	#define X_FINE_GAIN      0x03
 	#define Y_FINE_GAIN      0x04
 	#define Z_FINE_GAIN      0x05
@@ -36,7 +36,7 @@ class MPU9250:
 	#define YA_OFFSET_L_TC   0x09
 	#define ZA_OFFSET_H      0x0A
 	#define ZA_OFFSET_L_TC   0x0B
-	
+
 	__SELF_TEST_X_ACCEL = 0x0D
 	__SELF_TEST_Y_ACCEL = 0x0E
 	__SELF_TEST_Z_ACCEL = 0x0F
@@ -153,12 +153,12 @@ class MPU9250:
 	__
 	__MAG_MODE_100 = 0x06
 	__MAG_MODE_8 = 0x02
-	
+
 	bus = smbus.SMBus(2)
-	
-	MAGBIAS_X = None
-	MAGBIAS_Y = None
-	MAGBIAS_Z = None
+
+	__MAGBIAS_X = None
+	__MAGBIAS_Y = None
+	__MAGBIAS_Z = None
 
 	def __init__(self, Ascale, Gscale, Mscale, magMode):
 		self.a_scale = Ascale
@@ -167,64 +167,64 @@ class MPU9250:
 		self.mag_mode = magMode
 		self.mag_calibration = [0, 0, 0]
 		self.mag_bias = [MAGBIAS_X, MAGBIAS_Y, MAGBIAS_Z]
-	
+
 	def init_mpu(self):
 
 		# wake up device
-		bus.write_byte_data(MPU9250_ADDRESS, PWR_MGMT_1, 0X00)
+		bus.write_byte_data(self.__MPU9250_ADDRESS,self.__PWR_MGMT_1, 0X00)
 		time.sleep(0.1)
 
 		# get stable time source
-		bus.write_byte_data(MPU9250_ADDRESS, PWR_MGMT_1, 0x01)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
 
-		bus.write_byte_data(MPU9250_ADDRESS, CONFIG, 0x03)
-		bus.write_byte_data(MPU9250_ADDRESS, SMPLRT_DIV, 0x04)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x03)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x04)
 
-		c = bus.read_byte_Data(MPU9250_ADDRESS, GYRO_CONFIG)
+		c = bus.read_byte_Data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG)
 		c = c & ~0x02
 		c = c & ~0x18
 		c = c | self.g_scale << 3
-		bus.write_byte_data(MPU9250_ADDRESS, GYRO_CONFIG, c)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, c)
 
-		c = bus.read_byte_data(MPU9250_ADDRESS, ACCEL_CONFIG)
+		c = bus.read_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG)
 		c = c & ~0x18
 		c = c | self.a_scale << 3
-		bus.write_byte_data(MPU9250_ADDRESS, ACCEL_CONFIG, c)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, c)
 
-		c = bus.read_byte_Data(MPU9250_ADDRESS, ACCEL_CONFIG2)
+		c = bus.read_byte_Data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2)
 		c = c & ~0x0F
 		c = c | 0x03
-		bus.write_byte_data(MPU9250_ADDRESS, ACCEL_CONFIG2, c)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2, c)
 
-		bus.write_byte_data(MPU9250_ADDRESS, INT_PIN_CFG, 0x22)
-		bus.write_byte_data(MPU9250_ADDRESS, INT_ENABLE, 0x01)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_PIN_CFG, 0x22)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x01)
 
 	def init_ak8963():
 
-		bus.write_byte_data(AK8963_ADDRESS, AK8963_CNTL, 0x00)
+		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.01)
-		bus.write_byte_data(AK8963_ADDRESS, AK8963_CNTL, 0x0F)
+		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x0F)
 		time.sleep(0.01)
 
-		rawData = bus.read_i2c_block_data(AK8963_ADDRESS, AK8963_ASAX, 3)
+		rawData = bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_ASAX, 3)
 
 		for i in range(3):
 			self.mag_calibration[i] = (float)(rawData[i] - 128)/256.0 + 1.0
 
-		bus.write_byte_data(AK8963_ADDRESS, AK8963_CNTL, 0x00)
+		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.1)
 
-		bus.write_byte_data(AK8963_ADDRESS, AK8963_CNTL, self.m_scale << 4 | self.mag_mode)
+		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, self.m_scale << 4 | self.mag_mode)
 		time.sleep(0.1)
 
 	def reset_mpu():
 
-		bus.write_byte_data(MPU9250_ADDRESS, PWR_MGMT_1, 0x80)
+		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
 		time.sleep(0.1)
 
 	def read_accel(self):
 
-		self.accel_data = bus.read_i2c_block_data(MPU9250_ADDRESS, ACCEL_XOUT_H, 6)
+		self.accel_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
 
 		for i in range(3):
 			self.accel_data

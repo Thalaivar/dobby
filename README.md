@@ -1,4 +1,5 @@
-# ARMCopter #
+BeagleCopter
+=============
 
 Implementation of sliding mode control on a quadrotor
 -----------------------------------------------------

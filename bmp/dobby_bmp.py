@@ -46,11 +46,12 @@ class BMP280:
 	bus = smbus.SMBus(BMP_I2C_BUS)
 
 	def __init__(self):
-		self.config_class = self.config_class()
-		self.temperature = None
-		self.t_fine 	 = None
-		self.pressure  	 = None
-		self.altitude    = None
+		if self.init_bmp():
+			self.config_class = self.config_class()
+			self.temperature = None
+			self.t_fine 	 = None
+			self.pressure  	 = None
+			self.altitude    = None
 
 	## begin low level communication functions ##
 
@@ -87,6 +88,18 @@ class BMP280:
 		return (data[0] << 8 | data[1] << 8 | data[2])
 
 	## end low level communication functions ##
+
+	def init_bmp(self):
+		if self.read_byte(self.__BMP280_REGISTER_CHIPID) != self.__BMP280_CHIPID :
+			raise IOError('BMP280 not active!\n')
+			return False
+
+		else:
+			print "BMP280 sensor detected!\n"
+			self.read_coefficients()
+
+			self.write_byte(self.__BMP280__BMP280_REGISTER_CONTROL, 0x3F)
+			return True
 
 	def read_temperature(self):
 		adc_t = self.read_24_bits(self.__BMP280_REGISTER_TEMPDATA)
@@ -139,7 +152,7 @@ class BMP280:
 			self.dig_T1 = None
 			self.dig_T2 = None
 			self.dig_T3 = None
-	
+
 			self.dig_P1 = None
 			self.dig_P2 = None
 			self.dig_P3 = None
@@ -149,19 +162,19 @@ class BMP280:
 			self.dig_P7 = None
 			self.dig_P8 = None
 			self.dig_P9 = None
-	
+
 			self.dig_H1 = None
 			self.dig_H2 = None
 			self.dig_H3 = None
 			self.dig_H4 = None
 			self.dig_H5 = None
 			self.dig_H6 = None
-	
+
 	def read_coefficients(self):
 		self.config_class.dig_T1 = self.read_16_bits_LE(self.__BMP280_REGISTER_DIG_T1)
 		self.config_class.dig_T2 = self.read_16_bits_signed_LE(self.__BMP280_REGISTER_DIG_T2)
 		self.config_class.dig_T3 = self.read_16_bits_signed_LE(self.__BMP280_REGISTER_DIG_T3)
-	
+
 		self.config_class.dig_P1 = self.read_16_bits_LE(self.__BMP280__BMP280_REGISTER_DIG_P1)
 		self.config_class.dig_P2 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P2)
 		self.config_class.dig_P3 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P3)

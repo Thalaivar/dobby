@@ -14,8 +14,9 @@ import math
 class BMP280:
 	SEA_LEVEL_HPA = 1013.25
 	BMP_I2C_BUS = 2
+
 	#	I2C Addresses	#
-	__BMP280_ADDRESS               = 0x77
+	__BMP280_ADDRESS               = 0x76
 	__BMP280_CHIPID                = 0x58
 
 	# 	Registers	#

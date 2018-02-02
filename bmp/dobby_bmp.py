@@ -68,7 +68,7 @@ class BMP280:
 		self.bus.write_byte_data(self.__BMP280_ADDRESS, register, value)
 
 	def read_16_bits(self, register):
-		data = self.bus.i2c_read_block_data(self.__BMP280_ADDRESS, register, 2)
+		data = self.bus.read_i2c_block_data(self.__BMP280_ADDRESS, register, 2)
 		value = ((data[0] << 8) | data[1])
 		return value
 
@@ -83,7 +83,7 @@ class BMP280:
 		return int(self.read_16_bits_LE(register))
 
 	def read_24_bits(self, register):
-		data = self.bus.i2c_read_block_data(self.__BMP280_ADDRESS, register, 3)
+		data = self.bus.read_i2c_block_data(self.__BMP280_ADDRESS, register, 3)
 		return (data[0] << 8 | data[1] << 8 | data[2])
 
 	## end low level communication functions ##

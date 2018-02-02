@@ -41,9 +41,7 @@ class MPU9250:
 	__SELF_TEST_X_ACCEL = 0x0D
 	__SELF_TEST_Y_ACCEL = 0x0E
 	__SELF_TEST_Z_ACCEL = 0x0F
-	__
 	__SELF_TEST_A      =  0x10
-	__
 	__XG_OFFSET_H      =  0x13
 	__XG_OFFSET_L      =  0x14
 	__YG_OFFSET_H      =  0x15
@@ -57,11 +55,9 @@ class MPU9250:
 	__ACCEL_CONFIG2    =  0x1D
 	__LP_ACCEL_ODR     =  0x1E
 	__WOM_THR          =  0x1F
-	__
 	__MOT_DUR          =  0x20
 	__ZMOT_THR         =  0x21
 	__ZRMOT_DUR        =  0x22
-	__
 	__FIFO_EN          =  0x23
 	__I2C_MST_CTRL     =  0x24
 	__I2C_SLV0_ADDR    =  0x25
@@ -245,7 +241,7 @@ class MPU9250:
 		rawData = bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_ASAX, 3)
 
 		for i in range(3):
-			self.mag_calibration[i] = (float)(rawData[i] - 128)/256.0 + 1.0
+			self.mag_calibration[i] = float((rawData[i] - 128)/256.0 + 1.0)
 			i = i + 1
 
 		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
@@ -262,19 +258,19 @@ class MPU9250:
 	def read_accel(self):
 
 		raw_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
-
-		self.accel_data[0] = (int)(((int)raw_data[0]<<8) | raw_data[1])
-		self.accel_data[1] = (int)(((int)raw_data[2]<<8) | raw_data[3])
-		self.accel_data[2] = (int)(((int)raw_data[4]<<8) | raw_data[5])
+		
+		self.accel_data[0] = int(((raw_data[0] << 8) | raw_data[1]))
+		self.accel_data[1] = int(((raw_data[2] << 8) | raw_data[3]))
+		self.accel_data[2] = int(((raw_data[4] << 8) | raw_data[5]))
 
 
 	def read_gyro(self):
 
 		raw_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
 
-		self.gyro_data[0] = (int)(((int)raw_data[0]<<8) | raw_data[1])
-		self.gyro_data[1] = (int)(((int)raw_data[2]<<8) | raw_data[3])
-		self.gyro_data[2] = (int)(((int)raw_data[4]<<8) | raw_data[5])
+		self.gyro_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
+		self.gyro_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
+		self.gyro_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
 
 
 	def read_mag(self):
@@ -282,45 +278,45 @@ class MPU9250:
 		if bus.read_byte_data(self.AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
 			raw_data = bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
 
-			if !(raw_data[6] & 0x08):
-				self.mag_data[0] = (int)(((int)raw_data[0]<<8) | raw_data[1])
-				self.mag_data[1] = (int)(((int)raw_data[2]<<8) | raw_data[3])
-				self.mag_data[2] = (int)(((int)raw_data[4]<<8) | raw_data[5])
+			if not (raw_data[6] & 0x08):
+				self.mag_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
+				self.mag_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
+				self.mag_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
 
 	def get_ares(self):
 
 		if self.a_scale == self.__AFS_2G:
-			self.a_res = = 2.0/32768.0
+			self.a_res = 2.0/32768.0
 
 		elif self.a_scale == self.__AFS_4G:
-			self.a_res = = 4.0/32768.0
+			self.a_res = 4.0/32768.0
 
 		elif self.a_scale == self.__AFS_8G:
-			self.a_res = = 8.0/32768.0
+			self.a_res = 8.0/32768.0
 
 		elif self.a_scale == self.__AFS_16G:
-			self.a_res = = 16.0/32768.0
+			self.a_res = 16.0/32768.0
 
 	def get_gres(self):
 
-		if self.g_scale == self.__GFS_250DPS
+		if self.g_scale == self.__GFS_250DPS:
 			self.g_res = 250.0/32768.0
 
-		elif self.g_scale == self.__GFS_500DPS
+		elif self.g_scale == self.__GFS_500DPS:
 			self.g_res = 500.0/32768.0
 
-		elif self.g_scale == self.__GFS_1000DPS
+		elif self.g_scale == self.__GFS_1000DPS:
 			self.g_res = 1000.0/32768.0
 
-		elif self.g_scale == self.__GFS_2000DPS
+		elif self.g_scale == self.__GFS_2000DPS:
 			self.g_res = 2000.0/32768.0
 
 	def get_mres(self):
 
-		if self.m_scale == self.__MFS_14BITS
+		if self.m_scale == self.__MFS_14BITS:
 			self.m_res = 10.0*4912.0/8190.0
 
-		elif self.m_scale == self.__MFS_16BITS
+		elif self.m_scale == self.__MFS_16BITS:
 			self.m_res = 10.0*4912.0/32760.0
 
 	def calibrate(self):
@@ -361,7 +357,7 @@ class MPU9250:
 
 			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
 			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
-			fifo_count = ((uint16_t)data_0 << 8) | data_1
+			fifo_count = int(data_0 << 8) | data_1
 
 			packet_count = fifo_count/12
 
@@ -369,37 +365,37 @@ class MPU9250:
 
 				accel_temp = np.zeros((3,))
 				gyro_temp = np.zeros((3,))
-
+				
 				data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
 
-				accel_temp[0] = (((int)data[0] << 8) | data[1]  )
-				accel_temp[1] = (((int)data[2] << 8) | data[3]  )
-    			accel_temp[2] = (((int)data[4] << 8) | data[5]  )
-    			gyro_temp[0]  = (((int)data[6] << 8) | data[7]  )
-    			gyro_temp[1]  = (((int)data[8] << 8) | data[9]  )
-    			gyro_temp[2]  = (((int)data[10] << 8) | data[11])
+				accel_temp[0] = (int(data[0] << 8) | data[1]  )
+				accel_temp[1] = (int(data[2] << 8) | data[3]  )
+				accel_temp[2] = (int(data[4] << 8) | data[5]  )
+				gyro_temp[0]  = (int(data[6] << 8) | data[7]  )
+				gyro_temp[1]  = (int(data[8] << 8) | data[9]  )
+				gyro_temp[2]  = (int(data[10] << 8) | data[11])
 
-				accel_bias[0] += (int)accel_temp[0]
-				accel_bias[1] += (int)accel_temp[1]
-				accel_bias[2] += (int)accel_temp[2]
-				gyro_bias[0]  += (int)gyro_temp[0]
-				gyro_bias[1]  += (int)gyro_temp[1]
-				gyro_bias[2]  += (int)gyro_temp[2]
+				accel_bias[0] += int(accel_temp[0])
+				accel_bias[1] += int(accel_temp[1])
+				accel_bias[2] += int(accel_temp[2])
+				gyro_bias[0]  += int(gyro_temp[0])
+				gyro_bias[1]  += int(gyro_temp[1])
+				gyro_bias[2]  += int(gyro_temp[2])
 
 				i = i + 1
 
-			accel_bias[0] /= (int)packet_count
-			accel_bias[1] /= (int)packet_count
-			accel_bias[2] /= (int)packet_count
-			gyro_bias[0]  /= (int)packet_count
-			gyro_bias[1]  /= (int)packet_count
-			gyro_bias[2]  /= (int)packet_count
+			accel_bias[0] /= int(packet_count) 
+			accel_bias[1] /= int(packet_count)
+			accel_bias[2] /= int(packet_count)
+			gyro_bias[0]  /= int(packet_count)
+			gyro_bias[1]  /= int(packet_count)
+			gyro_bias[2]  /= int(packet_count)
 
-			if accel_bias[2] > (long)0:
-				accel_bias[2] -= (int)accelsensitivity
+			if accel_bias[2] > long(0):
+				accel_bias[2] -= int(accelsensitivity)
 
 			else:
-				accel_bias[2] += (int)accelsensitivity
+				accel_bias[2] += int(accelsensitivity)
 
 			# just check this with kris winer, i think we dont need it #
 			#data[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
@@ -409,17 +405,17 @@ class MPU9250:
 			#ata[4] = (-gyro_bias[2]/4  >> 8) & 0xFF
 			#data[5] = (-gyro_bias[2]/4        & 0xFF
 
-			self.gyro_bias[0] = (float)gyro_bias[0]/(float)gyrosensitivity
-			self.gyro_bias[1] = (float)gyro_bias[1]/(float)gyrosensitivity
-			self.gyro_bias[2] = (float)gyro_bias[2]/(float)gyrosensitivity
+			self.gyro_bias[0] = float(gyro_bias[0])/float(gyrosensitivity)
+			self.gyro_bias[1] = float(gyro_bias[1])/float(gyrosensitivity)
+			self.gyro_bias[2] = float(gyro_bias[2])/float(gyrosensitivity)
 
 			accel_bias_reg = np.zeros((3,1))
 			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
-			accel_bias_reg[0] = (int)((int16_t)data[0] << 8) | data[1]
+			accel_bias_reg[0] = int(int(data[0] << 8) | data[1])
 			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
-			accel_bias_reg[1] = (int)((int16_t)data[0] << 8) | data[1]
+			accel_bias_reg[1] = int(int(data[0] << 8) | data[1])
 			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
-			accel_bias_reg[2] = (int)((int16_t)data[0] << 8) | data[1]
+			accel_bias_reg[2] = int(int(data[0] << 8) | data[1])
 
 			# dont think this is needed neither is the above#
 			#mask = (long)1
@@ -433,9 +429,9 @@ class MPU9250:
 			#accel_bias_reg[1] -= (accel_bias[1]/8)
 			#accel_bias_reg[2] -= (accel_bias[2]/8)
 
-			self.accel_bias[0] = (float)accel_bias[0]/(float)accelsensitivity
-			self.accel_bias[1] = (float)accel_bias[1]/(float)accelsensitivity
-			self.accel_bias[2] = (float)accel_bias[2]/(float)accelsensitivity
+			self.accel_bias[0] = float(accel_bias[0])/float(accelsensitivity)
+			self.accel_bias[1] = float(accel_bias[1])/float(accelsensitivity)
+			self.accel_bias[2] = float(accel_bias[2])/float(accelsensitivity)
 
 		print "MPU calibration sequence finished"
 

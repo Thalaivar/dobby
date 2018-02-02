@@ -9,7 +9,7 @@ Chosen hardware : BeagleBone Blue
 Tasks to do:
 ------------
 
-~~* Write MPU9250 driver.~~
+* ~~Write MPU9250 driver.~~
 * Write BMP180 driver.
 * Write Motor driver.
 * Write AHRS algorithm.

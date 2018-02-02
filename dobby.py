@@ -12,35 +12,35 @@ import math
 class MPU9250:
 
 	#	defining class variables here	#
-    a_scale = None
-   	g_scale = None
-   	m_scale = None
-   	mag_mode = None
-   	mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
-   	mag_bias = None
+	a_scale = None
+	g_scale = None
+	m_scale = None
+	mag_mode = None
+	mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
+	mag_bias = None
 	a_res = None
-   	g_res = None
-   	m_res = None
-   	accel_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
-   	gyro_data = np.zeros((3,)) # faster than list.. [0, 0 ,0]
-   	mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
-   	accel_bias = np.zeros((3,))
-   	gyro_bias = np.zeros((3,))
-    g_vector = None
+	g_res = None
+	m_res = None
+	accel_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
+	gyro_data = np.zeros((3,)) # faster than list.. [0, 0 ,0]
+	mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
+	accel_bias = np.zeros((3,))
+	gyro_bias = np.zeros((3,))
+	g_vector = None
 
-    ACCEL_2G = 0x00
+	ACCEL_2G = 0x00
 	ACCEL_4G = 0x01
 	ACCEL_8G = 0x02
 	ACCEL_16G = 0x03
-
+	
 	GYRO_250DPS = 0X00
 	GYRO_500DPS = 0X01
 	GYRO_1000DPS = 0X02
 	GYRO_2000DPS = 0X03
-
+	
 	MAG_14BITS = 0x00
 	MAG_16BITS = 0x01
-
+	
 	MAG_100_HZ = 0x06
 	MAG_8_HZ = 0x02
 
@@ -213,28 +213,28 @@ class MPU9250:
 	__MAGBIAS_Z = None
 
 	def __init__(self, Ascale, Gscale, Mscale, magMode):
-		if Ascale not in [__AFS_2G, __AFS_4G, __AFS_8G, __AFS_16G]:
+		if Ascale not in [self.__AFS_2G, self.__AFS_4G, self.__AFS_8G, self.__AFS_16G]:
 			raise ValueError('ACCEL_SETTINGS: Incorrect accel scale chosen!\n')
 			return False
 
 		else:
 			self.a_scale = Ascale
 
-			if Gscale not in [__GFS_250DPS, __GFS_500DPS, __GFS_1000DPS, __GFS_2000DPS]:
-				raise ValueError('GYRO_SETTINGS: Incorrect gyro scale chosen!\n'))
+			if Gscale not in [self.__GFS_250DPS, self.__GFS_500DPS, self.__GFS_1000DPS, self.__GFS_2000DPS]:
+				raise ValueError('GYRO_SETTINGS: Incorrect gyro scale chosen!\n')
 				return False
 
 			else:
 				self.g_scale = Gscale
 
-				if Mscale not in [__MFS_14BITS, __MFS_16BITS]:
-					raise ValueError('MAG_SETTINGS: Incorrect mag scale chosen!\n'))
+				if Mscale not in [self.__MFS_14BITS, self.__MFS_16BITS]:
+					raise ValueError('MAG_SETTINGS: Incorrect mag scale chosen!\n')
 					return False
 
 				else:
 					self.m_scale = Mscale
 
-					if magMode not in [__MAG_MODE_100, __MAG_MODE_8]:
+					if magMode not in [self.__MAG_MODE_100, self.__MAG_MODE_8]:
 						raise ValueError('MAG_SETTINGS: Incorrect mag mode chosen!\n')
 						return False
 
@@ -250,7 +250,7 @@ class MPU9250:
 						self.get_ares()
 						self.get_gres()
 						self.get_mres()
-						return True
+						return None
 
 
 
@@ -515,10 +515,10 @@ class MPU9250:
 # ******************************************************************************************* #
 
 class BMP280:
-    temperature = 0
-    altitude = 0
-    pressure = 0
-
+	temperature = 0
+	altitude = 0
+	pressure = 0
+	
 	SEA_LEVEL_HPA = 1013.25
 	BMP_I2C_BUS = 2
 
@@ -709,3 +709,5 @@ class AHRS(MPU9250):
     def convert_accel_to_euler(self):
 		self.accel_pitch = math.asin(-MPU9250.accel_data[0]/MPU9250.g_vector)
 		self.accel_roll  = math.asin(MPU9250.accel_data[1]/(math.cos(self.accel_pitch*MPU9250.g_vector)))
+	
+	def scale_imu_readings()

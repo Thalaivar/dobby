@@ -10,7 +10,7 @@
 
 
 import sys
-sys.path.insert('/home/debian/dobby/imu/')
+sys.path.insert(0, '/home/debian/dobby/imu/')
 
 from dobby_imu import MPU9250
 
@@ -48,6 +48,9 @@ class AHRS(MPU9250):
 		self.accel_pitch = self.accel_pitch * 180 / math.pi
 		self.accel_roll  = self.accel_roll  * 180 / math.pi
 		# yaw?
+	def debug(self):
+		
+		print(MPU9250.gyro_bias)
 
 	def convert_gyro_to_euler(self):
 			gx = self.gyro_data[0]

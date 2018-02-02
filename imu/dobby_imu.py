@@ -14,7 +14,7 @@ class MPU9250:
 	m_scale = None
 	mag_mode = None
 	mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
-	mag_bias = None
+	mag_bias = np.zeros((3,))
 	a_res = None
 	g_res = None
 	m_res = None
@@ -23,7 +23,7 @@ class MPU9250:
 	mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
 	accel_bias = np.zeros((3,))
 	gyro_bias = np.zeros((3,))
-	norm_adata = None
+	norm_adata = 0
 
 	ACCEL_2G = 0x00
 	ACCEL_4G = 0x01
@@ -204,34 +204,34 @@ class MPU9250:
 
 	bus = smbus.SMBus(2)
 
-	__MAGBIAS_X = None
-	__MAGBIAS_Y = None
-	__MAGBIAS_Z = None
+	__MAGBIAS_X = 0
+	__MAGBIAS_Y = 0
+	__MAGBIAS_Z = 0
 
 	def __init__(self, Ascale, Gscale, Mscale, magMode):
 
-		if Ascale not in [__AFS_2G, __AFS_4G, __AFS_8G, __AFS_16G]:
+		if Ascale not in [self.__AFS_2G, self.__AFS_4G, self.__AFS_8G, self.__AFS_16G]:
 			raise ValueError('ACCEL_SETTINGS: Incorrect accel scale chosen!\n')
 			return False
 
 		else:
 			self.a_scale = Ascale
 
-			if Gscale not in [__GFS_250DPS, __GFS_500DPS, __GFS_1000DPS, __GFS_2000DPS]:
+			if Gscale not in [self.__GFS_250DPS, self.__GFS_500DPS, self.__GFS_1000DPS, self.__GFS_2000DPS]:
 				raise ValueError('GYRO_SETTINGS: Incorrect gyro scale chosen!\n')
 				return False
 
 			else:
 				self.g_scale = Gscale
 
-				if Mscale not in [__MFS_14BITS, __MFS_16BITS]:
+				if Mscale not in [self.__MFS_14BITS, self.__MFS_16BITS]:
 					raise ValueError('MAG_SETTINGS: Incorrect mag scale chosen!\n')
 					return False
 
 				else:
 					self.m_scale = Mscale
 
-					if magMode not in [__MAG_MODE_100, __MAG_MODE_8]:
+					if magMode not in [self.__MAG_MODE_100, self.__MAG_MODE_8]:
 						raise ValueError('MAG_SETTINGS: Incorrect mag mode chosen!\n')
 						return False
 
@@ -247,7 +247,7 @@ class MPU9250:
 						self.get_ares()
 						self.get_gres()
 						self.get_mres()
-
+						self.print_config()
 		# instead of putting scale functions
 		# How about when we read_accel we store only after scaling?
 		# modification done, have removed scale_rawdata()
@@ -335,9 +335,9 @@ class MPU9250:
 		self.gyro_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
 		self.gyro_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
 
-		self.gyro_data[i] = (self.gyro_data[i] * self.g_res) - self.gyro_bias[i]
-		self.gyro_data[i] = (self.gyro_data[i] * self.g_res) - self.gyro_bias[i]
-		self.gyro_data[i] = (self.gyro_data[i] * self.g_res) - self.gyro_bias[i]
+		self.gyro_data[0] = (self.gyro_data[0] * self.g_res) - self.gyro_bias[0]
+		self.gyro_data[1] = (self.gyro_data[1] * self.g_res) - self.gyro_bias[1]
+		self.gyro_data[2] = (self.gyro_data[2] * self.g_res) - self.gyro_bias[2]
 
 
 	def read_mag(self):
@@ -350,9 +350,9 @@ class MPU9250:
 				self.mag_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
 				self.mag_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
 
-				self.mag_data[i] = (self.mag_data[i] * self.m_res) - self.mag_bias[i]
-				self.mag_data[i] = (self.mag_data[i] * self.m_res) - self.mag_bias[i]
-				self.mag_data[i] = (self.mag_data[i] * self.m_res) - self.mag_bias[i]
+				self.mag_data[0] = (self.mag_data[0] * self.m_res) - self.mag_bias[0]
+				self.mag_data[1] = (self.mag_data[1] * self.m_res) - self.mag_bias[1]
+				self.mag_data[2] = (self.mag_data[2] * self.m_res) - self.mag_bias[2]
 
 	def get_ares(self):
 
@@ -514,7 +514,7 @@ class MPU9250:
 		self.read_gyro()
 		self.read_mag()
 		self.norm_adata	= math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
-
+	
 	def calibrate_accel(self):
 		print("********************************************\n")
 		print("initializing accelerometer calibration sequence")
@@ -523,3 +523,9 @@ class MPU9250:
 
 	def debug_print_vals(self):
 		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data
+
+	
+	def print_config(self):
+		print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
+		print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"
+		print "G =	", self.norm_adata

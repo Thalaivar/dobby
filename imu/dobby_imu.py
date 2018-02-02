@@ -182,9 +182,9 @@ class MPU9250:
 		self.mag_mode = magMode
 		self.mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
 		self.mag_bias = [self.__MAGBIAS_X, self.__MAGBIAS_Y, self.__MAGBIAS_Z]
-		self.ares = None
-		self.gres = None
-		self.mres = None
+		self.a_res = None
+		self.g_res = None
+		self.m_res = None
 		self.accel_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
 		self.gyro_data = np.zeros((3,)) # faster than list.. [0, 0 ,0]
 		self.mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
@@ -437,9 +437,9 @@ class MPU9250:
 
 
 	def update(self):
-		self.read_accel(self)
-		self.read_gyro(self)
-		self.read_mag(self)
+		self.read_accel()
+		self.read_gyro()
+		self.read_mag()
 
 	def debug_print_vals(self):
 		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data

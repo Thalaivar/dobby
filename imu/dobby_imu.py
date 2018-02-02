@@ -7,7 +7,7 @@ import numpy as np
 # need to add function to change
 # which is faster, referenicng a class attribute "accel_data" evrery time or return ax, ay, az??
 class MPU9250:
-	__AK8963_ADDRESS   =  0x0C<<1
+	__AK8963_ADDRESS   =  0x0C
 	__AK8963_WHO_AM_I  =  0x00
 	__AK8963_INFO      =  0x01
 	__AK8963_ST1       =  0x02

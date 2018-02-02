@@ -203,62 +203,62 @@ class MPU9250:
 	def init_mpu(self):
 
 		# wake up device
-		bus.write_byte_data(self.__MPU9250_ADDRESS,self.__PWR_MGMT_1, 0X00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS,self.__PWR_MGMT_1, 0X00)
 		time.sleep(0.1)
 
 		# get stable time source
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
 
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x03)
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x04)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x03)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x04)
 
-		c = bus.read_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG)
+		c = self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG)
 		c = c & ~0x02
 		c = c & ~0x18
 		c = c | self.g_scale << 3
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, c)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, c)
 
-		c = bus.read_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG)
+		c = self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG)
 		c = c & ~0x18
 		c = c | self.a_scale << 3
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, c)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, c)
 
-		c = bus.read_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2)
+		c = self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2)
 		c = c & ~0x0F
 		c = c | 0x03
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2, c)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2, c)
 
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_PIN_CFG, 0x22)
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x01)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_PIN_CFG, 0x22)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x01)
 
 	def init_ak8963(self):
 
-		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
+		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.01)
-		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x0F)
+		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x0F)
 		time.sleep(0.01)
 
-		rawData = bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_ASAX, 3)
+		rawData = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_ASAX, 3)
 
 		for i in range(3):
 			self.mag_calibration[i] = float((rawData[i] - 128)/256.0 + 1.0)
 			i = i + 1
 
-		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
+		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.1)
 
-		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, self.m_scale << 4 | self.mag_mode)
+		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, self.m_scale << 4 | self.mag_mode)
 		time.sleep(0.1)
 
 	def reset_mpu(self):
 
-		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
 		time.sleep(0.1)
 
 	def read_accel(self):
 
-		raw_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
-		
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
+
 		self.accel_data[0] = int(((raw_data[0] << 8) | raw_data[1]))
 		self.accel_data[1] = int(((raw_data[2] << 8) | raw_data[3]))
 		self.accel_data[2] = int(((raw_data[4] << 8) | raw_data[5]))
@@ -266,7 +266,7 @@ class MPU9250:
 
 	def read_gyro(self):
 
-		raw_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
 
 		self.gyro_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
 		self.gyro_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
@@ -275,8 +275,8 @@ class MPU9250:
 
 	def read_mag(self):
 
-		if bus.read_byte_data(self.AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
-			raw_data = bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
+		if self.bus.read_byte_data(self.AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
+			raw_data = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
 
 			if not (raw_data[6] & 0x08):
 				self.mag_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
@@ -328,35 +328,35 @@ class MPU9250:
 		option = raw_input("Press Y to continue or anything else to quit\n")
 
 		if option == 'Y':
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
 			time.sleep(0.1)
 
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_2, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_2, 0x00)
 			time.sleep(0.1)
 
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__I2C_MST_CTRL, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x0C)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__I2C_MST_CTRL, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x0C)
 			time.sleep(0.015)
 
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x01)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, 0x00)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x01)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, 0x00)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, 0x00)
 
 			gyrosensitivity  = 131
 			accelsensitivity = 16384
 
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x40)
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x78)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x40)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x78)
 			time.sleep(0.04)
 
-			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
-			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
+			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
+			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
 			fifo_count = int(data_0 << 8) | data_1
 
 			packet_count = fifo_count/12
@@ -365,8 +365,8 @@ class MPU9250:
 
 				accel_temp = np.zeros((3,))
 				gyro_temp = np.zeros((3,))
-				
-				data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
+
+				data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
 
 				accel_temp[0] = (int(data[0] << 8) | data[1]  )
 				accel_temp[1] = (int(data[2] << 8) | data[3]  )
@@ -384,7 +384,7 @@ class MPU9250:
 
 				i = i + 1
 
-			accel_bias[0] /= int(packet_count) 
+			accel_bias[0] /= int(packet_count)
 			accel_bias[1] /= int(packet_count)
 			accel_bias[2] /= int(packet_count)
 			gyro_bias[0]  /= int(packet_count)
@@ -410,11 +410,11 @@ class MPU9250:
 			self.gyro_bias[2] = float(gyro_bias[2])/float(gyrosensitivity)
 
 			accel_bias_reg = np.zeros((3,1))
-			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
+			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
 			accel_bias_reg[0] = int(int(data[0] << 8) | data[1])
-			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
+			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
 			accel_bias_reg[1] = int(int(data[0] << 8) | data[1])
-			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
+			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
 			accel_bias_reg[2] = int(int(data[0] << 8) | data[1])
 
 			# dont think this is needed neither is the above#

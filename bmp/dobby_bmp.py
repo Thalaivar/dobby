@@ -143,7 +143,7 @@ class BMP280:
 
 	def read_altitude(self):
 
-			self.pressure = self.read_pressure()
+			self.read_pressure()
 			self.pressure /= 100
 
 			self.altitude = 44330 * (1.0 - math.pow(self.pressure / self.SEA_LEVEL_HPA, 0.1903))

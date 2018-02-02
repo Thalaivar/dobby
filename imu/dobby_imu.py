@@ -526,4 +526,3 @@ class MPU9250:
 	def print_config(self):
 		print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
 		print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"
-		print "G =	", self.norm_adata

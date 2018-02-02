@@ -44,15 +44,12 @@ class AHRS(MPU9250):
 
 		self.norm_adata	= math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
 
-		self.accel_pitch = -(math.asin(MPU9250.accel_data[0]/MPU9250.norm_adata))
-		self.accel_roll  = math.asin(MPU9250.accel_data[1]/(MPU9250.norm_adata * math.cos(self.accel_pitch)))
+		self.accel_pitch = -(math.asin(MPU9250.accel_data[0]/self.norm_adata))
+		self.accel_roll  = math.asin(MPU9250.accel_data[1]/(self.norm_adata * math.cos(self.accel_pitch)))
 
 		self.accel_pitch = self.accel_pitch * 180 / math.pi
 		self.accel_roll  = self.accel_roll  * 180 / math.pi
 		# yaw?
-	def debug(self):
-
-		print(MPU9250.gyro_bias)
 
 	def convert_gyro_to_euler(self):
 			gx = self.gyro_data[0]

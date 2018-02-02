@@ -99,7 +99,7 @@ class BMP280:
 			print "BMP280 sensor detected!\n"
 			self.read_coefficients()
 
-			self.write_byte(self.__BMP280__BMP280_REGISTER_CONTROL, 0x3F)
+			self.write_byte(self.__BMP280_REGISTER_CONTROL, 0x3F)
 			return True
 
 	def read_temperature(self):
@@ -107,7 +107,7 @@ class BMP280:
 		adc_t >>= 4
 
 		var_1 = (((adc_t>>3) - (int(self.config_class.dig_T1 <<1)))*(int(self.config_class.dig_T2))) >> 11
-		var_2 = (((((adc_t>>4) - ((int(self.config_class.dig_T1))))*((adc_t>>4) - (int(self.config_class.dig_T1)))) >> 12)*(int(_bmp280_calib.dig_T3))) >> 14
+		var_2 = (((((adc_t>>4) - ((int(self.config_class.dig_T1))))*((adc_t>>4) - (int(self.config_class.dig_T1)))) >> 12)*(int(self.config_class.dig_T3))) >> 14
 
 		#incase you cant find it t_fine is int_32t
 		self.t_fine = var_1 + var_2

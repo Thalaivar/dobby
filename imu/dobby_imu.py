@@ -179,6 +179,7 @@ class MPU9250:
 	__MAGBIAS_Z = None
 
 	def __init__(self, Ascale, Gscale, Mscale, magMode):
+		## all the parameters and variables of mpu class ##
 		self.a_scale = Ascale
 		self.g_scale = Gscale
 		self.m_scale = Mscale
@@ -193,6 +194,15 @@ class MPU9250:
 		self.mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
 		self.accel_bias = np.zeros((3,))
 		self.gyro_bias = np.zeros((3,))
+
+		## methods to be called during initialization of mpu ##
+		# need to add error and exception handling
+		self.init_mpu(self)
+		self.init_ak89639(self)
+		self.calibrate(self)
+		self.get_ares(self)
+		self.get_gres(self)
+		self.get_mres(self)
 
 	def init_mpu(self):
 
@@ -236,6 +246,7 @@ class MPU9250:
 
 		for i in range(3):
 			self.mag_calibration[i] = (float)(rawData[i] - 128)/256.0 + 1.0
+			i = i + 1
 
 		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.1)
@@ -313,6 +324,8 @@ class MPU9250:
 			self.m_res = 10.0*4912.0/32760.0
 
 	def calibrate(self):
+		accel_bias = np.zeros((3,))
+		gyro_bias = np.zeros((3,))
 
 		print("\nThis program will generate a new gyro calibration file\n")
 		print("keep your beaglebone very still for this procedure.\n")
@@ -341,4 +354,96 @@ class MPU9250:
 
 			gyrosensitivity  = 131
 			accelsensitivity = 16384
-			
+
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x40)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x78)
+			time.sleep(0.04)
+
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
+			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
+			fifo_count = ((uint16_t)data_0 << 8) | data_1
+
+			packet_count = fifo_count/12
+
+			for i in range(packet_count):
+
+				accel_temp = np.zeros((3,))
+				gyro_temp = np.zeros((3,))
+
+				data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
+
+				accel_temp[0] = (((int)data[0] << 8) | data[1]  )
+				accel_temp[1] = (((int)data[2] << 8) | data[3]  )
+    			accel_temp[2] = (((int)data[4] << 8) | data[5]  )
+    			gyro_temp[0]  = (((int)data[6] << 8) | data[7]  )
+    			gyro_temp[1]  = (((int)data[8] << 8) | data[9]  )
+    			gyro_temp[2]  = (((int)data[10] << 8) | data[11])
+
+				accel_bias[0] += (int)accel_temp[0]
+				accel_bias[1] += (int)accel_temp[1]
+				accel_bias[2] += (int)accel_temp[2]
+				gyro_bias[0]  += (int)gyro_temp[0]
+				gyro_bias[1]  += (int)gyro_temp[1]
+				gyro_bias[2]  += (int)gyro_temp[2]
+
+				i = i + 1
+
+			accel_bias[0] /= (int)packet_count
+			accel_bias[1] /= (int)packet_count
+			accel_bias[2] /= (int)packet_count
+			gyro_bias[0]  /= (int)packet_count
+			gyro_bias[1]  /= (int)packet_count
+			gyro_bias[2]  /= (int)packet_count
+
+			if accel_bias[2] > (long)0:
+				accel_bias[2] -= (int)accelsensitivity
+
+			else:
+				accel_bias[2] += (int)accelsensitivity
+
+			# just check this with kris winer, i think we dont need it #
+			#data[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
+			#data[1] = (-gyro_bias[0]/4        & 0xFF
+			#data[2] = (-gyro_bias[1]/4  >> 8) & 0xFF
+			#data[3] = (-gyro_bias[1]/4        & 0xFF
+			#ata[4] = (-gyro_bias[2]/4  >> 8) & 0xFF
+			#data[5] = (-gyro_bias[2]/4        & 0xFF
+
+			self.gyro_bias[0] = (float)gyro_bias[0]/(float)gyrosensitivity
+			self.gyro_bias[1] = (float)gyro_bias[1]/(float)gyrosensitivity
+			self.gyro_bias[2] = (float)gyro_bias[2]/(float)gyrosensitivity
+
+			accel_bias_reg = np.zeros((3,1))
+			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
+			accel_bias_reg[0] = (int)((int16_t)data[0] << 8) | data[1]
+			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
+			accel_bias_reg[1] = (int)((int16_t)data[0] << 8) | data[1]
+			data_0, data_1 = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
+			accel_bias_reg[2] = (int)((int16_t)data[0] << 8) | data[1]
+
+			# dont think this is needed neither is the above#
+			#mask = (long)1
+			#mask_bit = np.zeros((3,))
+
+			#for i in range(3):
+			#	if accel_bias_reg[i] & mask:
+			#		 mask_bit[i] = 0x01
+
+			#accel_bias_reg[0] -= (accel_bias[0]/8)
+			#accel_bias_reg[1] -= (accel_bias[1]/8)
+			#accel_bias_reg[2] -= (accel_bias[2]/8)
+
+			self.accel_bias[0] = (float)accel_bias[0]/(float)accelsensitivity
+			self.accel_bias[1] = (float)accel_bias[1]/(float)accelsensitivity
+			self.accel_bias[2] = (float)accel_bias[2]/(float)accelsensitivity
+
+		print "MPU calibration sequence finished"
+
+
+	def update(self):
+		self.read_accel(self)
+		self.read_gyro(self)
+		self.read_mag(self)
+
+	def debug_print_vals(self):
+		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data

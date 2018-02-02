@@ -1,10 +1,11 @@
 import time
 import smbus
+import numpy as np
 
 # need to add some prints in reset_mpu
 # need to add calibration function for mag
 # need to add function to change
-
+# which is faster, referenicng a class attribute "accel_data" evrery time or return ax, ay, az??
 class MPU9250:
 	__AK8963_ADDRESS   =  0x0C<<1
 	__AK8963_WHO_AM_I  =  0x00
@@ -150,9 +151,26 @@ class MPU9250:
 	__ZA_OFFSET_H      =  0x7D
 	__ZA_OFFSET_L      =  0x7E
 	__MPU9250_ADDRESS  =  0x68
-	__
+
+	# choose the magnetometer sampling rate, 100Hz or 8Hz
 	__MAG_MODE_100 = 0x06
 	__MAG_MODE_8 = 0x02
+
+	# choose full scale ranges of accel
+	__AFS_2G = 0x00
+	__AFS_4G = 0x01
+	__AFS_8G = 0x02
+	__AFS_16G = 0x03
+
+	# choose full scale ranges of gyro
+	__GFS_250DPS = 0X00
+	__GFS_500DPS = 0X01
+	__GFS_1000DPS = 0X02
+	__GFS_2000DPS = 0X03
+
+	# choose full scale ranges of magnetometer
+	__MFS_14BITS = 0x00
+	__MFS_16BITS = 0x01
 
 	bus = smbus.SMBus(2)
 
@@ -165,8 +183,16 @@ class MPU9250:
 		self.g_scale = Gscale
 		self.m_scale = Mscale
 		self.mag_mode = magMode
-		self.mag_calibration = [0, 0, 0]
+		self.mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
 		self.mag_bias = [MAGBIAS_X, MAGBIAS_Y, MAGBIAS_Z]
+		self.ares = None
+		self.gres = None
+		self.mres = None
+		self.accel_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
+		self.gyro_data = np.zeros((3,)) # faster than list.. [0, 0 ,0]
+		self.mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
+		self.accel_bias = np.zeros((3,))
+		self.gyro_bias = np.zeros((3,))
 
 	def init_mpu(self):
 
@@ -180,7 +206,7 @@ class MPU9250:
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x03)
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x04)
 
-		c = bus.read_byte_Data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG)
+		c = bus.read_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG)
 		c = c & ~0x02
 		c = c & ~0x18
 		c = c | self.g_scale << 3
@@ -191,7 +217,7 @@ class MPU9250:
 		c = c | self.a_scale << 3
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, c)
 
-		c = bus.read_byte_Data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2)
+		c = bus.read_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2)
 		c = c & ~0x0F
 		c = c | 0x03
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG2, c)
@@ -199,7 +225,7 @@ class MPU9250:
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_PIN_CFG, 0x22)
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x01)
 
-	def init_ak8963():
+	def init_ak8963(self):
 
 		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.01)
@@ -217,14 +243,102 @@ class MPU9250:
 		bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, self.m_scale << 4 | self.mag_mode)
 		time.sleep(0.1)
 
-	def reset_mpu():
+	def reset_mpu(self):
 
 		bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
 		time.sleep(0.1)
 
 	def read_accel(self):
 
-		self.accel_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
+		raw_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
 
-		for i in range(3):
-			self.accel_data
+		self.accel_data[0] = (int)(((int)raw_data[0]<<8) | raw_data[1])
+		self.accel_data[1] = (int)(((int)raw_data[2]<<8) | raw_data[3])
+		self.accel_data[2] = (int)(((int)raw_data[4]<<8) | raw_data[5])
+
+
+	def read_gyro(self):
+
+		raw_data = bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
+
+		self.gyro_data[0] = (int)(((int)raw_data[0]<<8) | raw_data[1])
+		self.gyro_data[1] = (int)(((int)raw_data[2]<<8) | raw_data[3])
+		self.gyro_data[2] = (int)(((int)raw_data[4]<<8) | raw_data[5])
+
+
+	def read_mag(self):
+
+		if bus.read_byte_data(self.AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
+			raw_data = bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
+
+			if !(raw_data[6] & 0x08):
+				self.mag_data[0] = (int)(((int)raw_data[0]<<8) | raw_data[1])
+				self.mag_data[1] = (int)(((int)raw_data[2]<<8) | raw_data[3])
+				self.mag_data[2] = (int)(((int)raw_data[4]<<8) | raw_data[5])
+
+	def get_ares(self):
+
+		if self.a_scale == self.__AFS_2G:
+			self.a_res = = 2.0/32768.0
+
+		elif self.a_scale == self.__AFS_4G:
+			self.a_res = = 4.0/32768.0
+
+		elif self.a_scale == self.__AFS_8G:
+			self.a_res = = 8.0/32768.0
+
+		elif self.a_scale == self.__AFS_16G:
+			self.a_res = = 16.0/32768.0
+
+	def get_gres(self):
+
+		if self.g_scale == self.__GFS_250DPS
+			self.g_res = 250.0/32768.0
+
+		elif self.g_scale == self.__GFS_500DPS
+			self.g_res = 500.0/32768.0
+
+		elif self.g_scale == self.__GFS_1000DPS
+			self.g_res = 1000.0/32768.0
+
+		elif self.g_scale == self.__GFS_2000DPS
+			self.g_res = 2000.0/32768.0
+
+	def get_mres(self):
+
+		if self.m_scale == self.__MFS_14BITS
+			self.m_res = 10.0*4912.0/8190.0
+
+		elif self.m_scale == self.__MFS_16BITS
+			self.m_res = 10.0*4912.0/32760.0
+
+	def calibrate(self):
+
+		print("\nThis program will generate a new gyro calibration file\n")
+		print("keep your beaglebone very still for this procedure.\n")
+		option = raw_input("Press Y to continue or anything else to quit\n")
+
+		if option == 'Y':
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
+			time.sleep(0.1)
+
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_2, 0x00)
+			time.sleep(0.1)
+
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__I2C_MST_CTRL, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x0C)
+			time.sleep(0.015)
+
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x01)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, 0x00)
+			bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, 0x00)
+
+			gyrosensitivity  = 131
+			accelsensitivity = 16384
+			

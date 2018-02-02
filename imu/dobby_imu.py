@@ -181,7 +181,7 @@ class MPU9250:
 		self.m_scale = Mscale
 		self.mag_mode = magMode
 		self.mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
-		self.mag_bias = [MAGBIAS_X, MAGBIAS_Y, MAGBIAS_Z]
+		self.mag_bias = [self.__MAGBIAS_X, self.__MAGBIAS_Y, self.__MAGBIAS_Z]
 		self.ares = None
 		self.gres = None
 		self.mres = None

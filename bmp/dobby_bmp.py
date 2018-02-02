@@ -59,7 +59,9 @@ class BMP280:
 	# read8/write8 is write/read_byte_data
 	# read16/write16 is read/write_i2c_block_data
 	# first param is always __BMP280_ADDRESS
+
 	# second param is Registers
+
 	# third is number of bytes
 
 	def read_byte(self, register):

@@ -46,7 +46,7 @@ class BMP280:
 	bus = smbus.SMBus(BMP_I2C_BUS)
 
 	def __init__(self):
-		self.config_class = config_class()
+		self.config_class = self.config_class()
 		self.temperature = None
 		self.t_fine 	 = None
 		self.pressure  	 = None

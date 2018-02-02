@@ -121,7 +121,7 @@ class BMP280:
 		adc_p = self.read_24_bits(self.__BMP280_REGISTER_PRESSUREDATA)
 		adc_p >>= 4
 
-		var1 = (int(t_fine)) - 128000
+		var1 = (int(self.t_fine)) - 128000
 		var2 = var1 * var1 * (int(self.config_class.dig_P6))
 		var2 = var2 + ((var1*(int(self.config_class.dig_P5)))<<17)
 		var2 = var2 + ((int(self.config_class.dig_P4))<<35)

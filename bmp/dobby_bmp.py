@@ -13,10 +13,10 @@ import math
 # note : while adding params library, we could make SEA_LEVEL_HPA changeable, need to write func for that #
 class BMP280:
 	SEA_LEVEL_HPA = 1013.25
-
+	BMP_I2C_BUS = 2
 	#	I2C Addresses	#
 	__BMP280_ADDRESS               = 0x77
-    __BMP280_CHIPID                = 0x58
+	__BMP280_CHIPID                = 0x58
 
 	# 	Registers	#
 	__BMP280_REGISTER_DIG_T1       = 0x88
@@ -69,7 +69,7 @@ class BMP280:
 
 	def read_16_bits(self, register):
 		data = self.bus.i2c_read_block_data(self.__BMP280_ADDRESS, register, 2)
-		value = (data[0] << 8) | data[1])
+		value = ((data[0] << 8) | data[1])
 		return value
 
 	def read_16_bits_signed(self, register):
@@ -93,7 +93,7 @@ class BMP280:
 		adc_t >>= 4
 
 		var_1 = (((adc_t>>3) - (int(self.config_class.dig_T1 <<1)))*(int(self.config_class.dig_T2))) >> 11
-		var_2 = (((((adc_t>>4) - ((int(self.config_class.dig_T1))))*((adc_t>>4) - (int(self.config_class.dig_T1)))) >> 12)*((int32_t)_bmp280_calib.dig_T3)) >> 14
+		var_2 = (((((adc_t>>4) - ((int(self.config_class.dig_T1))))*((adc_t>>4) - (int(self.config_class.dig_T1)))) >> 12)*(int(_bmp280_calib.dig_T3))) >> 14
 
 		#incase you cant find it t_fine is int_32t
 		self.t_fine = var_1 + var_2
@@ -134,42 +134,40 @@ class BMP280:
 
 			self.altitude = 44330 * (1.0 - math.pow(self.pressure / self.SEA_LEVEL_HPA, 0.1903))
 
-	private:
-
-		class config_class:
-			def __init__(self):
-				self.dig_T1 = None
-				self.dig_T2 = None
-				self.dig_T3 = None
-
-				self.dig_P1 = None
-				self.dig_P2 = None
-				self.dig_P3 = None
-				self.dig_P4 = None
-				self.dig_P5 = None
-				self.dig_P6 = None
-				self.dig_P7 = None
-				self.dig_P8 = None
-				self.dig_P9 = None
-
-				self.dig_H1 = None
-				self.dig_H2 = None
-				self.dig_H3 = None
-				self.dig_H4 = None
-				self.dig_H5 = None
-				self.dig_H6 = None
-
-		def read_coefficients(self):
-			self.config_class.dig_T1 = self.read_16_bits_LE(self.__BMP280_REGISTER_DIG_T1)
-			self.config_class.dig_T2 = self.read_16_bits_signed_LE(self.__BMP280_REGISTER_DIG_T2)
-			self.config_class.dig_T3 = self.read_16_bits_signed_LE(self.__BMP280_REGISTER_DIG_T3)
-
-			self.config_class.dig_P1 = self.read_16_bits_LE(self.__BMP280__BMP280_REGISTER_DIG_P1)
-			self.config_class.dig_P2 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P2)
-			self.config_class.dig_P3 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P3)
-			self.config_class.dig_P4 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P4)
-			self.config_class.dig_P5 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P5)
-			self.config_class.dig_P6 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P6)
-			self.config_class.dig_P7 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P7)
-			self.config_class.dig_P8 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P8)
-			self.config_class.dig_P9 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P9)
+	class config_class:
+		def __init__(self):
+			self.dig_T1 = None
+			self.dig_T2 = None
+			self.dig_T3 = None
+	
+			self.dig_P1 = None
+			self.dig_P2 = None
+			self.dig_P3 = None
+			self.dig_P4 = None
+			self.dig_P5 = None
+			self.dig_P6 = None
+			self.dig_P7 = None
+			self.dig_P8 = None
+			self.dig_P9 = None
+	
+			self.dig_H1 = None
+			self.dig_H2 = None
+			self.dig_H3 = None
+			self.dig_H4 = None
+			self.dig_H5 = None
+			self.dig_H6 = None
+	
+	def read_coefficients(self):
+		self.config_class.dig_T1 = self.read_16_bits_LE(self.__BMP280_REGISTER_DIG_T1)
+		self.config_class.dig_T2 = self.read_16_bits_signed_LE(self.__BMP280_REGISTER_DIG_T2)
+		self.config_class.dig_T3 = self.read_16_bits_signed_LE(self.__BMP280_REGISTER_DIG_T3)
+	
+		self.config_class.dig_P1 = self.read_16_bits_LE(self.__BMP280__BMP280_REGISTER_DIG_P1)
+		self.config_class.dig_P2 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P2)
+		self.config_class.dig_P3 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P3)
+		self.config_class.dig_P4 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P4)
+		self.config_class.dig_P5 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P5)
+		self.config_class.dig_P6 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P6)
+		self.config_class.dig_P7 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P7)
+		self.config_class.dig_P8 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P8)
+		self.config_class.dig_P9 = self.read_16_bits_signed_LE(self.__BMP280__BMP280_REGISTER_DIG_P9)

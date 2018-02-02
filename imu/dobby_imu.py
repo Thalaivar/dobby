@@ -193,12 +193,12 @@ class MPU9250:
 
 		## methods to be called during initialization of mpu ##
 		# need to add error and exception handling
-		self.init_mpu(self)
-		self.init_ak89639(self)
-		self.calibrate(self)
-		self.get_ares(self)
-		self.get_gres(self)
-		self.get_mres(self)
+		self.init_mpu()
+		self.init_ak89639()
+		self.calibrate()
+		self.get_ares()
+		self.get_gres()
+		self.get_mres()
 
 	def init_mpu(self):
 

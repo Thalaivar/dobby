@@ -33,4 +33,26 @@ class AHRS:
 		self.accel_roll = None
 		self.accel_pitch = None
 
+
+	#list of methods in this class
+	self.convert_accel_to_euler()
+	self.update_ahrs()
+
 	def convert_accel_to_euler(self):
+
+		norm_adata = sqrt(accel_data[0]*accel_data[0] + accel_data[1]*accel_data[1] + accel_data[2]*accel_data[2])
+
+		accel_pitch = (math.asin(accel_data[0]/norm_adata))
+		accel_roll  = -math.asin(accel_data[1]/(norm_adata * math.cos(pitch)))
+
+		accel_pitch = accel_pitch * 180 / math.pi
+		accel_roll  = accel_roll  * 180 / math.pi
+		#Yaw is still left
+
+	def update_ahrs():
+			#run update_imu
+			#run conversion functions
+			#refresh values
+
+			# update_imu()
+			self.convert_accel_to_euler()

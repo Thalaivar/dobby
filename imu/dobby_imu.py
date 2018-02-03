@@ -23,7 +23,7 @@ class MPU9250:
 	mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
 	accel_bias = np.zeros((3,))
 	gyro_bias = np.zeros((3,))
-	g_vector = None
+	norm_adata = None
 
 	ACCEL_2G = 0x00
 	ACCEL_4G = 0x01
@@ -513,7 +513,6 @@ class MPU9250:
 		self.read_accel()
 		self.read_gyro()
 		self.read_mag()
-#what is g_vector? should we use before or after scaling?
 		self.norm_adata	= math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
 
 	def calibrate_accel(self):

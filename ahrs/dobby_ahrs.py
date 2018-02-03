@@ -10,11 +10,12 @@
 
 
 import sys
-sys.path.insert(0, '/home/debian/dobby/imu')
-sys.path.insert(0, '/home/debian/dobby/bmp')
+sys.path.insert('/home/debian/dobby/imu/')
+
+from dobby_imu import MPU9250
 
 import math
-class AHRS:
+class AHRS(MPU9250):
 	accel_roll   = None
 	accel_pitch  = None
 	accel_yaw    = None
@@ -35,37 +36,36 @@ class AHRS:
 
 
 	#list of methods in this class
-	self.convert_accel_to_euler()
-	self.convert_gyro_to_euler()
-	self.update_ahrs()
+	#self.convert_accel_to_euler()
+	#self.convert_gyro_to_euler()
+	#self.update_ahrs()
 
 	def convert_accel_to_euler(self):
 
-		norm_adata = sqrt(accel_data[0]*accel_data[0] + accel_data[1]*accel_data[1] + accel_data[2]*accel_data[2])
+		self.accel_pitch = -(math.asin(MPU9250.accel_data[0]/MPU9250.norm_adata))
+		self.accel_roll  = math.asin(MPU9250.accel_data[1]/(MPU9250.norm_adata * math.cos(self.accel_pitch)))
 
-		accel_pitch = (math.asin(accel_data[0]/norm_adata))
-		accel_roll  = -math.asin(accel_data[1]/(norm_adata * math.cos(pitch)))
-
-		accel_pitch = accel_pitch * 180 / math.pi
-		accel_roll  = accel_roll  * 180 / math.pi
+		self.accel_pitch = self.accel_pitch * 180 / math.pi
+		self.accel_roll  = self.accel_roll  * 180 / math.pi
 		# yaw?
 
 	def convert_gyro_to_euler(self):
-			gx = gyro_data[0]
-			gy = gyro_data[1]
-			gz = gyro_data[2]
+			gx = self.gyro_data[0]
+			gy = self.gyro_data[1]
+			gz = self.gyro_data[2]
 
 			#integrate gx gy gz to get euler angles:
 			# time step?
-	def low_pass_filter_ahrs(self):
+#	def low_pass_filter_ahrs(self):
+	
 		#implement low pass filter with proper gains for accel and gyro
 
-	def update_ahrs(self):
+#	def update_ahrs(self):
 			#run update_imu
 			#run conversion functions
 			#refresh values
 
 			# update_imu()
-			self.convert_accel_to_euler()
-			self.convert_gyro_to_euler()
-			# we can call filtering function to get ahrs_roll ahrs_pitch ahrs_yaw
+#			self.convert_accel_to_euler()
+#			self.convert_gyro_to_euler()
+#			# we can call filtering function to get ahrs_roll ahrs_pitch ahrs_yaw

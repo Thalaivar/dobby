@@ -211,14 +211,23 @@ class MPU9250:
 
 		## methods to be called during initialization of mpu ##
 		# need to add error and exception handling
-		self.reset_mpu()
-		self.calibrate()
 		self.init_mpu()
 		self.init_ak8963()
+		self.reset_mpu()
+		self.read_accel()
+		self.read_gyro()
+		self.read_mag()
 		self.get_ares()
 		self.get_gres()
 		self.get_mres()
+		self.calibrate()
+		self.scale_rawdata()
+		self.update()
 
+		#instead of putting scale functions
+		#How about when we read_accel we store only after scaling?
+		# Why is there a accel_calibrate function apart from the calibrate?
+		#added scale_rawdata function call it last in update function
 	def init_mpu(self):
 
 		# wake up device
@@ -261,7 +270,7 @@ class MPU9250:
 
 		for i in range(3):
 			self.mag_calibration[i] = float((rawData[i] - 128)/256.0 + 1.0)
-			i = i + 1
+			#i = i + 1 dont do this it will update itself
 
 		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
 		time.sleep(0.1)
@@ -402,7 +411,7 @@ class MPU9250:
 				gyro_bias[1]  += int(gyro_temp[1])
 				gyro_bias[2]  += int(gyro_temp[2])
 
-				i = i + 1
+				#i = i + 1 dont do this it will update itself
 
 			accel_bias[0] /= int(packet_count)
 			accel_bias[1] /= int(packet_count)
@@ -461,11 +470,20 @@ class MPU9250:
 		self.read_accel()
 		self.read_gyro()
 		self.read_mag()
+#what is g_vector? should we use before or after scaling?
 		self.g_vector = math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
-		
+		self.scale_rawdata()
+
 	def calibrate_accel(self):
 		print("********************************************\n")
 		print("initializing accelerometer calibration sequence")
+		#Is this function complete yet?
+
+	def scale_rawdata(self):
+		for i in range(3):
+				accel_data[i] = (accel_data[i] * a_res) - accel_bias[i]
+				gyro_data[i] = (gyro_data[i] * m_res) - gyro_bias[i]
+				mag_data[i] = (mag_data[i] * m_res) - mag_bias[i]
 
 	def debug_print_vals(self):
 		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data

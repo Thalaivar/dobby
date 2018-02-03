@@ -8,6 +8,23 @@ import math
 # need to add function to change
 # which is faster, referenicng a class attribute "accel_data" evrery time or return ax, ay, az??
 class MPU9250:
+#	defining class variables here	#
+	a_scale = None
+	g_scale = None
+	m_scale = None
+	mag_mode = None
+	mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
+	mag_bias = None
+	a_res = None
+	g_res = None
+	m_res = None
+	accel_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
+	gyro_data = np.zeros((3,)) # faster than list.. [0, 0 ,0]
+	mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
+	accel_bias = np.zeros((3,))
+	gyro_bias = np.zeros((3,))
+	g_vector = None
+
 	ACCEL_2G = 0x00
 	ACCEL_4G = 0x01
 	ACCEL_8G = 0x02
@@ -192,42 +209,57 @@ class MPU9250:
 	__MAGBIAS_Z = None
 
 	def __init__(self, Ascale, Gscale, Mscale, magMode):
-		## all the parameters and variables of mpu class ##
-		self.a_scale = Ascale
-		self.g_scale = Gscale
-		self.m_scale = Mscale
-		self.mag_mode = magMode
-		self.mag_calibration = np.zeros((3,)) # faster than list.. [0, 0, 0]
-		self.mag_bias = [self.__MAGBIAS_X, self.__MAGBIAS_Y, self.__MAGBIAS_Z]
-		self.a_res = None
-		self.g_res = None
-		self.m_res = None
-		self.accel_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
-		self.gyro_data = np.zeros((3,)) # faster than list.. [0, 0 ,0]
-		self.mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
-		self.accel_bias = np.zeros((3,))
-		self.gyro_bias = np.zeros((3,))
-		self.g_vector = None
 
-		## methods to be called during initialization of mpu ##
-		# need to add error and exception handling
-		self.init_mpu()
-		self.init_ak8963()
-		self.reset_mpu()
-		self.read_accel()
-		self.read_gyro()
-		self.read_mag()
-		self.get_ares()
-		self.get_gres()
-		self.get_mres()
-		self.calibrate()
-		self.scale_rawdata()
-		self.update()
+		if Ascale not in [__AFS_2G, __AFS_4G, __AFS_8G, __AFS_16G]:
+			raise ValueError('ACCEL_SETTINGS: Incorrect accel scale chosen!\n')
+			return False
 
-		#instead of putting scale functions
-		#How about when we read_accel we store only after scaling?
+		else:
+			self.a_scale = Ascale
+
+			if Gscale not in [__GFS_250DPS, __GFS_500DPS, __GFS_1000DPS, __GFS_2000DPS]:
+				raise ValueError('GYRO_SETTINGS: Incorrect gyro scale chosen!\n')
+				return False
+
+			else:
+				self.g_scale = Gscale
+
+				if Mscale not in [__MFS_14BITS, __MFS_16BITS]:
+					raise ValueError('MAG_SETTINGS: Incorrect mag scale chosen!\n')
+					return False
+
+				else:
+					self.m_scale = Mscale
+
+					if magMode not in [__MAG_MODE_100, __MAG_MODE_8]:
+						raise ValueError('MAG_SETTINGS: Incorrect mag mode chosen!\n')
+						return False
+
+					else:
+						self.mag_mode = magMode
+
+						## methods to be called during initialization of mpu ##
+						# need to add error and exception handling
+						self.reset_mpu()
+						self.calibrate()
+						self.init_mpu()
+						self.init_ak8963()
+						self.get_ares()
+						self.get_gres()
+						self.get_mres()
+
+		# instead of putting scale functions
+		# How about when we read_accel we store only after scaling?
+		# modification done, have removed scale_rawdata()
+		#---------------------------------------------------------------#
+
 		# Why is there a accel_calibrate function apart from the calibrate?
+		# yet to be made, need to calculate accel offsets by tilting quad on all axes
+		#---------------------------------------------------------------#
+
 		#added scale_rawdata function call it last in update function
+		# removed scale_rawdata #
+		
 	def init_mpu(self):
 
 		# wake up device
@@ -291,6 +323,9 @@ class MPU9250:
 		self.accel_data[1] = int(((raw_data[2] << 8) | raw_data[3]))
 		self.accel_data[2] = int(((raw_data[4] << 8) | raw_data[5]))
 
+		self.accel_data[0] = (self.accel_data[0] * self.a_res) - self.accel_bias[0]
+		self.accel_data[1] = (self.accel_data[1] * self.a_res) - self.accel_bias[1]
+		self.accel_data[2] = (self.accel_data[2] * self.a_res) - self.accel_bias[2]
 
 	def read_gyro(self):
 
@@ -299,6 +334,10 @@ class MPU9250:
 		self.gyro_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
 		self.gyro_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
 		self.gyro_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
+
+		self.gyro_data[i] = (self.gyro_data[i] * self.g_res) - self.gyro_bias[i]
+		self.gyro_data[i] = (self.gyro_data[i] * self.g_res) - self.gyro_bias[i]
+		self.gyro_data[i] = (self.gyro_data[i] * self.g_res) - self.gyro_bias[i]
 
 
 	def read_mag(self):
@@ -310,6 +349,10 @@ class MPU9250:
 				self.mag_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
 				self.mag_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
 				self.mag_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
+
+				self.mag_data[i] = (self.mag_data[i] * self.m_res) - self.mag_bias[i]
+				self.mag_data[i] = (self.mag_data[i] * self.m_res) - self.mag_bias[i]
+				self.mag_data[i] = (self.mag_data[i] * self.m_res) - self.mag_bias[i]
 
 	def get_ares(self):
 
@@ -471,19 +514,13 @@ class MPU9250:
 		self.read_gyro()
 		self.read_mag()
 #what is g_vector? should we use before or after scaling?
-		self.g_vector = math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
-		self.scale_rawdata()
+		self.norm_adata	= math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
 
 	def calibrate_accel(self):
 		print("********************************************\n")
 		print("initializing accelerometer calibration sequence")
 		#Is this function complete yet?
 
-	def scale_rawdata(self):
-		for i in range(3):
-				accel_data[i] = (accel_data[i] * a_res) - accel_bias[i]
-				gyro_data[i] = (gyro_data[i] * m_res) - gyro_bias[i]
-				mag_data[i] = (mag_data[i] * m_res) - mag_bias[i]
 
 	def debug_print_vals(self):
 		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data

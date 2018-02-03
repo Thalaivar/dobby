@@ -36,6 +36,7 @@ class AHRS:
 
 	#list of methods in this class
 	self.convert_accel_to_euler()
+	self.convert_gyro_to_euler()
 	self.update_ahrs()
 
 	def convert_accel_to_euler(self):
@@ -47,12 +48,24 @@ class AHRS:
 
 		accel_pitch = accel_pitch * 180 / math.pi
 		accel_roll  = accel_roll  * 180 / math.pi
-		#Yaw is still left
+		# yaw?
 
-	def update_ahrs():
+	def convert_gyro_to_euler(self):
+			gx = gyro_data[0]
+			gy = gyro_data[1]
+			gz = gyro_data[2]
+
+			#integrate gx gy gz to get euler angles:
+			# time step?
+	def low_pass_filter_ahrs(self):
+		#implement low pass filter with proper gains for accel and gyro
+
+	def update_ahrs(self):
 			#run update_imu
 			#run conversion functions
 			#refresh values
 
 			# update_imu()
 			self.convert_accel_to_euler()
+			self.convert_gyro_to_euler()
+			# we can call filtering function to get ahrs_roll ahrs_pitch ahrs_yaw

@@ -1,12 +1,29 @@
 import time
 import smbus
 import numpy as np
+import math
 
 # need to add some prints in reset_mpu
 # need to add calibration function for mag
 # need to add function to change
 # which is faster, referenicng a class attribute "accel_data" evrery time or return ax, ay, az??
 class MPU9250:
+	ACCEL_2G = 0x00
+	ACCEL_4G = 0x01
+	ACCEL_8G = 0x02
+	ACCEL_16G = 0x03
+
+	GYRO_250DPS = 0X00
+	GYRO_500DPS = 0X01
+	GYRO_1000DPS = 0X02
+	GYRO_2000DPS = 0X03
+
+	MAG_14BITS = 0x00
+	MAG_16BITS = 0x01
+
+	MAG_100_HZ = 0x06
+	MAG_8_HZ = 0x02
+
 	__AK8963_ADDRESS   =  0x0C
 	__AK8963_WHO_AM_I  =  0x00
 	__AK8963_INFO      =  0x01
@@ -190,11 +207,12 @@ class MPU9250:
 		self.mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
 		self.accel_bias = np.zeros((3,))
 		self.gyro_bias = np.zeros((3,))
+		self.g_vector = None
 
 		## methods to be called during initialization of mpu ##
 		# need to add error and exception handling
 		self.reset_mpu()
-		self.calibrate()		
+		self.calibrate()
 		self.init_mpu()
 		self.init_ak8963()
 		self.get_ares()
@@ -324,6 +342,7 @@ class MPU9250:
 		accel_bias = np.zeros((3,))
 		gyro_bias = np.zeros((3,))
 
+		print "*************************************"
 		print("\nThis program will generate a new gyro calibration file\n")
 		print("keep your beaglebone very still for this procedure.\n")
 		option = raw_input("Press Y to continue or anything else to quit\n")
@@ -434,13 +453,19 @@ class MPU9250:
 			self.accel_bias[1] = float(accel_bias[1])/float(accelsensitivity)
 			self.accel_bias[2] = float(accel_bias[2])/float(accelsensitivity)
 
-		print "MPU calibration sequence finished"
+		print "MPU calibration sequence finished\n"
+		print "*************************************\n"
 
 
 	def update(self):
 		self.read_accel()
 		self.read_gyro()
 		self.read_mag()
+		self.g_vector = math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
+		
+	def calibrate_accel(self):
+		print("********************************************\n")
+		print("initializing accelerometer calibration sequence")
 
 	def debug_print_vals(self):
 		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data

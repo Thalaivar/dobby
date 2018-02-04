@@ -34,13 +34,15 @@ class AHRS(MPU9250):
 		self.accel_roll = None
 		self.accel_pitch = None
 
-
+		self.norm_adata = None
 	#list of methods in this class
 	#self.convert_accel_to_euler()
 	#self.convert_gyro_to_euler()
 	#self.update_ahrs()
 
 	def convert_accel_to_euler(self):
+
+		self.norm_adata	= math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
 
 		self.accel_pitch = -(math.asin(MPU9250.accel_data[0]/MPU9250.norm_adata))
 		self.accel_roll  = math.asin(MPU9250.accel_data[1]/(MPU9250.norm_adata * math.cos(self.accel_pitch)))
@@ -49,7 +51,7 @@ class AHRS(MPU9250):
 		self.accel_roll  = self.accel_roll  * 180 / math.pi
 		# yaw?
 	def debug(self):
-		
+
 		print(MPU9250.gyro_bias)
 
 	def convert_gyro_to_euler(self):
@@ -60,7 +62,7 @@ class AHRS(MPU9250):
 			#integrate gx gy gz to get euler angles:
 			# time step?
 #	def low_pass_filter_ahrs(self):
-	
+
 		#implement low pass filter with proper gains for accel and gyro
 
 #	def update_ahrs(self):

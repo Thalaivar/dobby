@@ -23,7 +23,6 @@ class MPU9250:
 	mag_data = np.zeros((3,)) # faster than list.. [0, 0, 0]
 	accel_bias = np.zeros((3,))
 	gyro_bias = np.zeros((3,))
-	norm_adata = 0
 
 	ACCEL_2G = 0x00
 	ACCEL_4G = 0x01
@@ -259,7 +258,7 @@ class MPU9250:
 
 		#added scale_rawdata function call it last in update function
 		# removed scale_rawdata #
-		
+
 	def init_mpu(self):
 
 		# wake up device
@@ -513,8 +512,7 @@ class MPU9250:
 		self.read_accel()
 		self.read_gyro()
 		self.read_mag()
-		self.norm_adata	= math.sqrt((self.accel_data[0]*self.accel_data[0] + self.accel_data[1]*self.accel_data[1] + self.accel_data[2]*self.accel_data[2]))
-	
+
 	def calibrate_accel(self):
 		print("********************************************\n")
 		print("initializing accelerometer calibration sequence")
@@ -524,7 +522,7 @@ class MPU9250:
 	def debug_print_vals(self):
 		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data
 
-	
+
 	def print_config(self):
 		print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
 		print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"

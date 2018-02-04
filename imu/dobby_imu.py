@@ -528,7 +528,7 @@ class MPU9250:
 		next_step = input("Enter \"1\" to continue: ")
 		if next_step == 1:
 			for i in range(1000):
-				while !self.is_data_ready(): pass
+				while not self.is_data_ready(): pass
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[0]
 				if i%100 == 0:
@@ -541,7 +541,7 @@ class MPU9250:
 			next_step = input("Enter \"1\" to continue: ")
 			if next_step == 1:
 				for i in range(1000):
-					while !self.is_data_ready(): pass
+					while not self.is_data_ready(): pass
 					self.read_accel()
 					data_1 = data_1 + self.accel_data[0]
 					if i%100 == 0:
@@ -557,7 +557,7 @@ class MPU9250:
 				next_step = input("Enter \"1\" to continue: ")
 				if next_step == 1:
 					for i in range(1000):
-						while !self.is_data_ready(): pass
+						while not self.is_data_ready(): pass
 						self.read_accel()
 						data_0 = data_0 + self.accel_data[1]
 						if i%100 == 0:
@@ -570,7 +570,7 @@ class MPU9250:
 					next_step = input("Enter \"1\" to continue: ")
 					if next_step == 1:
 						for i in range(1000):
-							while !self.is_data_ready(): pass
+							while not self.is_data_ready(): pass
 							self.read_accel()
 							data_1 = data_1 + self.accel_data[1]
 							if i%100 == 0:
@@ -586,7 +586,7 @@ class MPU9250:
 						next_step = input("Enter \"1\" to continue: ")
 						if next_step == 1:
 							for i in range(1000):
-								while !self.is_data_ready(): pass
+								while not self.is_data_ready(): pass
 								self.read_accel()
 								data_0 = data_0 + self.accel_data[2]
 								if i%100 == 0:
@@ -599,7 +599,7 @@ class MPU9250:
 							next_step = input("Enter \"1\" to continue: ")
 							if next_step == 1:
 								for i in range(1000):
-									while !self.is_data_ready(): pass
+									while not self.is_data_ready(): pass
 									self.read_accel()
 									data_1 = data_1 + self.accel_data[2]
 									if i%100 == 0:
@@ -612,7 +612,8 @@ class MPU9250:
 								self.accel_bias[2] = 0.5*(data_1 + data_0)
 
 								print("Accel calibration complete!\n\r")
-								return self.save_accel_bias():
+								if self.save_accel_bias():
+									return True
 
 
 	def calibrate_gyro(self):
@@ -623,16 +624,17 @@ class MPU9250:
 		time.sleep(3)
 
 		for i in range(2000):
-			while !self.is_data_ready(): pass
+			while not self.is_data_ready(): pass
 			self.read_gyro()
-			for j in range(self.gyro_data):
+			for j in range(len(self.gyro_data)):
 				data[j] = self.gyro_data[j] + data[j]
 
-		for i in range(data):
+		for i in range(len(data)):
 			self.gyro_bias[i] = data[i]/2000
 
 		print("Gyro calibration complete!\n\r")
-		return self.save_gyro_bias():
+		if self.save_gyro_bias():
+			return True
 
 	def print_config(self):
 		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");
@@ -662,7 +664,6 @@ class MPU9250:
 			print "MPU9250 is online...\n\r"
 			time.sleep(1)
 			self.reset_mpu()
-			self.calibrate()
 			if self.load_accel_bias() :
 				if self.load_gyro_bias() :
 					self.print_bias()
@@ -682,10 +683,6 @@ class MPU9250:
 							print("AK8963 not found!")
 					else:
 						print("MPU9250 init failed!")
-
-			else:
-
-
 		else:
 			raise IOError("No MPU9250 found!\n")
 
@@ -754,14 +751,14 @@ class MPU9250:
 
 	def save_accel_bias(self):
 		self.__accel_bias_file = open("accel_bias_save.txt", "w")
-		self.__accel_bias_file.write(self.accel_bias[0] + ',' + self.accel_bias[1] + ',' + self.accel_bias[2] + '\n')
+		self.__accel_bias_file.write(str(self.accel_bias[0]) + ',' + str(self.accel_bias[1]) + ',' + str(self.accel_bias[2]) + '\n')
 		self.__accel_bias_file.close()
 		print("Accel biases saved successfully!")
 		return True
 
 	def save_gyro_bias(self):
-		self.__gyro_bias_file = open("accel_bias_save.txt", "w")
-		self.__gyro_bias_file.write(self.accel_bias[0] + ',' + self.accel_bias[1] + ',' + self.accel_bias[2] + '\n')
+		self.__gyro_bias_file = open("gyro_bias_save.txt", "w")
+		self.__gyro_bias_file.write(str(self.gyro_bias[0]) + ',' + str(self.accel_bias[1]) + ',' + str(self.accel_bias[2]) + '\n')
 		self.__gyro_bias_file.close()
 		print("Gyro biases saved successfully!")
 		return True

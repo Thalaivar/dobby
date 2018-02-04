@@ -308,9 +308,9 @@ class MPU9250:
 
 		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
 
-		self.accel_data[0] = int(((int(raw_data[0]) << 8) | raw_data[1]))
-		self.accel_data[1] = int(((int(raw_data[2]) << 8) | raw_data[3]))
-		self.accel_data[2] = int(((int(raw_data[4]) << 8) | raw_data[5]))
+		self.accel_data[0] = self.dataConv(raw_data[1], raw_data[0])
+		self.accel_data[1] = self.dataConv(raw_data[3], raw_data[2])
+		self.accel_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
 		self.accel_data[0] = float((self.accel_data[0] * self.a_res) - self.accel_bias[0])
 		self.accel_data[1] = float((self.accel_data[1] * self.a_res) - self.accel_bias[1])
@@ -320,9 +320,9 @@ class MPU9250:
 
 		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
 
-		self.gyro_data[0] = int(((int(raw_data[0])<<8) | raw_data[1]))
-		self.gyro_data[1] = int(((int(raw_data[2])<<8) | raw_data[3]))
-		self.gyro_data[2] = int(((int(raw_data[4])<<8) | raw_data[5]))
+		self.gyro_data[0] = self.dataConv(raw_data[1], raw_data[0])
+		self.gyro_data[1] = self.dataConv(raw_data[3], raw_data[2])
+		self.gyro_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
 		self.gyro_data[0] = float((self.gyro_data[0] * self.g_res) - self.gyro_bias[0])
 		self.gyro_data[1] = float((self.gyro_data[1] * self.g_res) - self.gyro_bias[1])
@@ -335,9 +335,9 @@ class MPU9250:
 			raw_data = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
 
 			if not (raw_data[6] & 0x08):
-				self.mag_data[0] = int(((int(raw_data[0])<<8) | raw_data[1]))
-				self.mag_data[1] = int(((int(raw_data[2])<<8) | raw_data[3]))
-				self.mag_data[2] = int(((int(raw_data[4])<<8) | raw_data[5]))
+				self.mag_data[0] = self.dataConv(raw_data[1], raw_data[0])
+				self.mag_data[1] = self.dataConv(raw_data[3], raw_data[2])
+				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
 				self.mag_data[0] = float((self.mag_data[0] * self.m_res) - self.mag_bias[0])
 				self.mag_data[1] = float((self.mag_data[1] * self.m_res) - self.mag_bias[1])
@@ -374,10 +374,10 @@ class MPU9250:
 	def get_mres(self):
 
 		if self.m_scale == self.__MFS_14BITS:
-			self.m_res = 10.0*4912.0/8190.0
+			self.m_res = 4912.0/8190.0
 
 		elif self.m_scale == self.__MFS_16BITS:
-			self.m_res = 10.0*4912.0/32760.0
+			self.m_res = 4912.0/32760.0
 
 	def calibrate(self):
 		accel_bias = np.zeros((3,))
@@ -417,8 +417,8 @@ class MPU9250:
 			time.sleep(0.04)
 
 			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
-			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
-			fifo_count = int(data_0 << 8) | data_1
+			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
+			fifo_count = self.dataConv(raw_data[1], raw_data[0])
 
 			packet_count = fifo_count/12
 
@@ -429,34 +429,34 @@ class MPU9250:
 
 				data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
 
-				accel_temp[0] = (int(data[0] << 8) | data[1]  )
-				accel_temp[1] = (int(data[2] << 8) | data[3]  )
-				accel_temp[2] = (int(data[4] << 8) | data[5]  )
-				gyro_temp[0]  = (int(data[6] << 8) | data[7]  )
-				gyro_temp[1]  = (int(data[8] << 8) | data[9]  )
-				gyro_temp[2]  = (int(data[10] << 8) | data[11])
+				accel_temp[0] = self.dataConv(data[1], data[0])
+				accel_temp[1] = self.dataConv(data[3], data[2])
+				accel_temp[2] = self.dataConv(data[5], data[4])
+				gyro_temp[0]  = self.dataConv(data[7], data[6])
+				gyro_temp[1]  = self.dataConv(data[9], data[8])
+				gyro_temp[2]  = self.dataConv(data[11], data[10])
 
-				accel_bias[0] += int(accel_temp[0])
-				accel_bias[1] += int(accel_temp[1])
-				accel_bias[2] += int(accel_temp[2])
-				gyro_bias[0]  += int(gyro_temp[0])
-				gyro_bias[1]  += int(gyro_temp[1])
-				gyro_bias[2]  += int(gyro_temp[2])
+				temp_accel_bias[0] += int(accel_temp[0])
+				temp_accel_bias[1] += int(accel_temp[1])
+				temp_accel_bias[2] += int(accel_temp[2])
+				temp_gyro_bias[0]  += int(gyro_temp[0])
+				temp_gyro_bias[1]  += int(gyro_temp[1])
+				temp_gyro_bias[2]  += int(gyro_temp[2])
 
 				#i = i + 1 dont do this it will update itself
 
-			accel_bias[0] /= int(packet_count)
-			accel_bias[1] /= int(packet_count)
-			accel_bias[2] /= int(packet_count)
-			gyro_bias[0]  /= int(packet_count)
-			gyro_bias[1]  /= int(packet_count)
-			gyro_bias[2]  /= int(packet_count)
+			temp_accel_bias[0] /= int(packet_count)
+			temp_accel_bias[1] /= int(packet_count)
+			temp_accel_bias[2] /= int(packet_count)
+			temp_gyro_bias[0]  /= int(packet_count)
+			temp_gyro_bias[1]  /= int(packet_count)
+			temp_gyro_bias[2]  /= int(packet_count)
 
 			if accel_bias[2] > long(0):
-				accel_bias[2] -= int(accelsensitivity)
+				temp_accel_bias[2] -= int(accelsensitivity)
 
 			else:
-				accel_bias[2] += int(accelsensitivity)
+				temp_accel_bias[2] += int(accelsensitivity)
 
 			# just check this with kris winer, i think we dont need it #
 			#data[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
@@ -466,17 +466,17 @@ class MPU9250:
 			#ata[4] = (-gyro_bias[2]/4  >> 8) & 0xFF
 			#data[5] = (-gyro_bias[2]/4        & 0xFF
 
-			self.gyro_bias[0] = float(gyro_bias[0])/float(gyrosensitivity)
-			self.gyro_bias[1] = float(gyro_bias[1])/float(gyrosensitivity)
-			self.gyro_bias[2] = float(gyro_bias[2])/float(gyrosensitivity)
+			self.gyro_bias[0] = float(temp_gyro_bias[0])/float(gyrosensitivity)
+			self.gyro_bias[1] = float(temp_gyro_bias[1])/float(gyrosensitivity)
+			self.gyro_bias[2] = float(temp_gyro_bias[2])/float(gyrosensitivity)
 
 			accel_bias_reg = np.zeros((3,1))
-			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
-			accel_bias_reg[0] = int(int(data[0] << 8) | data[1])
-			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
-			accel_bias_reg[1] = int(int(data[0] << 8) | data[1])
-			data_0, data_1 = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
-			accel_bias_reg[2] = int(int(data[0] << 8) | data[1])
+			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
+			accel_bias_reg[0] = int(self.dataConv(raw_data[1], raw_data[0]))
+			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
+			accel_bias_reg[1] = int(self.dataConv(raw_data[1], raw_data[0]))
+			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
+			accel_bias_reg[2] = int(self.dataConv(raw_data[1], raw_data[0]))
 
 			# dont think this is needed neither is the above#
 			#mask = (long)1
@@ -490,16 +490,15 @@ class MPU9250:
 			#accel_bias_reg[1] -= (accel_bias[1]/8)
 			#accel_bias_reg[2] -= (accel_bias[2]/8)
 
-			self.accel_bias[0] = float(accel_bias[0])/float(accelsensitivity)
-			self.accel_bias[1] = float(accel_bias[1])/float(accelsensitivity)
-			self.accel_bias[2] = float(accel_bias[2])/float(accelsensitivity)
+			self.accel_bias[0] = float(temp_accel_bias[0])/float(accelsensitivity)
+			self.accel_bias[1] = float(temp_accel_bias[1])/float(accelsensitivity)
+			self.accel_bias[2] = float(temp_accel_bias[2])/float(accelsensitivity)
 
 		print "MPU calibration sequence finished\n"
 		print "*************************************\n"
 
 
 	def update(self):
-		if 
 		self.read_accel()
 		self.read_gyro()
 		self.read_mag()
@@ -508,10 +507,6 @@ class MPU9250:
 		print("********************************************\n")
 		print("initializing accelerometer calibration sequence")
 		#Is this function complete yet?
-
-
-	def debug_print_vals(self):
-		print "Accel: ", self.accel_data, "Gyro: ", self.gyro_data, "Mag: ", self.mag_data
 
 
 	def print_config(self):
@@ -560,3 +555,18 @@ class MPU9250:
 	def set_default_config(self):
 		self.a_scale = self.__AFS_4G
 		self.g_scale = self.__GFS_1000DPS
+
+	def dataConv(self, data1, data2):
+        value = data1 | (data2 << 8)
+        if(value & (1 << 16 - 1)):
+            value -= (1<<16)
+        return value
+
+	def is_data_ready(self):
+		drdy = self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__INT_STATUS)
+
+		if drdy & 0x01:
+			return True
+
+		else:
+			return False

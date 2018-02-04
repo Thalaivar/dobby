@@ -392,120 +392,111 @@ class MPU9250:
 		accel_bias = np.zeros((3,))
 		gyro_bias = np.zeros((3,))
 
-		print "*************************************"
-		print("\nThis program will generate a new gyro calibration file\n")
-		print("keep your beaglebone very still for this procedure.\n")
-		option = raw_input("Press Y to continue or anything else to quit\n")
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
+		time.sleep(0.1)
 
-		if option == 'Y':
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x80)
-			time.sleep(0.1)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_2, 0x00)
+		time.sleep(0.1)
 
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x01)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_2, 0x00)
-			time.sleep(0.1)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__I2C_MST_CTRL, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x0C)
+		time.sleep(0.015)
 
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__PWR_MGMT_1, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__I2C_MST_CTRL, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x0C)
-			time.sleep(0.015)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x01)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, 0x00)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, 0x00)
 
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__CONFIG, 0x01)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__SMPLRT_DIV, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__GYRO_CONFIG, 0x00)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__ACCEL_CONFIG, 0x00)
+		gyrosensitivity  = 131
+		accelsensitivity = 16384
 
-			gyrosensitivity  = 131
-			accelsensitivity = 16384
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x40)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x78)
+		time.sleep(0.04)
 
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__USER_CTRL, 0x40)
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x78)
-			time.sleep(0.04)
+		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
+		fifo_count = self.dataConv(raw_data[1], raw_data[0])
 
-			self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__FIFO_EN, 0x00)
-			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_COUNTH, 2)
-			fifo_count = self.dataConv(raw_data[1], raw_data[0])
+		packet_count = fifo_count/12
 
-			packet_count = fifo_count/12
+		for i in range(packet_count):
 
-			for i in range(packet_count):
+			accel_temp = np.zeros((3,))
+			gyro_temp = np.zeros((3,))
+			temp_accel_bias = np.zeros((3,))
+			temp_gyro_bias = np.zeros((3,))
 
-				accel_temp = np.zeros((3,))
-				gyro_temp = np.zeros((3,))
-				temp_accel_bias = np.zeros((3,))
-				temp_gyro_bias = np.zeros((3,))
+			data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
 
-				data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
+			accel_temp[0] = self.dataConv(data[1], data[0])
+			accel_temp[1] = self.dataConv(data[3], data[2])
+			accel_temp[2] = self.dataConv(data[5], data[4])
+			gyro_temp[0]  = self.dataConv(data[7], data[6])
+			gyro_temp[1]  = self.dataConv(data[9], data[8])
+			gyro_temp[2]  = self.dataConv(data[11], data[10])
 
-				accel_temp[0] = self.dataConv(data[1], data[0])
-				accel_temp[1] = self.dataConv(data[3], data[2])
-				accel_temp[2] = self.dataConv(data[5], data[4])
-				gyro_temp[0]  = self.dataConv(data[7], data[6])
-				gyro_temp[1]  = self.dataConv(data[9], data[8])
-				gyro_temp[2]  = self.dataConv(data[11], data[10])
+			temp_accel_bias[0] += int(accel_temp[0])
+			temp_accel_bias[1] += int(accel_temp[1])
+			temp_accel_bias[2] += int(accel_temp[2])
+			temp_gyro_bias[0]  += int(gyro_temp[0])
+			temp_gyro_bias[1]  += int(gyro_temp[1])
+			temp_gyro_bias[2]  += int(gyro_temp[2])
 
-				temp_accel_bias[0] += int(accel_temp[0])
-				temp_accel_bias[1] += int(accel_temp[1])
-				temp_accel_bias[2] += int(accel_temp[2])
-				temp_gyro_bias[0]  += int(gyro_temp[0])
-				temp_gyro_bias[1]  += int(gyro_temp[1])
-				temp_gyro_bias[2]  += int(gyro_temp[2])
+			#i = i + 1 dont do this it will update itself
 
-				#i = i + 1 dont do this it will update itself
+		temp_accel_bias[0] /= int(packet_count)
+		temp_accel_bias[1] /= int(packet_count)
+		temp_accel_bias[2] /= int(packet_count)
+		temp_gyro_bias[0]  /= int(packet_count)
+		temp_gyro_bias[1]  /= int(packet_count)
+		temp_gyro_bias[2]  /= int(packet_count)
 
-			temp_accel_bias[0] /= int(packet_count)
-			temp_accel_bias[1] /= int(packet_count)
-			temp_accel_bias[2] /= int(packet_count)
-			temp_gyro_bias[0]  /= int(packet_count)
-			temp_gyro_bias[1]  /= int(packet_count)
-			temp_gyro_bias[2]  /= int(packet_count)
+		if accel_bias[2] > long(0):
+			temp_accel_bias[2] -= int(accelsensitivity)
 
-			if accel_bias[2] > long(0):
-				temp_accel_bias[2] -= int(accelsensitivity)
+		else:
+			temp_accel_bias[2] += int(accelsensitivity)
 
-			else:
-				temp_accel_bias[2] += int(accelsensitivity)
+		#ata[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
+		#data[1] = (-gyro_bias[0]/4        & 0xFF
+		#data[2] = (-gyro_bias[1]/4  >> 8) & 0xFF
+		#data[3] = (-gyro_bias[1]/4        & 0xFF
+		#ata[4] = (-gyro_bias[2]/4  >> 8) & 0xFF
+		#data[5] = (-gyro_bias[2]/4        & 0xFF
 
-			#ata[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
-			#data[1] = (-gyro_bias[0]/4        & 0xFF
-			#data[2] = (-gyro_bias[1]/4  >> 8) & 0xFF
-			#data[3] = (-gyro_bias[1]/4        & 0xFF
-			#ata[4] = (-gyro_bias[2]/4  >> 8) & 0xFF
-			#data[5] = (-gyro_bias[2]/4        & 0xFF
+		self.gyro_bias[0] = float(temp_gyro_bias[0])/float(gyrosensitivity)
+		self.gyro_bias[1] = float(temp_gyro_bias[1])/float(gyrosensitivity)
+		self.gyro_bias[2] = float(temp_gyro_bias[2])/float(gyrosensitivity)
 
-			self.gyro_bias[0] = float(temp_gyro_bias[0])/float(gyrosensitivity)
-			self.gyro_bias[1] = float(temp_gyro_bias[1])/float(gyrosensitivity)
-			self.gyro_bias[2] = float(temp_gyro_bias[2])/float(gyrosensitivity)
+		accel_bias_reg = np.zeros((3,1))
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
+		accel_bias_reg[0] = int(self.dataConv(raw_data[1], raw_data[0]))
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
+		accel_bias_reg[1] = int(self.dataConv(raw_data[1], raw_data[0]))
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
+		accel_bias_reg[2] = int(self.dataConv(raw_data[1], raw_data[0]))
 
-			accel_bias_reg = np.zeros((3,1))
-			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__XA_OFFSET_H, 2)
-			accel_bias_reg[0] = int(self.dataConv(raw_data[1], raw_data[0]))
-			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__YA_OFFSET_H, 2)
-			accel_bias_reg[1] = int(self.dataConv(raw_data[1], raw_data[0]))
-			raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ZA_OFFSET_H, 2)
-			accel_bias_reg[2] = int(self.dataConv(raw_data[1], raw_data[0]))
+		# dont think this is needed neither is the above#
+		#mask = (long)1
+		#mask_bit = np.zeros((3,))
 
-			# dont think this is needed neither is the above#
-			#mask = (long)1
-			#mask_bit = np.zeros((3,))
+		#for i in range(3):
+		#	if accel_bias_reg[i] & mask:
+		#		 mask_bit[i] = 0x01
 
-			#for i in range(3):
-			#	if accel_bias_reg[i] & mask:
-			#		 mask_bit[i] = 0x01
+		#accel_bias_reg[0] -= (accel_bias[0]/8)
+		#accel_bias_reg[1] -= (accel_bias[1]/8)
+		#accel_bias_reg[2] -= (accel_bias[2]/8)
 
-			#accel_bias_reg[0] -= (accel_bias[0]/8)
-			#accel_bias_reg[1] -= (accel_bias[1]/8)
-			#accel_bias_reg[2] -= (accel_bias[2]/8)
-
-			self.accel_bias[0] = float(temp_accel_bias[0])/float(accelsensitivity)
-			self.accel_bias[1] = float(temp_accel_bias[1])/float(accelsensitivity)
-			self.accel_bias[2] = float(temp_accel_bias[2])/float(accelsensitivity)
-
-		print "MPU calibration sequence finished\n"
-		print "*************************************\n"
+		self.accel_bias[0] = float(temp_accel_bias[0])/float(accelsensitivity)
+		self.accel_bias[1] = float(temp_accel_bias[1])/float(accelsensitivity)
+		self.accel_bias[2] = float(temp_accel_bias[2])/float(accelsensitivity)
 
 
 	def update(self):
@@ -664,6 +655,8 @@ class MPU9250:
 			print "MPU9250 is online...\n\r"
 			time.sleep(1)
 			self.reset_mpu()
+			self.calibrate()
+			time.sleep(1)
 			if self.load_accel_bias() :
 				if self.load_gyro_bias() :
 					self.print_bias()

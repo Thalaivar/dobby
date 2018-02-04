@@ -15,7 +15,7 @@ while True:
 		if imu.is_data_ready():
 			imu.update()
 			ahrs.convert_accel_to_euler()
-			print ahrs.accel_pitch
+			print ahrs.accel_pitch, " ", ahrs.accel_roll
 
 	except KeyboardInterrupt:
 		break

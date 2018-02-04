@@ -12,5 +12,4 @@ bmp = BMP280()
 ahrs = AHRS()
 for i in range(2000):
 	imu.update()
-	ahrs.convert_accel_to_euler()
-	print(ahrs.accel_roll)
+	print imu.gyro_data

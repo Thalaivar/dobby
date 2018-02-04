@@ -237,7 +237,6 @@ class MPU9250:
 					else:
 						self.mag_mode = magMode
 						self.init_imu()
-
 		# instead of putting scale functions
 		# How about when we read_accel we store only after scaling?
 		# modification done, have removed scale_rawdata()
@@ -515,16 +514,15 @@ class MPU9250:
 
 
 	def print_config(self):
-<<<<<<< HEAD
 		printf("Accelerometer sensitivity is ", 1.0/self.a_res ," LSB/g \n\r");
-    	printf("Gyroscope sensitivity is ", 1.0/self.g_res ," LSB/deg/s \n\r");
-    	printf("Magnetometer sensitivity is ", 1.0/self.m_res," LSB/G \n\r");
+		printf("Gyroscope sensitivity is ", 1.0/self.g_res ," LSB/deg/s \n\r");
+		printf("Magnetometer sensitivity is ", 1.0/self.m_res," LSB/G \n\r");
 
 		if self.mag_mode == self.__MFS_14BITS:
 			print "Magnetometer resolution = 14  bits\n\r"
 
 		elif self.mag_mode == self.__MFS_16BITS:
-			print "Magnetometer resolution = 16  bits\n\"
+			print "Magnetometer resolution = 16  bits\n\r"
 
 	def print_bias(self):
 		print "x gyro bias = ", self.gyro_bias[0], "\n\r"
@@ -547,7 +545,7 @@ class MPU9250:
 			time.sleep(2)
 			self.print_bias()
 			time.sleep(2)
-			self.init_mpu
+			self.init_mpu()
 			print "MPU9250 initialized for active data mode....\n\r"
 			self.init_ak8963()
 			self.get_ares()
@@ -555,7 +553,5 @@ class MPU9250:
 			self.get_mres()
 			time.sleep(3)
 			print "MPU9250 initialization is over!\n\r"
-=======
-		print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
-		print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"
->>>>>>> 5dc4e92652bf5bd7e0eba8c1a85913950a4336d6
+			print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
+			print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"

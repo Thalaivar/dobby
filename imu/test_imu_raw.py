@@ -5,5 +5,4 @@ imu = MPU9250(MPU9250.ACCEL_4G, MPU9250.GYR0_500DPS, MPU9250.MAG_16BITS, MPU9250
 for i in range(5000):
 	imu.update()
 	print(imu.accel_data)
-	time.sleep(0.1)
 	

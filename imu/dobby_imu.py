@@ -499,6 +499,7 @@ class MPU9250:
 
 
 	def update(self):
+		if 
 		self.read_accel()
 		self.read_gyro()
 		self.read_mag()

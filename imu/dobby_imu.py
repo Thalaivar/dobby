@@ -334,7 +334,7 @@ class MPU9250:
 		if self.bus.read_byte_data(self.__AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
 			raw_data = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
 
-			if not (raw_data[6] & 0x08):
+			if (raw_data[6] & 0x08) != 0x08:
 				self.mag_data[0] = self.dataConv(raw_data[1], raw_data[0])
 				self.mag_data[1] = self.dataConv(raw_data[3], raw_data[2])
 				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])

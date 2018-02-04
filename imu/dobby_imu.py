@@ -7,6 +7,22 @@ import math
 # need to add calibration function for mag
 # need to add function to change
 # which is faster, referenicng a class attribute "accel_data" evrery time or return ax, ay, az??
+
+
+# ********************************************************** #
+#			MPU9250 class to use the imu sensor
+#	Class variables:
+#		1. x_scale = the scaling value of raw x data
+#		2. x_data  = holds the raw x data
+#		3. x_bias  = holds the bias values calculated	(mag_bias and gyro_bias calculation still left)
+# 		4. mag_calibration = holds calibration data for magnetometer
+#	Class methods:
+#		1. MPU9250.init_imu() - the main init function
+#		2. MPU9250.update()   - loads lates raw data into x_data
+#		3. MPU9250.scale_rawdata() - scales raw data to physical units
+#		4. MPU9250.is_data_ready() - checks if latest data is ready for read
+# ********************************************************** #
+
 class MPU9250:
 #	defining class variables here	#
 	a_scale = None
@@ -207,6 +223,8 @@ class MPU9250:
 	__MAGBIAS_Y = 0
 	__MAGBIAS_Z = 0
 
+	__accel_bias_file = None
+
 	def __init__(self, Ascale, Gscale, Mscale, magMode):
 
 		if Ascale not in [self.__AFS_2G, self.__AFS_4G, self.__AFS_8G, self.__AFS_16G]:
@@ -280,6 +298,8 @@ class MPU9250:
 		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_PIN_CFG, 0x22)
 		self.bus.write_byte_data(self.__MPU9250_ADDRESS, self.__INT_ENABLE, 0x01)
 
+		return True
+
 	def init_ak8963(self):
 
 		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, 0x00)
@@ -298,6 +318,8 @@ class MPU9250:
 
 		self.bus.write_byte_data(self.__AK8963_ADDRESS, self.__AK8963_CNTL, self.m_scale << 4 | self.mag_mode)
 		time.sleep(0.1)
+
+		return True
 
 	def reset_mpu(self):
 
@@ -585,6 +607,9 @@ class MPU9250:
 								self.accel_bias[2] = 0.5*(data_1 + data_0)
 
 								print("Accel calibration complete!\n\r")
+								return self.save_accel_bias():
+
+
 
 	def print_config(self):
 		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");
@@ -615,20 +640,31 @@ class MPU9250:
 			time.sleep(1)
 			self.reset_mpu()
 			self.calibrate()
-			self.calibrate_accel()
-			time.sleep(2)
-			self.print_bias()
-			time.sleep(2)
-			self.init_mpu()
-			print "MPU9250 initialized for active data mode....\n\r"
-			self.init_ak8963()
-			self.get_ares()
-			self.get_gres()
-			self.get_mres()
-			time.sleep(3)
-			print "MPU9250 initialization is over!\n\r"
-			print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
+			if self.load_accel_bias() :
+					time.sleep(2)
+					self.print_bias()
+					time.sleep(2)
+					if self.init_mpu():
+						print "MPU9250 initialized for active data mode....\n\r"
+						if self.init_ak8963():
+							print "Magnetometer activated for use.....\n\r"
+							self.get_ares()
+							self.get_gres()
+							self.get_mres()
+							time.sleep(3)
+							print "MPU9250 initialization is over!\n\r"
+							print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
 
+						else:
+							print("AK8963 not found!")
+					else:
+						print("MPU9250 init failed!")
+
+			else:
+
+
+		else:
+			raise IOError("No MPU9250 found!\n")
 
 	def set_default_config(self):
 		self.a_scale = self.__AFS_4G
@@ -660,3 +696,26 @@ class MPU9250:
 		self.gyro_data[0] = float((self.gyro_data[0] - self.gyro_bias[0]) * self.g_res)
 		self.gyro_data[1] = float((self.gyro_data[1] - self.gyro_bias[1]) * self.g_res)
 		self.gyro_data[2] = float((self.gyro_data[2] - self.gyro_bias[2]) * self.g_res)
+
+	def load_accel_bias(self):
+
+		try:
+			self.__accel_bias_file =  open("accel_bias_save.txt", "r")
+			response = input("The calibration data for accelerometer exists, do you want to recalibrate? Enter \"1\" to calibrate:")
+			if response == 1:
+				self.calibrate_accel()
+				return True
+
+			else:
+				accel_bias_data = self.__accel_bias_file.readline()
+
+		except IOError:
+			print("The accelerometer needs calibration!")
+			self.calibrate_accel()
+
+	def save_accel_bias(self):
+		self.__accel_bias_file = open("accel_bias_save.txt", "w")
+		self.__accel_bias_file.write(self.accel_bias[0] + ',' + self.accel_bias[1] + ',' + self.accel_bias[2] + '\n')
+		self.__accel_bias_file.close()
+		print("Accel biases saved successfully!")
+		return True

@@ -197,6 +197,22 @@ class MPU9250:
 	__MAGBIAS_Y = 0
 	__MAGBIAS_Z = 0
 
+<<<<<<< HEAD
+
+	def __init__(self):
+		self.a_scale = None
+		self.g_scale = None
+		self.m_scale = None
+		self.mag_mode = None
+		self.a_res = None
+		self.g_res = None
+		self.m_res = None
+		self.mag_calibration = np.zeros((3,))
+		self.mag_bias = np.zeros((3,))
+		self.set_default_config()
+		self.accel_bias = np.zeros((3,))
+		self.gyro_bias = np.zeros((3,))
+=======
 	__accel_bias_file = None
 
 	def __init__(self):
@@ -279,6 +295,7 @@ class MPU9250:
 
 		if self.m_scale == self.__MFS_14BITS:
 			self.m_res = 4912.0/8190.0
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 
 		elif self.m_scale == self.__MFS_16BITS:
 			self.m_res = 4912.0/32760.0
@@ -289,37 +306,68 @@ class MPU9250:
 		self.m_scale = self.__MFS_16BITS
 		self.mag_mode = self.__MAG_MODE_100
 
+<<<<<<< HEAD
+## ---------- main call in loop -------------- ##
+=======
 ## -------------------- data handling functions ------------------ #
 	def read_accel(self):
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 
-		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
+	def update(self):
+		self.read_accel()
+		self.read_gyro()
+		self.read_mag()
 
-		self.accel_data[0] = self.dataConv(raw_data[1], raw_data[0])
-		self.accel_data[1] = self.dataConv(raw_data[3], raw_data[2])
-		self.accel_data[2] = self.dataConv(raw_data[5], raw_data[4])
+## -------------------------- debug functions --------------------- ##
 
-	def read_gyro(self):
+	def print_config(self):
+		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");
+		printf("Gyroscope sensitivity is ", self.g_res ," deg/s \n\r");
+		printf("Magnetometer sensitivity is ", self.m_res," G \n\r");
 
-		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
+		if self.mag_mode == self.__MFS_14BITS:
+			print "Magnetometer resolution = 14  bits\n\r"
 
-		self.gyro_data[0] = self.dataConv(raw_data[1], raw_data[0])
-		self.gyro_data[1] = self.dataConv(raw_data[3], raw_data[2])
-		self.gyro_data[2] = self.dataConv(raw_data[5], raw_data[4])
+		elif self.mag_mode == self.__MFS_16BITS:
+			print "Magnetometer resolution = 16  bits\n\r"
 
-	def read_mag(self):
+	def print_bias(self):
+		print "x gyro bias = ", self.gyro_bias[0], "\n\r"
+		print "y gyro bias = ", self.gyro_bias[1], "\n\r"
+		print "z gyro bias = ", self.gyro_bias[2], "\n\r"
+		print "x accel bias = ", self.accel_bias[0], "\n\r"
+		print "y accel bias = ", self.accel_bias[1], "\n\r"
+		print "z accel bias = ", self.accel_bias[2], "\n\r"
 
-		if self.bus.read_byte_data(self.__AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
-			raw_data = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
+<<<<<<< HEAD
+## ---------------------- settings functions ----------------- ##
+	def get_ares(self):
 
-			if (raw_data[6] & 0x08) != 0x08:
-				self.mag_data[0] = self.dataConv(raw_data[1], raw_data[0])
-				self.mag_data[1] = self.dataConv(raw_data[3], raw_data[2])
-				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])
+		if self.a_scale == self.__AFS_2G:
+			self.a_res = 2.0/32768.0
 
+		elif self.a_scale == self.__AFS_4G:
+			self.a_res = 4.0/32768.0
+
+		elif self.a_scale == self.__AFS_8G:
+			self.a_res = 8.0/32768.0
+
+		elif self.a_scale == self.__AFS_16G:
+			self.a_res = 16.0/32768.0
+
+	def get_gres(self):
+
+		if self.g_scale == self.__GFS_250DPS:
+			self.g_res = 250.0/32768.0
+
+		elif self.g_scale == self.__GFS_500DPS:
+			self.g_res = 500.0/32768.0
+=======
 	def scale_rawdata(self):
 		self.accel_data[0] = float((self.accel_data[0] - self.accel_bias[0]) * self.a_res)
 		self.accel_data[1] = float((self.accel_data[1] - self.accel_bias[1]) * self.a_res)
 		self.accel_data[2] = float((self.accel_data[2] - self.accel_bias[2]) * self.a_res)
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 
 		self.mag_data[0] = float((self.mag_data[0] - self.mag_bias[0]) * self.m_res)
 		self.mag_data[1] = float((self.mag_data[1] - self.mag_bias[1]) * self.m_res)
@@ -343,6 +391,22 @@ class MPU9250:
 		else:
 			return False
 
+<<<<<<< HEAD
+	def set_default_config(self):
+		self.a_scale = self.__AFS_4G
+		self.g_scale = self.__GFS_500DPS
+		self.m_scale = self.__MFS_16BITS
+		self.mag_mode = self.__MAG_MODE_100
+
+## -------------------- data handling functions ------------------ #
+	def read_accel(self):
+
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
+
+		self.accel_data[0] = self.dataConv(raw_data[1], raw_data[0])
+		self.accel_data[1] = self.dataConv(raw_data[3], raw_data[2])
+		self.accel_data[2] = self.dataConv(raw_data[5], raw_data[4])
+=======
 ## ------------------ calibration functions ---------------- ##
 	def calibrate(self):
 		accel_bias = np.zeros((3,))
@@ -466,6 +530,65 @@ class MPU9250:
 			for j in range(len(self.gyro_data)):
 				data[j] = self.gyro_data[j] + data[j]
 			i = i + 1
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
+
+	def read_gyro(self):
+
+<<<<<<< HEAD
+		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
+
+		self.gyro_data[0] = self.dataConv(raw_data[1], raw_data[0])
+		self.gyro_data[1] = self.dataConv(raw_data[3], raw_data[2])
+		self.gyro_data[2] = self.dataConv(raw_data[5], raw_data[4])
+
+	def read_mag(self):
+
+		if self.bus.read_byte_data(self.__AK8963_ADDRESS, self.__AK8963_ST1) & 0x01:
+			raw_data = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
+
+			if (raw_data[6] & 0x08) != 0x08:
+				self.mag_data[0] = self.dataConv(raw_data[1], raw_data[0])
+				self.mag_data[1] = self.dataConv(raw_data[3], raw_data[2])
+				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])
+
+	def scale_rawdata(self):
+		self.accel_data[0] = float((self.accel_data[0] - self.accel_bias[0]) * self.a_res)
+		self.accel_data[1] = float((self.accel_data[1] - self.accel_bias[1]) * self.a_res)
+		self.accel_data[2] = float((self.accel_data[2] - self.accel_bias[2]) * self.a_res)
+
+		self.mag_data[0] = float((self.mag_data[0] - self.mag_bias[0]) * self.m_res)
+		self.mag_data[1] = float((self.mag_data[1] - self.mag_bias[1]) * self.m_res)
+		self.mag_data[2] = float((self.mag_data[2] - self.mag_bias[2]) * self.m_res)
+
+		self.gyro_data[0] = float((self.gyro_data[0] - self.gyro_bias[0]) * self.g_res)
+		self.gyro_data[1] = float((self.gyro_data[1] - self.gyro_bias[1]) * self.g_res)
+		self.gyro_data[2] = float((self.gyro_data[2] - self.gyro_bias[2]) * self.g_res)
+
+	def dataConv(self, data1, data2):
+		value = data1 | (data2 << 8)
+		if(value & (1 << 16 - 1)):
+			value -= (1<<16)
+		return value
+
+	def is_data_ready(self):
+		drdy = self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__INT_STATUS)
+		if drdy & 0x01:
+			return True
+
+		else:
+			return False
+
+## ------------------ calibration functions ---------------- ##
+	def calibrate_gyro(self):
+		data = np.zeros((3,))
+		time.sleep(3)
+		i = 0
+		while i < 2000:
+			if self.is_data_ready():
+				self.read_gyro()
+			for j in range(len(self.gyro_data)):
+				data[j] = self.gyro_data[j] + data[j]
+			i = i + 1
 
 		for i in range(len(data)):
 			self.gyro_bias[i] = data[i]/2000
@@ -548,7 +671,88 @@ class MPU9250:
 
 		#store in accel_bias[z]
 		self.accel_bias[2] = 0.5*(data_1 + data_0)
+		self.save_accel_bias()
+=======
+		self.save_gyro_bias()
 
+	def calibrate_accel(self):
+		data_1 = 0
+		data_0 = 0
+		i = 0
+
+		# calculate for body x-axis
+		print("Place quadrotor in nose up position...\n\r")
+		time.sleep(4)
+		for i in range(1000):
+			if self.is_data_ready():
+				self.read_accel()
+				data_0 = data_0 + self.accel_data[0]
+				i = i + 1
+		data_0 = data_0/1000
+		i = 0
+
+		print("Place quadrotor in nose down position...\n\r")
+		time.sleep(4)
+		for i in range(1000):
+			if self.is_data_ready():
+				self.read_accel()
+				data_1 = data_1 + self.accel_data[0]
+				i = i + 1
+		data_1 = data_1/1000
+		i = 0
+
+		#store in accel_bias[x]
+		self.accel_bias[0] = 0.5*(data_1 + data_0)
+
+		# calculate for body y - axis
+		print("Place quadrotor on its right side...\n\r")
+		time.sleep(4)
+		for i in range(1000):
+			if self.is_data_ready():
+				self.read_accel()
+				data_0 = data_0 + self.accel_data[1]
+				i = i + 1
+		data_0 = data_0/1000
+		i = 0
+
+		print("Place quadrotor on its left side...\n\r")
+		time.sleep(4)
+		for i in range(1000):
+			if self.is_data_ready():
+				self.read_accel()
+				data_1 = data_1 + self.accel_data[1]
+				i = i + 1
+		data_1 = data_1/1000
+		i = 0
+
+		#store in accel_bias[y]
+		self.accel_bias[1] = 0.5*(data_1 + data_0)
+
+		#calculate for body z- axis
+		print("Place quadrotor flat and right way up...\n\r")
+		time.sleep(4)
+		for i in range(1000):
+			if self.is_data_ready():
+				self.read_accel()
+				data_0 = data_0 + self.accel_data[2]
+				i = i + 1
+		data_0 = data_0/1000
+		i = 0
+
+		print("Place quadrotor flat and on its back...\n\r")
+		time.sleep(4)
+		for i in range(1000):
+			if self.is_data_ready():
+				self.read_accel()
+				data_1 = data_1 + self.accel_data[2]
+				i = i + 1
+		data_1 = data_1/1000
+		i = 0
+
+		#store in accel_bias[z]
+		self.accel_bias[2] = 0.5*(data_1 + data_0)
+
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 ## -------------------- bias handling -------------------- ##
 	def load_accel_bias(self):
 
@@ -558,7 +762,11 @@ class MPU9250:
 			self.__accel_bias_file.close()
 			return True
 
+<<<<<<< HEAD
+		except IOError:
+=======
 		except:
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 			self.calibrate_accel()
 
 	def load_gyro_bias(self):
@@ -569,7 +777,11 @@ class MPU9250:
 			self.__gyro_bias_file.close()
 			return True
 
+<<<<<<< HEAD
+		except IOError:
+=======
 		except:
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 			self.calibrate_gyro()
 
 	def save_accel_bias(self):
@@ -642,12 +854,22 @@ class MPU9250:
 	def init_imu(self):
 		who_am_i = int(self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__WHO_AM_I_MPU9250))
 
+<<<<<<< HEAD
+		if who_am_i == 113:
+=======
 		if who_am_i == 113im:
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 			self.reset_mpu()
 			if self.init_mpu():
 				if self.init_ak8963():
 					self.load_accel_bias()
 					self.load_gyro_bias()
+<<<<<<< HEAD
+					self.get_ares()
+					self.get_gres()
+					self.get_mres()
+=======
+>>>>>>> d564a222f077b478218be14ba80e4f2c53076aa2
 					print("Ready!")
 
 		else:

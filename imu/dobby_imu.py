@@ -494,7 +494,7 @@ class MPU9250:
 	def calibrate_accel(self):
 		accel_bias_calc = np.zeros((3,))
 		data_1 = 0
-		data_2 = 0
+		data_0 = 0
 
 		print("********************************************\n")
 		print("Initializing accelerometer calibration sequence..\n\r")
@@ -510,75 +510,81 @@ class MPU9250:
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[0]
 				if i%100 == 0:
-					print(". ", end='')
+					print ". ",
+					time.sleep(0.1)
+			data_0 = data_0/1000
+			time.sleep(1)
+
+			print("Place quadrotor in nose down position...\n\r")
+			next_step = input("Enter \"1\" to continue: ")
+			if next_step == 1:
+				for i in range(1000):
+					self.read_accel()
+					data_1 = data_1 + self.accel_data[0]
+					if i%100 == 0:
+						print ". ",
+						time.sleep(0.1)
+				data_1 = data_1/1000
+				time.sleep(1)
+
+				#store in accel_bias[x]
+				self.accel_bias[0] = 0.5*(data_1 + data_0)
+
+				print("Place quadrotor on its right side...\n\r")
+				next_step = input("Enter \"1\" to continue: ")
+				if next_step == 1:
+					for i in range(1000):
+						self.read_accel()
+						data_0 = data_0 + self.accel_data[1]
+						if i%100 == 0:
+							print ". ",
+							time.sleep(0.1)
 					data_0 = data_0/1000
 					time.sleep(1)
 
-					print("Place quadrotor in nose down position...\n\r")
+					print("Place quadrotor on its left side...\n\r")
 					next_step = input("Enter \"1\" to continue: ")
 					if next_step == 1:
 						for i in range(1000):
 							self.read_accel()
-							data_1 = data_1 + self.accel_data[0]
+							data_1 = data_1 + self.accel_data[1]
 							if i%100 == 0:
-								print(". ", end='')
+								print ". ",
+								time.sleep(0.1)
+						data_1 = data_1/1000
+						time.sleep(1)
+
+						#store in accel_bias[y]
+						self.accel_bias[1] = 0.5*(data_1 + data_0)
+
+						print("Place quadrotor flat and right way up...\n\r")
+						next_step = input("Enter \"1\" to continue: ")
+						if next_step == 1:
+							for i in range(1000):
+								self.read_accel()
+								data_0 = data_0 + self.accel_data[2]
+								if i%100 == 0:
+									time.sleep(0.1)
+									print ". ",
+							data_0 = data_0/1000
+							time.sleep(1)
+
+							print("Place quadrotor flat and on its back...\n\r")
+							next_step = input("Enter \"1\" to continue: ")
+							if next_step == 1:
+								for i in range(1000):
+									self.read_accel()
+									data_1 = data_1 + self.accel_data[2]
+									if i%100 == 0:
+										print ". ",
+										time.sleep(0.1)
 								data_1 = data_1/1000
 								time.sleep(1)
 
-								#store in accel_bias[x]
-								self.accel_bias[0] = 0.5*(data_1 + data_0)
+								#store in accel_bias[y]
+								self.accel_bias[2] = 0.5*(data_1 + data_0)
 
-								print("Place quadrotor on its right side...\n\r")
-								next_step = input("Enter \"1\" to continue: ")
-								if next_step == 1:
-									for i in range(1000):
-										self.read_accel()
-										data_0 = data_0 + self.accel_data[1]
-										if i%100 == 0:
-											print(". ", end='')
-											data_0 = data_0/1000
-											time.sleep(1)
-
-											print("Place quadrotor on its left side...\n\r")
-											next_step = input("Enter \"1\" to continue: ")
-											if next_step == 1:
-												for i in range(1000):
-													self.read_accel()
-													data_1 = data_1 + self.accel_data[1]
-													if i%100 == 0:
-														print(". ", end='')
-														data_1 = data_1/1000
-														time.sleep(1)
-
-														#store in accel_bias[y]
-														self.accel_bias[1] = 0.5*(data_1 + data_0)
-
-														print("Place quadrotor flat and right way up...\n\r")
-														next_step = input("Enter \"1\" to continue: ")
-														if next_step == 1:
-															for i in range(1000):
-																self.read_accel()
-																data_0 = data_0 + self.accel_data[2]
-																if i%100 == 0:
-																	print(". ", end='')
-																	data_0 = data_0/1000
-																	time.sleep(1)
-
-																	print("Place quadrotor flat and on its back...\n\r")
-																	next_step = input("Enter \"1\" to continue: ")
-																	if next_step == 1:
-																		for i in range(1000):
-																			self.read_accel()
-																			data_1 = data_1 + self.accel_data[2]
-																			if i%100 == 0:
-																				print(". ", end='')
-																				data_1 = data_1/1000
-																				time.sleep(1)
-
-																				#store in accel_bias[y]
-																				self.accel_bias[2] = 0.5*(data_1 + data_0)
-
-																				print("Accel calibration complete!\n\r")
+								print("Accel calibration complete!\n\r")
 
 	def print_config(self):
 		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");

@@ -426,6 +426,8 @@ class MPU9250:
 
 				accel_temp = np.zeros((3,))
 				gyro_temp = np.zeros((3,))
+				temp_accel_bias = np.zeros((3,))
+				temp_gyro_bias = np.zeros((3,))
 
 				data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__FIFO_R_W, 12)
 
@@ -557,14 +559,13 @@ class MPU9250:
 		self.g_scale = self.__GFS_1000DPS
 
 	def dataConv(self, data1, data2):
-        value = data1 | (data2 << 8)
-        if(value & (1 << 16 - 1)):
-            value -= (1<<16)
-        return value
+		value = data1 | (data2 << 8)
+		if(value & (1 << 16 - 1)):
+			value -= (1<<16)
+		return value
 
 	def is_data_ready(self):
 		drdy = self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__INT_STATUS)
-
 		if drdy & 0x01:
 			return True
 

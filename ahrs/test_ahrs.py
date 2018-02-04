@@ -11,5 +11,8 @@ imu = MPU9250(MPU9250.ACCEL_4G, MPU9250.GYRO_250DPS, MPU9250.MAG_16BITS, MPU9250
 bmp = BMP280()
 ahrs = AHRS()
 for i in range(2000):
-	imu.update()
-	print imu.gyro_data
+	if imu.is_data_ready():
+		imu.update()
+		ahrs.convert_accel_to_euler()
+	print ahrs.accel_pitch
+

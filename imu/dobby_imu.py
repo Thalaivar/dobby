@@ -514,7 +514,6 @@ class MPU9250:
 		self.read_mag()
 
 	def calibrate_accel(self):
-		accel_bias_calc = np.zeros((3,))
 		data_1 = 0
 		data_0 = 0
 
@@ -529,10 +528,11 @@ class MPU9250:
 		next_step = input("Enter \"1\" to continue: ")
 		if next_step == 1:
 			for i in range(1000):
+				while !self.is_data_ready(): pass
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[0]
 				if i%100 == 0:
-					print ". ",
+					print ".",
 					time.sleep(0.1)
 			data_0 = data_0/1000
 			time.sleep(1)
@@ -541,6 +541,7 @@ class MPU9250:
 			next_step = input("Enter \"1\" to continue: ")
 			if next_step == 1:
 				for i in range(1000):
+					while !self.is_data_ready(): pass
 					self.read_accel()
 					data_1 = data_1 + self.accel_data[0]
 					if i%100 == 0:
@@ -556,6 +557,7 @@ class MPU9250:
 				next_step = input("Enter \"1\" to continue: ")
 				if next_step == 1:
 					for i in range(1000):
+						while !self.is_data_ready(): pass
 						self.read_accel()
 						data_0 = data_0 + self.accel_data[1]
 						if i%100 == 0:
@@ -568,6 +570,7 @@ class MPU9250:
 					next_step = input("Enter \"1\" to continue: ")
 					if next_step == 1:
 						for i in range(1000):
+							while !self.is_data_ready(): pass
 							self.read_accel()
 							data_1 = data_1 + self.accel_data[1]
 							if i%100 == 0:
@@ -583,6 +586,7 @@ class MPU9250:
 						next_step = input("Enter \"1\" to continue: ")
 						if next_step == 1:
 							for i in range(1000):
+								while !self.is_data_ready(): pass
 								self.read_accel()
 								data_0 = data_0 + self.accel_data[2]
 								if i%100 == 0:
@@ -595,6 +599,7 @@ class MPU9250:
 							next_step = input("Enter \"1\" to continue: ")
 							if next_step == 1:
 								for i in range(1000):
+									while !self.is_data_ready(): pass
 									self.read_accel()
 									data_1 = data_1 + self.accel_data[2]
 									if i%100 == 0:
@@ -610,6 +615,24 @@ class MPU9250:
 								return self.save_accel_bias():
 
 
+	def calibrate_gyro(self):
+		data = np.zeros((3,))
+		print("********************************************\n")
+		print("Initializing accelerometer calibration sequence..\n\r")
+		print("Keep quadrotor extremely steady for this procedure!\n\r")
+		time.sleep(3)
+
+		for i in range(2000):
+			while !self.is_data_ready(): pass
+			self.read_gyro()
+			for j in range(self.gyro_data):
+				data[j] = self.gyro_data[j] + data[j]
+
+		for i in range(data):
+			self.gyro_bias[i] = data[i]/2000
+
+		print("Gyro calibration complete!\n\r")
+		return self.save_gyro_bias():
 
 	def print_config(self):
 		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");
@@ -641,7 +664,7 @@ class MPU9250:
 			self.reset_mpu()
 			self.calibrate()
 			if self.load_accel_bias() :
-					time.sleep(2)
+				if self.load_gyro_bias() :
 					self.print_bias()
 					time.sleep(2)
 					if self.init_mpu():
@@ -704,18 +727,41 @@ class MPU9250:
 			response = input("The calibration data for accelerometer exists, do you want to recalibrate? Enter \"1\" to calibrate:")
 			if response == 1:
 				self.calibrate_accel()
-				return True
 
 			else:
-				accel_bias_data = self.__accel_bias_file.readline()
+				self.accel_bias = np.loadtxt(self.__accel_bias_file, delimiter=',', unpack=True)
+				return True
 
 		except IOError:
 			print("The accelerometer needs calibration!")
 			self.calibrate_accel()
+
+	def load_gyro_bias(self):
+
+		try:
+			self.__gyro_bias_file =  open("gyro_bias_save.txt", "r")
+			response = input("The calibration data for gyroscope exists, do you want to recalibrate? Enter \"1\" to calibrate:")
+			if response == 1:
+				self.calibrate_gyro()
+
+			else:
+				self.gyro_bias = np.loadtxt(self.__gyro_bias_file, delimiter=',', unpack=True)
+				return True
+
+		except IOError:
+			print("The gyroscope needs calibration!")
+			self.calibrate_gyro()
 
 	def save_accel_bias(self):
 		self.__accel_bias_file = open("accel_bias_save.txt", "w")
 		self.__accel_bias_file.write(self.accel_bias[0] + ',' + self.accel_bias[1] + ',' + self.accel_bias[2] + '\n')
 		self.__accel_bias_file.close()
 		print("Accel biases saved successfully!")
+		return True
+
+	def save_gyro_bias(self):
+		self.__gyro_bias_file = open("accel_bias_save.txt", "w")
+		self.__gyro_bias_file.write(self.accel_bias[0] + ',' + self.accel_bias[1] + ',' + self.accel_bias[2] + '\n')
+		self.__gyro_bias_file.close()
+		print("Gyro biases saved successfully!")
 		return True

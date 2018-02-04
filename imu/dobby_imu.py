@@ -622,7 +622,7 @@ class MPU9250:
 			time.sleep(3)
 			print "MPU9250 initialization is over!\n\r"
 			print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
-			print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"
+
 
 	def set_default_config(self):
 		self.a_scale = self.__AFS_4G
@@ -643,14 +643,14 @@ class MPU9250:
 			return False
 
 	def scale_rawdata(self):
-		self.accel_data[0] = float((self.accel_data[0] * self.a_res) - self.accel_bias[0])
-		self.accel_data[1] = float((self.accel_data[1] * self.a_res) - self.accel_bias[1])
-		self.accel_data[2] = float((self.accel_data[2] * self.a_res) - self.accel_bias[2])
+		self.accel_data[0] = float((self.accel_data[0] - self.accel_bias[0]) * self.a_res)
+		self.accel_data[1] = float((self.accel_data[1] - self.accel_bias[1]) * self.a_res)
+		self.accel_data[2] = float((self.accel_data[2] - self.accel_bias[2]) * self.a_res)
 
-		self.mag_data[0] = float((self.mag_data[0] * self.m_res) - self.mag_bias[0])
-		self.mag_data[1] = float((self.mag_data[1] * self.m_res) - self.mag_bias[1])
-		self.mag_data[2] = float((self.mag_data[2] * self.m_res) - self.mag_bias[2])
+		self.mag_data[0] = float((self.mag_data[0] - self.mag_bias[0]) * self.m_res)
+		self.mag_data[1] = float((self.mag_data[1] - self.mag_bias[1]) * self.m_res)
+		self.mag_data[2] = float((self.mag_data[2] - self.mag_bias[2]) * self.m_res)
 
-		self.gyro_data[0] = float((self.gyro_data[0] * self.g_res) - self.gyro_bias[0])
-		self.gyro_data[1] = float((self.gyro_data[1] * self.g_res) - self.gyro_bias[1])
-		self.gyro_data[2] = float((self.gyro_data[2] * self.g_res) - self.gyro_bias[2])
+		self.gyro_data[0] = float((self.gyro_data[0] - self.gyro_bias[0]) * self.g_res)
+		self.gyro_data[1] = float((self.gyro_data[1] - self.gyro_bias[1]) * self.g_res)
+		self.gyro_data[2] = float((self.gyro_data[2] - self.gyro_bias[2]) * self.g_res)

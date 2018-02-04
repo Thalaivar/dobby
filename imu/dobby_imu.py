@@ -312,10 +312,6 @@ class MPU9250:
 		self.accel_data[1] = self.dataConv(raw_data[3], raw_data[2])
 		self.accel_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
-		self.accel_data[0] = float((self.accel_data[0] * self.a_res) - self.accel_bias[0])
-		self.accel_data[1] = float((self.accel_data[1] * self.a_res) - self.accel_bias[1])
-		self.accel_data[2] = float((self.accel_data[2] * self.a_res) - self.accel_bias[2])
-
 	def read_gyro(self):
 
 		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
@@ -323,11 +319,6 @@ class MPU9250:
 		self.gyro_data[0] = self.dataConv(raw_data[1], raw_data[0])
 		self.gyro_data[1] = self.dataConv(raw_data[3], raw_data[2])
 		self.gyro_data[2] = self.dataConv(raw_data[5], raw_data[4])
-
-		self.gyro_data[0] = float((self.gyro_data[0] * self.g_res) - self.gyro_bias[0])
-		self.gyro_data[1] = float((self.gyro_data[1] * self.g_res) - self.gyro_bias[1])
-		self.gyro_data[2] = float((self.gyro_data[2] * self.g_res) - self.gyro_bias[2])
-
 
 	def read_mag(self):
 
@@ -338,10 +329,6 @@ class MPU9250:
 				self.mag_data[0] = self.dataConv(raw_data[1], raw_data[0])
 				self.mag_data[1] = self.dataConv(raw_data[3], raw_data[2])
 				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])
-
-				self.mag_data[0] = float((self.mag_data[0] * self.m_res) - self.mag_bias[0])
-				self.mag_data[1] = float((self.mag_data[1] * self.m_res) - self.mag_bias[1])
-				self.mag_data[2] = float((self.mag_data[2] * self.m_res) - self.mag_bias[2])
 
 	def get_ares(self):
 
@@ -460,8 +447,7 @@ class MPU9250:
 			else:
 				temp_accel_bias[2] += int(accelsensitivity)
 
-			# just check this with kris winer, i think we dont need it #
-			#data[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
+			#ata[0] = (-gyro_bias[0]/4  >> 8) & 0xFF
 			#data[1] = (-gyro_bias[0]/4        & 0xFF
 			#data[2] = (-gyro_bias[1]/4  >> 8) & 0xFF
 			#data[3] = (-gyro_bias[1]/4        & 0xFF
@@ -506,10 +492,93 @@ class MPU9250:
 		self.read_mag()
 
 	def calibrate_accel(self):
-		print("********************************************\n")
-		print("initializing accelerometer calibration sequence")
-		#Is this function complete yet?
+		accel_bias_calc = np.zeros((3,))
+		data_1 = 0
+		data_2 = 0
 
+		print("********************************************\n")
+		print("Initializing accelerometer calibration sequence..\n\r")
+		#Is this function complete yet?
+		#do ya think??
+		time.sleep(2)
+		print("You have to place the quadrotor in the specified position and then enter 1 to proceed:\n\r")
+		time.sleep(2)
+		print("Place quadrotor in nose up position...\n\r")
+		next_step = input("Enter \"1\" to continue: ")
+		if next_step == 1:
+			for i in range(1000):
+				self.read_accel()
+				data_0 = data_0 + self.accel_data[0]
+				if i%100 == 0:
+					print(". ", end='')
+					data_0 = data_0/1000
+					time.sleep(1)
+
+					print("Place quadrotor in nose down position...\n\r")
+					next_step = input("Enter \"1\" to continue: )
+					if next_step == 1:
+						for i in range(1000):
+							self.read_accel()
+							data_1 = data_1 + self.accel_data[0]
+							if i%100 == 0:
+								print(". ", end='')
+								data_1 = data_1/1000
+								time.sleep(1)
+
+								#store in accel_bias[x]
+								self.accel_bias[0] = 0.5*(data_1 + data_0)
+
+								print("Place quadrotor on its right side...\n\r")
+								next_step = input("Enter \"1\" to continue: ")
+								if next_step == 1:
+									for i in range(1000):
+										self.read_accel()
+										data_0 = data_0 + self.accel_data[1]
+										if i%100 == 0:
+											print(". ", end='')
+											data_0 = data_0/1000
+											time.sleep(1)
+
+											print("Place quadrotor on its left side...\n\r")
+											next_step = input("Enter \"1\" to continue: )
+											if next_step == 1:
+												for i in range(1000):
+													self.read_accel()
+													data_1 = data_1 + self.accel_data[1]
+													if i%100 == 0:
+														print(". ", end='')
+														data_1 = data_1/1000
+														time.sleep(1)
+
+														#store in accel_bias[y]
+														self.accel_bias[1] = 0.5*(data_1 + data_0)
+
+														print("Place quadrotor flat and right way up...\n\r")
+														next_step = input("Enter \"1\" to continue: ")
+														if next_step == 1:
+															for i in range(1000):
+																self.read_accel()
+																data_0 = data_0 + self.accel_data[2]
+																if i%100 == 0:
+																	print(". ", end='')
+																	data_0 = data_0/1000
+																	time.sleep(1)
+
+																	print("Place quadrotor flat and on its back...\n\r")
+																	next_step = input("Enter \"1\" to continue: )
+																	if next_step == 1:
+																		for i in range(1000):
+																			self.read_accel()
+																			data_1 = data_1 + self.accel_data[2]
+																			if i%100 == 0:
+																				print(". ", end='')
+																				data_1 = data_1/1000
+																				time.sleep(1)
+
+																				#store in accel_bias[y]
+																				self.accel_bias[2] = 0.5*(data_1 + data_0)
+
+																				print("Accel calibration complete!\n\r")
 
 	def print_config(self):
 		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");
@@ -540,6 +609,7 @@ class MPU9250:
 			time.sleep(1)
 			self.reset_mpu()
 			self.calibrate()
+			self.calibrate_accel()
 			time.sleep(2)
 			self.print_bias()
 			time.sleep(2)
@@ -571,3 +641,16 @@ class MPU9250:
 
 		else:
 			return False
+
+	def scale_rawdata(self):
+		self.accel_data[0] = float((self.accel_data[0] * self.a_res) - self.accel_bias[0])
+		self.accel_data[1] = float((self.accel_data[1] * self.a_res) - self.accel_bias[1])
+		self.accel_data[2] = float((self.accel_data[2] * self.a_res) - self.accel_bias[2])
+
+		self.mag_data[0] = float((self.mag_data[0] * self.m_res) - self.mag_bias[0])
+		self.mag_data[1] = float((self.mag_data[1] * self.m_res) - self.mag_bias[1])
+		self.mag_data[2] = float((self.mag_data[2] * self.m_res) - self.mag_bias[2])
+
+		self.gyro_data[0] = float((self.gyro_data[0] * self.g_res) - self.gyro_bias[0])
+		self.gyro_data[1] = float((self.gyro_data[1] * self.g_res) - self.gyro_bias[1])
+		self.gyro_data[2] = float((self.gyro_data[2] * self.g_res) - self.gyro_bias[2])

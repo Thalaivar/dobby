@@ -514,9 +514,9 @@ class MPU9250:
 
 
 	def print_config(self):
-		printf("Accelerometer sensitivity is ", 1.0/self.a_res ," LSB/g \n\r");
-		printf("Gyroscope sensitivity is ", 1.0/self.g_res ," LSB/deg/s \n\r");
-		printf("Magnetometer sensitivity is ", 1.0/self.m_res," LSB/G \n\r");
+		printf("Accelerometer sensitivity is ", self.a_res ," g \n\r");
+		printf("Gyroscope sensitivity is ", self.g_res ," deg/s \n\r");
+		printf("Magnetometer sensitivity is ", self.m_res," G \n\r");
 
 		if self.mag_mode == self.__MFS_14BITS:
 			print "Magnetometer resolution = 14  bits\n\r"
@@ -555,3 +555,7 @@ class MPU9250:
 			print "MPU9250 initialization is over!\n\r"
 			print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
 			print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"
+
+	def set_default_config(self):
+		self.a_scale = self.__AFS_4G
+		self.g_scale = self.__GFS_1000DPS

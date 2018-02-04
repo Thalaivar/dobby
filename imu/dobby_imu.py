@@ -236,17 +236,8 @@ class MPU9250:
 
 					else:
 						self.mag_mode = magMode
+						self.init_imu()
 
-						## methods to be called during initialization of mpu ##
-						# need to add error and exception handling
-						self.reset_mpu()
-						self.calibrate()
-						self.init_mpu()
-						self.init_ak8963()
-						self.get_ares()
-						self.get_gres()
-						self.get_mres()
-						self.print_config()
 		# instead of putting scale functions
 		# How about when we read_accel we store only after scaling?
 		# modification done, have removed scale_rawdata()
@@ -318,25 +309,25 @@ class MPU9250:
 
 		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__ACCEL_XOUT_H, 6)
 
-		self.accel_data[0] = int(((raw_data[0] << 8) | raw_data[1]))
-		self.accel_data[1] = int(((raw_data[2] << 8) | raw_data[3]))
-		self.accel_data[2] = int(((raw_data[4] << 8) | raw_data[5]))
+		self.accel_data[0] = int(((int(raw_data[0]) << 8) | raw_data[1]))
+		self.accel_data[1] = int(((int(raw_data[2]) << 8) | raw_data[3]))
+		self.accel_data[2] = int(((int(raw_data[4]) << 8) | raw_data[5]))
 
-		self.accel_data[0] = (self.accel_data[0] * self.a_res) - self.accel_bias[0]
-		self.accel_data[1] = (self.accel_data[1] * self.a_res) - self.accel_bias[1]
-		self.accel_data[2] = (self.accel_data[2] * self.a_res) - self.accel_bias[2]
+		self.accel_data[0] = float((self.accel_data[0] * self.a_res) - self.accel_bias[0])
+		self.accel_data[1] = float((self.accel_data[1] * self.a_res) - self.accel_bias[1])
+		self.accel_data[2] = float((self.accel_data[2] * self.a_res) - self.accel_bias[2])
 
 	def read_gyro(self):
 
 		raw_data = self.bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
 
-		self.gyro_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
-		self.gyro_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
-		self.gyro_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
+		self.gyro_data[0] = int(((int(raw_data[0])<<8) | raw_data[1]))
+		self.gyro_data[1] = int(((int(raw_data[2])<<8) | raw_data[3]))
+		self.gyro_data[2] = int(((int(raw_data[4])<<8) | raw_data[5]))
 
-		self.gyro_data[0] = (self.gyro_data[0] * self.g_res) - self.gyro_bias[0]
-		self.gyro_data[1] = (self.gyro_data[1] * self.g_res) - self.gyro_bias[1]
-		self.gyro_data[2] = (self.gyro_data[2] * self.g_res) - self.gyro_bias[2]
+		self.gyro_data[0] = float((self.gyro_data[0] * self.g_res) - self.gyro_bias[0])
+		self.gyro_data[1] = float((self.gyro_data[1] * self.g_res) - self.gyro_bias[1])
+		self.gyro_data[2] = float((self.gyro_data[2] * self.g_res) - self.gyro_bias[2])
 
 
 	def read_mag(self):
@@ -345,13 +336,13 @@ class MPU9250:
 			raw_data = self.bus.read_i2c_block_data(self.__AK8963_ADDRESS, self.__AK8963_XOUT_L, 7)
 
 			if not (raw_data[6] & 0x08):
-				self.mag_data[0] = int(((raw_data[0]<<8) | raw_data[1]))
-				self.mag_data[1] = int(((raw_data[2]<<8) | raw_data[3]))
-				self.mag_data[2] = int(((raw_data[4]<<8) | raw_data[5]))
+				self.mag_data[0] = int(((int(raw_data[0])<<8) | raw_data[1]))
+				self.mag_data[1] = int(((int(raw_data[2])<<8) | raw_data[3]))
+				self.mag_data[2] = int(((int(raw_data[4])<<8) | raw_data[5]))
 
-				self.mag_data[0] = (self.mag_data[0] * self.m_res) - self.mag_bias[0]
-				self.mag_data[1] = (self.mag_data[1] * self.m_res) - self.mag_bias[1]
-				self.mag_data[2] = (self.mag_data[2] * self.m_res) - self.mag_bias[2]
+				self.mag_data[0] = float((self.mag_data[0] * self.m_res) - self.mag_bias[0])
+				self.mag_data[1] = float((self.mag_data[1] * self.m_res) - self.mag_bias[1])
+				self.mag_data[2] = float((self.mag_data[2] * self.m_res) - self.mag_bias[2])
 
 	def get_ares(self):
 
@@ -524,5 +515,47 @@ class MPU9250:
 
 
 	def print_config(self):
+<<<<<<< HEAD
+		printf("Accelerometer sensitivity is ", 1.0/self.a_res ," LSB/g \n\r");
+    	printf("Gyroscope sensitivity is ", 1.0/self.g_res ," LSB/deg/s \n\r");
+    	printf("Magnetometer sensitivity is ", 1.0/self.m_res," LSB/G \n\r");
+
+		if self.mag_mode == self.__MFS_14BITS:
+			print "Magnetometer resolution = 14  bits\n\r"
+
+		elif self.mag_mode == self.__MFS_16BITS:
+			print "Magnetometer resolution = 16  bits\n\"
+
+	def print_bias(self):
+		print "x gyro bias = ", self.gyro_bias[0], "\n\r"
+		print "y gyro bias = ", self.gyro_bias[1], "\n\r"
+		print "z gyro bias = ", self.gyro_bias[2], "\n\r"
+		print "x accel bias = ", self.accel_bias[0], "\n\r"
+		print "y accel bias = ", self.accel_bias[1], "\n\r"
+		print "z accel bias = ", self.accel_bias[2], "\n\r"
+
+	def init_imu(self):
+		## methods to be called during initialization of mpu ##
+		# need to add error and exception handling
+		who_am_i = int(self.bus.read_byte_data(self.__MPU9250_ADDRESS, self.__WHO_AM_I_MPU9250))
+
+		if who_am_i == 113:
+			print "MPU9250 is online...\n\r"
+			time.sleep(1)
+			self.reset_mpu()
+			self.calibrate()
+			time.sleep(2)
+			self.print_bias()
+			time.sleep(2)
+			self.init_mpu
+			print "MPU9250 initialized for active data mode....\n\r"
+			self.init_ak8963()
+			self.get_ares()
+			self.get_gres()
+			self.get_mres()
+			time.sleep(3)
+			print "MPU9250 initialization is over!\n\r"
+=======
 		print "[ Ares Gres Mres ] = [ ", self.a_res, " ", self.g_res, " ", self.m_res, " ]"
 		print "[ Ascale, Gscale, Mscale ] = [ ", self.a_scale, " ", self.g_scale, " ", self.m_scale," ]"
+>>>>>>> 5dc4e92652bf5bd7e0eba8c1a85913950a4336d6

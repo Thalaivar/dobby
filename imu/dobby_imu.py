@@ -515,7 +515,7 @@ class MPU9250:
 					time.sleep(1)
 
 					print("Place quadrotor in nose down position...\n\r")
-					next_step = input("Enter \"1\" to continue: )
+					next_step = input("Enter \"1\" to continue: ")
 					if next_step == 1:
 						for i in range(1000):
 							self.read_accel()
@@ -540,7 +540,7 @@ class MPU9250:
 											time.sleep(1)
 
 											print("Place quadrotor on its left side...\n\r")
-											next_step = input("Enter \"1\" to continue: )
+											next_step = input("Enter \"1\" to continue: ")
 											if next_step == 1:
 												for i in range(1000):
 													self.read_accel()
@@ -565,7 +565,7 @@ class MPU9250:
 																	time.sleep(1)
 
 																	print("Place quadrotor flat and on its back...\n\r")
-																	next_step = input("Enter \"1\" to continue: )
+																	next_step = input("Enter \"1\" to continue: ")
 																	if next_step == 1:
 																		for i in range(1000):
 																			self.read_accel()

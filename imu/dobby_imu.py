@@ -380,7 +380,7 @@ class MPU9250:
 			if self.is_data_ready():
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[0]
-				i = i + 1
+				#i = i + 1---check this again
 		data_0 = data_0/1000
 		i = 0
 
@@ -390,7 +390,7 @@ class MPU9250:
 			if self.is_data_ready():
 				self.read_accel()
 				data_1 = data_1 + self.accel_data[0]
-				i = i + 1
+				#i = i + 1----check this again
 		data_1 = data_1/1000
 		i = 0
 
@@ -449,6 +449,43 @@ class MPU9250:
 	def calibrate_mag(self):
 		# define methods
 		# call save_mag_bias() (create it if not made)
+		#Default Sample Count set To 2000, please change as required
+		#function written only for soft iron magbiases
+		#hard iron bias is a confusion because of mag_scale
+
+		mag_min[3] = np.zeroes((3,))
+		mag_max[3] = np.zeroes((3,))
+		sample_count = 2000
+		print "Magnetometer Calibration Initiated."
+		print "Wave Device in a figure 8 until done"
+		time.sleep(3)
+		print "Calibration has started:"
+
+		for i in range(sample_count):
+			if self.is_data_ready():
+				self.read_mag()
+#Looping is possible but could it slow the system down as loops will become nested?
+			if mag_min[0] > self.mag_data[0]:
+				mag_min[0] = self.mag_data[0]
+			if mag_max[0] < self.mag_data[0]:
+				mag_max[0] = self.mag_data[0]
+
+			if mag_min[1] > self.mag_data[1]:
+				mag_min[1] = self.mag_data[1]
+			if mag_max[1] < self.mag_data[1]:
+				mag_max[1] = self.mag_data[1]
+
+			if mag_min[2] > self.mag_data[2]:
+				mag_min[2] = self.mag_data[2]
+			if mag_max[2] < self.mag_data[2]:
+				mag_max[2] = self.mag_data[2]
+
+		#store soft iron biases in the magbiases
+		self.mag_bias[0] = 0.5*(mag_min[0] + mag_max[0])
+		self.mag_bias[1] = 0.5*(mag_min[1] + mag_max[1])
+		self.mag_bias[2] = 0.5*(mag_min[2] + mag_max[2])
+		self.save_mag_bias()
+
 ## ********************************************************* ##
 
 ## ********************************************************* ##
@@ -476,6 +513,18 @@ class MPU9250:
 
 		except:
 			self.calibrate_gyro()
+
+	def load_mag_bias(self):
+
+			try:
+				self.__mag_bias_file = open("mag_bias_save.txt", "r")
+				self.mag_bias = np.loadtxt(self.__mag_bias_file, delimiter = ',', unpack=True)
+				self.__mag_bias_file.close()
+			return True
+
+		except:
+			self.calibrate_mag()
+			
 
 	def save_accel_bias(self):
 		self.__accel_bias_file = open("accel_bias_save.txt", "w")

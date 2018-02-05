@@ -2,6 +2,7 @@ import time
 import smbus
 import numpy as np
 import math
+import Adafruit_BBIO.GPIO as GPIO
 
 # need to add calibration function for mag
 

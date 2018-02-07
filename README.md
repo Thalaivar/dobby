@@ -16,4 +16,7 @@ Tasks to do:
 * PRU PPM/PWM libraries.
 * Cython-ize the code and check loop rates.
 * Write the remote comms.
-* Write accel_calibration function.
+* ~~Write accel_calibration function.~~
+* ~~Write gyro_calibration function~~
+* ~~Write mag_calibration function~~
+* Write failsafes and arm checks

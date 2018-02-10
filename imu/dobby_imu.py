@@ -517,10 +517,10 @@ class MPU9250:
 
 	def load_mag_bias(self):
 
-			try:
-				self.__mag_bias_file = open("mag_bias_save.txt", "r")
-				self.mag_bias = np.loadtxt(self.__mag_bias_file, delimiter = ',', unpack=True)
-				self.__mag_bias_file.close()
+		try:
+			self.__mag_bias_file = open("mag_bias_save.txt", "r")
+			self.mag_bias = np.loadtxt(self.__mag_bias_file, delimiter = ',', unpack=True)
+			self.__mag_bias_file.close()
 			return True
 
 		except:
@@ -605,7 +605,7 @@ class MPU9250:
 	def init_imu(self):
 		who_am_i = int(self.__bus.read_byte_data(self.__MPU9250_ADDRESS, self.__WHO_AM_I_MPU9250))
 
-		if who_am_i == 113im:
+		if who_am_i == 113:
 			self.reset_mpu()
 			if self.init_mpu():
 				if self.init_ak8963():

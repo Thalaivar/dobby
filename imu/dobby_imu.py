@@ -25,6 +25,7 @@ class MPU9250:
 
 	accel_data = np.zeros((3,))
 	gyro_data = np.zeros((3,))
+	gyro_prev_data = np.zeroes((3,0))
 	mag_data = np.zeros((3,))
 
 	__AK8963_ADDRESS   =  0x0C
@@ -206,6 +207,8 @@ class MPU9250:
 		self.accel_bias = np.zeros((3,))
 		self.gyro_bias = np.zeros((3,))
 		self.mag_bias = np.zeros((3,))
+		self.gyroprev_time = 0
+		self.gyroprev_time = 0
 
 	def reset_mpu(self):
 
@@ -304,12 +307,31 @@ class MPU9250:
 		self.accel_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
 	def read_gyro(self):
+# all time functions for gyro are local
+#please remove any public declarations
+
+		gyro_time = time.clock()
 
 		raw_data = self.__bus.read_i2c_block_data(self.__MPU9250_ADDRESS, self.__GYRO_XOUT_H, 6)
 
 		self.gyro_data[0] = self.dataConv(raw_data[1], raw_data[0])
 		self.gyro_data[1] = self.dataConv(raw_data[3], raw_data[2])
 		self.gyro_data[2] = self.dataConv(raw_data[5], raw_data[4])
+
+#Need to decide how calling of scale_rawdata() is done
+#The case for gyro is confusing
+
+		self.gyro_data[0] = float((self.gyro_data[0] - self.gyro_bias[0]) * self.g_res)
+		self.gyro_data[1] = float((self.gyro_data[1] - self.gyro_bias[1]) * self.g_res)
+		self.gyro_data[2] = float((self.gyro_data[2] - self.gyro_bias[2]) * self.g_res)
+
+		dt_time = gyro_time - gyroprev_time
+		if dt_time == 0:
+			dt_time = 0.0033 #Assuming 300Hz Loop rate
+		self.gyro_euler = dt_time * (self.gyro_data - self.gyro_prev_data)
+
+		gyroprev_time = gyro_time
+		self.gyro_prev_data = self.gyro_data
 
 	def read_mag(self):
 
@@ -477,10 +499,10 @@ class MPU9250:
 				mag_max[1] = self.mag_data[1]
 
 			if mag_min[2] > self.mag_data[2]:
+
 				mag_min[2] = self.mag_data[2]
 			if mag_max[2] < self.mag_data[2]:
 				mag_max[2] = self.mag_data[2]
-
 		#store soft iron biases in the magbiases
 		self.mag_bias[0] = 0.5*(mag_min[0] + mag_max[0])
 		self.mag_bias[1] = 0.5*(mag_min[1] + mag_max[1])
@@ -525,7 +547,7 @@ class MPU9250:
 
 		except:
 			self.calibrate_mag()
-			
+
 
 	def save_accel_bias(self):
 		self.__accel_bias_file = open("accel_bias_save.txt", "w")

@@ -206,6 +206,8 @@ class MPU9250:
 		self.accel_bias = np.zeros((3,))
 		self.gyro_bias = np.zeros((3,))
 		self.mag_bias = np.zeros((3,))
+		GPIO.setup("RED", GPIO.OUT)
+		GPIO.setup("GREEN", GPIO.OUT)
 
 	def reset_mpu(self):
 
@@ -353,93 +355,116 @@ class MPU9250:
 ## ********************************************************* ##
 	def calibrate_gyro(self):
 		data = np.zeros((3,))
-		time.sleep(3)
+		self.blink_led("GREEN", 4)	
+		GPIO.output("RED", 1)
 		i = 0
+		
 		while i < 2000:
 			if self.is_data_ready():
 				self.read_gyro()
-			for j in range(len(self.gyro_data)):
-				data[j] = self.gyro_data[j] + data[j]
-			i = i + 1
+				i = i + 1
+				for j in range(len(self.gyro_data)):
+					data[j] = self.gyro_data[j] + data[j]
 
 		for i in range(len(data)):
 			self.gyro_bias[i] = data[i]/2000
 
 		self.save_gyro_bias()
+		GPIO.output("RED", 0)
 
 	def calibrate_accel(self):
 		data_1 = 0
 		data_0 = 0
 		i = 0
-
+		
+		
 		# calculate for body x-axis
 		print("Place quadrotor in nose up position...\n\r")
-		time.sleep(4)
-		for i in range(1000):
+		self.blink_led("GREEN", 4)
+		GPIO.output("RED", 1)
+		
+		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[0]
-				#i = i + 1---check this again
+				i = i + 1
 		data_0 = data_0/1000
 		i = 0
+		GPIO.output("RED", 0)
 
 		print("Place quadrotor in nose down position...\n\r")
-		time.sleep(4)
-		for i in range(1000):
+		self.blink_led("GREEN", 4)
+		GPIO.output("RED", 1)
+		
+		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_1 = data_1 + self.accel_data[0]
-				#i = i + 1----check this again
+				i = i + 1		
+		
 		data_1 = data_1/1000
 		i = 0
+		GPIO.output("RED", 0)
 
 		#store in accel_bias[x]
 		self.accel_bias[0] = 0.5*(data_1 + data_0)
 
 		# calculate for body y - axis
 		print("Place quadrotor on its right side...\n\r")
-		time.sleep(4)
-		for i in range(1000):
+		self.blink_led("GREEN", 4)
+		GPIO.output("RED", 1)
+		
+		while i	< 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[1]
 				i = i + 1
 		data_0 = data_0/1000
 		i = 0
+		GPIO.output("RED", 0)
 
 		print("Place quadrotor on its left side...\n\r")
-		time.sleep(4)
-		for i in range(1000):
+		self.blink_led("GREEN", 4)
+		GPIO.output("RED", 1)
+		
+		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_1 = data_1 + self.accel_data[1]
 				i = i + 1
 		data_1 = data_1/1000
 		i = 0
+		GPIO.output("RED", 0)
 
 		#store in accel_bias[y]
 		self.accel_bias[1] = 0.5*(data_1 + data_0)
 
 		#calculate for body z- axis
 		print("Place quadrotor flat and right way up...\n\r")
-		time.sleep(4)
-		for i in range(1000):
+		self.blink_led("GREEN", 4)
+		GPIO.output("RED", 1)
+		
+		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_0 = data_0 + self.accel_data[2]
 				i = i + 1
 		data_0 = data_0/1000
 		i = 0
+		GPIO.output("RED", 0)
 
 		print("Place quadrotor flat and on its back...\n\r")
-		time.sleep(4)
-		for i in range(1000):
+		self.blink_led("GREEN", 4)
+		GPIO.output("RED", 1)
+		
+		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_1 = data_1 + self.accel_data[2]
 				i = i + 1
 		data_1 = data_1/1000
 		i = 0
+		GPIO.output("RED", 0)
 
 		#store in accel_bias[z]
 		self.accel_bias[2] = 0.5*(data_1 + data_0)
@@ -532,7 +557,7 @@ class MPU9250:
 
 	def save_gyro_bias(self):
 		self.__gyro_bias_file = open("gyro_bias_save.txt", "w")
-		self.__gyro_bias_file.write(str(self.gyro_bias[0]) + ',' + str(self.accel_bias[1]) + ',' + str(self.accel_bias[2]) + '\n')
+		self.__gyro_bias_file.write(str(self.gyro_bias[0]) + ',' + str(self.gyro_bias[1]) + ',' + str(self.gyro_bias[2]) + '\n')
 		self.__gyro_bias_file.close()
 
 	def save_mag_bias(self):
@@ -610,7 +635,23 @@ class MPU9250:
 					self.load_accel_bias()
 					self.load_gyro_bias()
 					print("Ready!")
+					self.get_ares()
+					self.get_mres()
+					self.get_gres()
 
 		else:
 			print("Failed")
+
+	def blink_led(self, led, n):
+		state = 1
+		for i in range(2*n):
+			if state == 1:
+				GPIO.output(led, 0)
+				state = 0
+
+			else:
+				GPIO.output(led, 1)
+				state = 1
+			time.sleep(0.5)
+		GPIO.output(led, 0)
 ## ********************************************************* ##

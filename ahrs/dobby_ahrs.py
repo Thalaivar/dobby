@@ -39,12 +39,12 @@ class AHRS(MPU9250):
 	
 	def euler_comp_update(self):
 		self.gyro_time = time.clock()
-		dt_time = self.gyro_time - self.gyro_prevtime
+		self.dt_time = self.gyro_time - self.gyro_prevtime
 		self.get_accel_euler()
 		self.get_gyro_euler()
-		self.euler[0] = self.__GYRO_CONSTANT*(self.gyro_euler[0]*dt_time + self.euler[0]) + self.__ACCEL_CONSTANT*self.accel_euler[0]*180.0/math.pi
-		self.euler[1] = self.__GYRO_CONSTANT*(self.gyro_euler[1]*dt_time + self.euler[1]) + self.__ACCEL_CONSTANT*self.accel_euler[1]*180.0/math.pi
-		self.euler[2] = self.__GYRO_CONSTANT*(self.gyro_euler[2]*dt_time + self.euler[2]) + self.__ACCEL_CONSTANT*self.accel_euler[2]*180.0/math.pi
+		self.euler[0] = self.__GYRO_CONSTANT*(self.gyro_euler[0]*self.dt_time + self.euler[0]) + self.__ACCEL_CONSTANT*self.accel_euler[0]*180.0/math.pi
+		self.euler[1] = self.__GYRO_CONSTANT*(self.gyro_euler[1]*self.dt_time + self.euler[1]) + self.__ACCEL_CONSTANT*self.accel_euler[1]*180.0/math.pi
+		self.euler[2] = self.__GYRO_CONSTANT*(self.gyro_euler[2]*self.dt_time + self.euler[2]) + self.__ACCEL_CONSTANT*self.accel_euler[2]*180.0/math.pi
 		self.gyro_prevdata = self.gyro_data
 		self.gyro_prevtime = self.gyro_time
 	

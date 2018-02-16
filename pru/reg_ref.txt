@@ -1,0 +1,38 @@
+//-------- constants table ---------------------------------------------------//
+//
+//	 c0 = 0x000'20'000	// local: intc
+//	 c1 = 0x480'40'000	// l4ls: timer 2
+//	 c2 = 0x480'2a'000	// l4ls: i²c 1
+//	 c3 = 0x000'30'000	// local: cap
+//	 c4 = 0x000'26'000	// local: ctrl
+//	 c5 = 0x480'60'000	// l4ls: mmc 0
+//	 c6 = 0x480'30'000	// l4ls: spi 0
+//	 c7 = 0x000'28'000	// local: uart
+//	 c8 = 0x460'00'000	// l3: asp 0 data
+//	 c9 = 0x4a1'00'000	// l4hs: ethernet
+//	c10 = 0x483'18'000	// l4ls: pka
+//	c11 = 0x480'22'000	// l4ls: uart 1
+//	c12 = 0x480'24'000	// l4ls: uart 2
+//	c13 = 0x483'10'000	// l4ls: rng
+//	c14 = 0x481'cc'000	// l4ls: can 0
+//	c15 = 0x481'd0'000	// l4ls: can 1
+//	c16 = 0x481'a0'000	// l4ls: spi 1
+//	c17 = 0x481'9c'000	// l4ls: i²c 2
+//	c18 = 0x483'00'000	// l4ls: pwmss 0
+//	c19 = 0x483'02'000	// l4ls: pwmss 1
+//	c20 = 0x483'04'000	// l4ls: pwmss 2
+//	c21 = 0x000'32'400	// local: mdio
+//	c22 = 0x480'c8'000	// l4ls: mailbox
+//	c23 = 0x480'ca'000	// l4ls: spinlock
+//
+//	(bits 8-11 configurable)
+//	c24 = 0x000'00'_00	// local: core data ram
+//	c25 = 0x000'02'_00	// local: other core data ram
+//	c26 = 0x000'2e'_00	// local: iep
+//	c27 = 0x000'32'_00	// local: mii-rt
+//
+//	(bits 8-23 configurable)
+//	c28 = 0x00_'__'_00	// local
+//	c29 = 0x49_'__'_00	// l3: edma
+//	c30 = 0x40_'__'_00	// l3: ocmc ram
+//	c31 = 0x80_'__'_00	// l3: ddr ram

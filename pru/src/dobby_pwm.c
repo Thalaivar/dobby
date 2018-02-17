@@ -23,7 +23,7 @@ void exec_dobby_pwm() {
   }
 
 unsigned int convert_pwm_pulsewidth(unsigned int pulsewidth_in_us) {
-        unsigned int loop_counter_for_pru = pulsewidth_in_us/PRU_LOOP_TIME_US;
+        unsigned int loop_counter_for_pru = pulsewidth_in_us*PRU_LOOP_TIME_US;
         return loop_counter_for_pru;
   }
 

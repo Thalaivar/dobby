@@ -9,10 +9,24 @@
 #define GPIO_SETDATAOUT   0x194
 #define GPIO_DATAIN      0x138
 
+#define LED_RED (1<<2)
 #define CHANNEL_1 8
 #define CHANNEL_2 10
 #define CHANNEL_3 9
 #define CHANNEL_4 11
+
+.macro ledon
+     MOV r4, GPIO2 | GPIO_SETDATAOUT
+     MOV r6, LED_RED
+     SBBO r6, r4, 0, 4
+.endm
+
+.macro ledoff
+     MOV r4, GPIO2 | GPIO_CLEARDATAOUT
+     MOV r6, LED_RED
+     SBBO r6, r4, 0, 4
+.endm
+
 
 SETUP:
         // Enable the OCP master port
@@ -25,6 +39,7 @@ READ_MEM:
 
 SET_ALL_HIGH:
         MOV r30, ((CHANNEL_4<<11) | (CHANNEL_2<<10) | (CHANNEL_3<<9) | (CHANNEL_1<<8)) // set all channels high
+        ledon
 
 HIGH_TIME:       
         SUB r0, r0, 1
@@ -49,6 +64,7 @@ CHECK_4:
 
 //only for testing purposes, needs to be replaced later
 CHECK_BUTTON:
+        ledoff
         MOV r5, GPIO2 | GPIO_DATAIN //for reading gpio bit
         LBBO r6, r5, 0, 4
         QBBS READ_MEM, r6.t5

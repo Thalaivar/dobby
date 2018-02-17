@@ -1,4 +1,5 @@
 from ti.icss import Icss
+import ctypes
 
 pruss = Icss( "/dev/uio/pruss/module" )
 
@@ -9,17 +10,20 @@ pruss.cfg.standbyreq = False
 
 pruss.core1.full_reset()
 
-with open('../../bin/pwm.bin', 'rb') as f:
+with open('../../bin/dobby_pwm.bin', 'rb') as f:
 	pruss.iram1.write( f.read() )
 
+channel_width = [8*int(x) for x in input("Enter 4 Ch vals: ").split()]
+
+data = pruss.dram1.map(ctypes.c_uint32 * 4, offset=0)
+data[:] = channel_width
+pruss.core1.run()
+	
 while True:
 	try:
-		channel_width = [int(x) for x in input("Enter 4 Ch vals: ").split()]
-		for i in range(4):
-			pruss.core1.r[i] = int(channel_width[i])
+		channel_width = [8*int(x) for x in input("Enter 4 Ch vals: ").split()]
+		data[:] = channel_width
 
-		pruss.core1.run()
-	
 	except KeyboardInterrupt:
 		break
 		print("DONE!")

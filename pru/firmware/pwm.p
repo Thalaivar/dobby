@@ -15,6 +15,7 @@
 #define CHANNEL_3 9
 #define CHANNEL_4 11
 
+#define DELAY_TIME  2000
 .macro ledon
      MOV r4, GPIO2 | GPIO_SETDATAOUT
      MOV r6, LED_RED
@@ -61,6 +62,11 @@ CHECK_3:
 CHECK_4:
         QBNE HIGH_TIME, r3, 0
         CLR r30.t11
+        MOV r8, DELAY_TIME
+
+DELAY:
+        SUB r8, r8, 1
+        QBNE DELAY, r8, 0
 
 //only for testing purposes, needs to be replaced later
 CHECK_BUTTON:

@@ -1,6 +1,6 @@
-ODIR= ../obj
-LDIR= ../lib
-BDIR= ../bin
+ODIR= ../../obj
+LDIR= ../../lib
+BDIR= ../../bin
 
 CC= gcc
 CFLAGS= -I$(LDIR)

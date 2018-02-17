@@ -9,27 +9,45 @@
 #define GPIO_SETDATAOUT   0x194
 #define GPIO_DATAIN      0x138
 
+#define CHANNEL_1 8
+#define CHANNEL_2 10
+#define CHANNEL_3 9
+#define CHANNEL_4 11
+
 SETUP:
         // Enable the OCP master port
-        LBCO r0, C4, 4, 4
+        LBCO &r0, C4, 4, 4
         CLR  r0, r0, 4
         SBCO r0, C4, 4, 4
          
 READ_MEM:
-        lbco &r0, c24, 0, 4 // read the pulsewidth from SRAM
-        SET r30.t8          // set SERVO1 high
+        LBCO &r0, c24, 0, 32 // read the pulsewidth from SRAM
 
-ON_LOOP:
+SET_ALL_HIGH:
+        MOV r30, ((CHANNEL_4<<11) | (CHANNEL_2<<10) | (CHANNEL_3<<9) | (CHANNEL_1<<8)) // set all channels high
+
+HIGH_TIME:       
         SUB r0, r0, 1
-        QBNE ON_LOOP, r0, 0
-        CLR r30.t8
-        MOV r1, 100000
-
-DELAY:
-
         SUB r1, r1, 1
-        QBNE DELAY, r1, 0
+        SUB r2, r2, 1
+        SUB r3, r3, 1
+ 
+        QBNE CHECK_2, r0, 0
+        CLR r30.t8
 
+CHECK_2:
+        QBNE CHECK_3, r1, 0
+        CLR r30.t10
+
+CHECK_3:
+        QBNE CHECK_4, r2, 0
+        CLR r30.t9
+
+CHECK_4:
+        QBNE HIGH_TIME, r3, 0
+        CLR r30.t11
+
+//only for testing purposes, needs to be replaced later
 CHECK_BUTTON:
         MOV r5, GPIO2 | GPIO_DATAIN //for reading gpio bit
         LBBO r6, r5, 0, 4

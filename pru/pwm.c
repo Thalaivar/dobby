@@ -17,3 +17,6 @@ void main (void){
 		prussdrv_pru_disable(PRU_NUM);
 		prussdrv_exit ();
 	 }
+
+
+		

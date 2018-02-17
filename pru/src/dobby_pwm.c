@@ -29,5 +29,5 @@ unsigned int convert_pwm_pulsewidth(unsigned int pulsewidth_in_us) {
 
 void write_pwm_pulsewidth(unsigned int channel, unsigned int pulsewidth_in_us) {
 			unsigned int data = convert_pwm_pulsewidth(pulsewidth_in_us);
-			prussdrv_pru_write_memory(PRUSS0_PRU0_DATARAM, channel-1, &data, 4);
+			prussdrv_pru_write_memory(PRUSS0_PRU1_DATARAM, channel-1, &data, 4);
   }

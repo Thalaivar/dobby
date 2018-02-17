@@ -33,20 +33,20 @@ SETUP:
         LBCO &r0, C4, 4, 4
         CLR  r0, r0, 4
         SBCO r0, C4, 4, 4
-         
+        ledon
+
 READ_MEM:
         LBCO &r0, c24, 0, 32 // read the pulsewidth from SRAM
 
 SET_ALL_HIGH:
-        MOV r30, ((CHANNEL_4<<11) | (CHANNEL_2<<10) | (CHANNEL_3<<9) | (CHANNEL_1<<8)) // set all channels high
-        ledon
+        MOV r30, ((1<<CHANNEL_4) | (1<<CHANNEL_2) | (1<<CHANNEL_3) | (1<<CHANNEL_1)) // set all channels high
 
-HIGH_TIME:       
+HIGH_TIME:
         SUB r0, r0, 1
         SUB r1, r1, 1
         SUB r2, r2, 1
         SUB r3, r3, 1
- 
+
         QBNE CHECK_2, r0, 0
         CLR r30.t8
 
@@ -64,13 +64,11 @@ CHECK_4:
 
 //only for testing purposes, needs to be replaced later
 CHECK_BUTTON:
-        ledoff
         MOV r5, GPIO2 | GPIO_DATAIN //for reading gpio bit
         LBBO r6, r5, 0, 4
         QBBS READ_MEM, r6.t5
-         
+
 END:
+        ledoff
         MOV R31.b0, PRU1_R31_VEC_VALID | PRU_EVTOUT_0
         HALT
-
-

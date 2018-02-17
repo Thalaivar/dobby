@@ -6,9 +6,9 @@
 
 #define PRU_NUM   1
 #define US_TO_NS 1000
-#define TIME_PER_LOOP 20
+#define TIME_PER_LOOP 50
 
-#define PRU_LOOP_TIME_US 1000/TIME_PER_LOOP
+#define PRU_LOOP_TIME_US US_TO_NS/TIME_PER_LOOP
 
 #define REG_OFFSET 32
 

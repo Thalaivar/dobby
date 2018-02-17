@@ -16,6 +16,7 @@ $(ODIR)/%.o: %.c $(DEPS)
 test_dobby_pwm: $(OBJ)
 		$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 		rm *.o
+
 .PHONY: clean
 
 clean:

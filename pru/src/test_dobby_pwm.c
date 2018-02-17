@@ -1,28 +1,39 @@
 #include "dobby_pwm.h"
 
+int write_to_motors();
+
 void main(){
 
     init_pwm_pru();
-	  exec_dobby_pwm();
+	write_to_motors();
+	exec_dobby_pwm();
 
-	  printf("STARTING\n");
-    int option = 0;
-    unsigned int channel_width[4];
+	printf("STARTING\n");
 
     while(1){
+			int choose = write_to_motors();
+			if(choose == -1) break;
+        }
+	  printf("DONE!");
+	  stop_pwm_pru();
+}
 
-          scanf("Enter 1 to set PWM, -1 to exit: %d", &option);
+int write_to_motors() {
+		
+    	  int option = 0;	 
+	      unsigned int channel_width[4];
+	   	  printf("Enter 1 to write pwm, -1 to exit: ");
+		  scanf("%d\n", &option);
           if(option){
-              scanf("Enter PWM for C1: %d ; C2: %d ; C3: %d ; C4: %d", &channel_width);
+		      printf("Enter PWM for C1 C2 C3 C4: ")
+              scanf("%d %d %d %d\n", &channel_width);
               write_pwm_pulsewidth(1, channel_width[0]);
               write_pwm_pulsewidth(2, channel_width[1]);
               write_pwm_pulsewidth(3, channel_width[2]);
               write_pwm_pulsewidth(4, channel_width[3]);
-              stop_pwm_pru();
-           }
+		   }
 
-          else  break;
-      }
-	  printf("DONE!");
-	  stop_pwm_pru();
-}
+          return option;
+
+
+	}

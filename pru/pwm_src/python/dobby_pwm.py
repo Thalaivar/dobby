@@ -31,8 +31,24 @@ class MOTORS(AHRS):
 				self.pruss.iram0.write( f.read() )
 		
 		def calibrate_esc(self):
+			motor_outputs = [self.motor1, self.motor2, self.motor3, self.motor4]
+			
 			print("Make sure all props are removed before calibrating ESCs!")
-						
+			time.sleep(4)
+			print("Sending 2000 uS pulse")
+			
+			motor_outputs = [ x - x + 1000 for x in motor_outputs]
+			self.write()
+
+			time.sleep(1)
+			print("Sending 1000 uS pulse")
+
+			motor_outputs = [ x - x + 1000 for x in motor_outputs]
+			self.write()
+
+			time.sleep(2)
+			print("ESC calibrated!")
+
 		def update(self):
 		
 		

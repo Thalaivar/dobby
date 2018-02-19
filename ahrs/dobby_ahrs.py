@@ -19,7 +19,6 @@ class AHRS(MPU9250):
 		self.accel_euler = np.zeros((3,))
 		self.mag_euler   = np.zeros((3,))
 		self.euler       = np.zeros((3,))
-		self.dcm		 = DCM()
 
 	def get_accel_euler(self):
 		self.accel_euler[1] = math.asin(-MPU9250.accel_data[0]/self.norm(MPU9250.accel_data))
@@ -39,13 +38,6 @@ class AHRS(MPU9250):
 		temp = math.sqrt(temp)
 		return temp
 
-	def euler_dcm_update(self):
-		self.nowtime = time.clock()
-		dt = self.nowtime - self.prevtime
-		self.dcm.matrix_update(dt)
-		self.euler = self.dcm.to_euler()
-		self.prevtime = self.nowtime
-		
 	def euler_comp_update(self):
 		self.nowtime = time.clock()
 		dt = self.nowtime - self.prevtime

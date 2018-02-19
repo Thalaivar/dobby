@@ -193,10 +193,10 @@ class MPU9250:
 	__accel_bias_file = None
 
 	def __init__(self):
-		self.a_scale = None
-		self.g_scale = None
-		self.m_scale = None
-		self.mag_mode = None
+		self.a_scale = self.__AFS_2G
+		self.g_scale = self.__GFS_250DPS
+		self.m_scale = self.__MFS_16BITS
+		self.mag_mode = self.__MAG_MODE_100
 		self.a_res = None
 		self.g_res = None
 		self.m_res = None
@@ -355,10 +355,10 @@ class MPU9250:
 ## ********************************************************* ##
 	def calibrate_gyro(self):
 		data = np.zeros((3,))
-		self.blink_led("GREEN", 4)	
+		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
 		i = 0
-		
+
 		while i < 2000:
 			if self.is_data_ready():
 				self.read_gyro()
@@ -376,13 +376,13 @@ class MPU9250:
 		data_1 = 0
 		data_0 = 0
 		i = 0
-		
-		
+
+
 		# calculate for body x-axis
 		print("Place quadrotor in nose up position...\n\r")
 		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
-		
+
 		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
@@ -395,13 +395,13 @@ class MPU9250:
 		print("Place quadrotor in nose down position...\n\r")
 		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
-		
+
 		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
 				data_1 = data_1 + self.accel_data[0]
-				i = i + 1		
-		
+				i = i + 1
+
 		data_1 = data_1/1000
 		i = 0
 		GPIO.output("RED", 0)
@@ -413,7 +413,7 @@ class MPU9250:
 		print("Place quadrotor on its right side...\n\r")
 		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
-		
+
 		while i	< 1000:
 			if self.is_data_ready():
 				self.read_accel()
@@ -426,7 +426,7 @@ class MPU9250:
 		print("Place quadrotor on its left side...\n\r")
 		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
-		
+
 		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
@@ -443,7 +443,7 @@ class MPU9250:
 		print("Place quadrotor flat and right way up...\n\r")
 		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
-		
+
 		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
@@ -456,7 +456,7 @@ class MPU9250:
 		print("Place quadrotor flat and on its back...\n\r")
 		self.blink_led("GREEN", 4)
 		GPIO.output("RED", 1)
-		
+
 		while i < 1000:
 			if self.is_data_ready():
 				self.read_accel()
@@ -471,8 +471,7 @@ class MPU9250:
 		self.save_accel_bias()
 
 	def calibrate_mag(self):
-		# define methods
-		# call save_mag_bias() (create it if not made)
+
 		#Default Sample Count set To 2000, please change as required
 		#function written only for soft iron magbiases
 		#hard iron bias is a confusion because of mag_scale
@@ -485,25 +484,32 @@ class MPU9250:
 		time.sleep(3)
 		print "Calibration has started:"
 
-		for i in range(sample_count):
+		i = 0
+
+		while i < sample_count:
 			if self.is_data_ready():
 				self.read_mag()
-#Looping is possible but could it slow the system down as loops will become nested?
-			if mag_min[0] > self.mag_data[0]:
-				mag_min[0] = self.mag_data[0]
-			if mag_max[0] < self.mag_data[0]:
-				mag_max[0] = self.mag_data[0]
 
-			if mag_min[1] > self.mag_data[1]:
-				mag_min[1] = self.mag_data[1]
-			if mag_max[1] < self.mag_data[1]:
-				mag_max[1] = self.mag_data[1]
+				if mag_min[0] > self.mag_data[0]:
+					mag_min[0] = self.mag_data[0]
+				
+				if mag_max[0] < self.mag_data[0]:
+					mag_max[0] = self.mag_data[0]
 
-			if mag_min[2] > self.mag_data[2]:
+				if mag_min[1] > self.mag_data[1]:
+					mag_min[1] = self.mag_data[1]
+				
+				if mag_max[1] < self.mag_data[1]:
+					mag_max[1] = self.mag_data[1]
 
-				mag_min[2] = self.mag_data[2]
-			if mag_max[2] < self.mag_data[2]:
-				mag_max[2] = self.mag_data[2]
+				if mag_min[2] > self.mag_data[2]:
+					mag_min[2] = self.mag_data[2]
+
+				if mag_max[2] < self.mag_data[2]:
+					mag_max[2] = self.mag_data[2]
+				
+				i = i + 1
+
 		#store soft iron biases in the magbiases
 		self.mag_bias[0] = 0.5*(mag_min[0] + mag_max[0])
 		self.mag_bias[1] = 0.5*(mag_min[1] + mag_max[1])

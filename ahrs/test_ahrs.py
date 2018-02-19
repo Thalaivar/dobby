@@ -16,19 +16,11 @@ def main():
 		try:
 			if imu.is_data_ready():
 				imu.update()
-				ahrs.euler_comp_update()
-				loop_rate[i] = ahrs.dt_time
+				ahrs.euler_dcm_update()
+				print(ahrs.euler)
 				i = i + 1
 		except KeyboardInterrupt:
-			break
 			print("Done!")
-	i = 0
-	temp = 0
-
-	for i in range(np.size(loop_rate)):
-		temp = temp + loop_rate[i]
-	
-	temp = temp/10000
-	print(temp)
+			break
 if __name__ == '__main__':
 	main()

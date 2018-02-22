@@ -4,6 +4,7 @@ import numpy as np
 import math
 import Adafruit_BBIO.GPIO as GPIO
 
+
 # need to add calibration function for mag
 
 # ********************************************************** #
@@ -321,7 +322,7 @@ class MPU9250:
 				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
 	def scale_rawdata(self):
-		self.accel_data[0] = float((self.accel_data[0]) * self.a_res) - self.accel_bias[0] 
+		self.accel_data[0] = float((self.accel_data[0]) * self.a_res) - self.accel_bias[0]
 		self.accel_data[1] = float((self.accel_data[1]) * self.a_res) - self.accel_bias[1]
 		self.accel_data[2] = float((self.accel_data[2]) * self.a_res) - self.accel_bias[2]
 

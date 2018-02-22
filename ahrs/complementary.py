@@ -1,9 +1,6 @@
-import sys
-sys.path.insert(0, '../imu/')
-from dobby_imu import MPU9250
 import time
 
-class COMPLEMENTARY(MPU9250):
+class COMPLEMENTARY():
 	__GYRO_CONSTANT = 0.98
 	__ACCEL_CONSTANT = 0.02
 
@@ -16,15 +13,15 @@ class COMPLEMENTARY(MPU9250):
 		self.prevtime = 0
 		self.nowtime = 0
 		self.gyro_prevdata=np.zeros((3,))
-	
-	def get_accel_euler(self):
-		self.accel_euler[1] = math.asin(-MPU9250.accel_data[0]/self.norm(MPU9250.accel_data))
-		self.accel_euler[0] = math.atan2(MPU9250.accel_data[1], MPU9250.accel_data[2])
 
-	def get_gyro_euler(self):
-		self.gyro_euler[0] = MPU9250.gyro_data[0] + math.sin(self.euler[0]*math.pi/180.0)*math.tan(self.euler[1]*math.pi/180.0)*MPU9250.gyro_data[1] - math.sin(self.euler[1]*math.pi/180.0)*MPU9250.gyro_data[2]
-		self.gyro_euler[1] = math.cos(self.euler[0]*math.pi/180.0)*MPU9250.gyro_data[1] - math.sin(self.euler[0]*math.pi/180.0)*MPU9250.gyro_data[2]
-		self.gyro_euler[2] = (math.sin(self.euler[0]*math.pi/180.)*MPU9250.gyro_data[1] + math.cos(self.euler[0]*math.pi/180.)*MPU9250.gyro_data[2])/math.cos(self.euler[1]*math.pi/180.)
+	def get_accel_euler(self, accel_data):
+		self.accel_euler[1] = math.asin(-accel_data[0]/self.norm(accel_data))
+		self.accel_euler[0] = math.atan2(accel_data[1], accel_data[2])
+
+	def get_gyro_euler(self, gyro_data):
+		self.gyro_euler[0] = gyro_data[0] + math.sin(self.euler[0]*math.pi/180.0)*math.tan(self.euler[1]*math.pi/180.0)*gyro_data[1] - math.sin(self.euler[1]*math.pi/180.0)*gyro_data[2]
+		self.gyro_euler[1] = math.cos(self.euler[0]*math.pi/180.0)*gyro_data[1] - math.sin(self.euler[0]*math.pi/180.0)*gyro_data[2]
+		self.gyro_euler[2] = (math.sin(self.euler[0]*math.pi/180.)*gyro_data[1] + math.cos(self.euler[0]*math.pi/180.)*gyro_data[2])/math.cos(self.euler[1]*math.pi/180.)
 
 	def norm(self, array):
 		temp = 0

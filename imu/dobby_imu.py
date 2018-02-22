@@ -201,7 +201,6 @@ class MPU9250:
 		self.g_res = None
 		self.m_res = None
 		self.mag_calibration = np.zeros((3,))
-		self.mag_bias = np.zeros((3,))
 		self.set_default_config()
 		self.accel_bias = np.zeros((3,))
 		self.gyro_bias = np.zeros((3,))
@@ -322,17 +321,17 @@ class MPU9250:
 				self.mag_data[2] = self.dataConv(raw_data[5], raw_data[4])
 
 	def scale_rawdata(self):
-		self.accel_data[0] = float((self.accel_data[0] - self.accel_bias[0]) * self.a_res)
-		self.accel_data[1] = float((self.accel_data[1] - self.accel_bias[1]) * self.a_res)
-		self.accel_data[2] = float((self.accel_data[2] - self.accel_bias[2]) * self.a_res)
+		self.accel_data[0] = float((self.accel_data[0]) * self.a_res) - self.accel_bias[0] 
+		self.accel_data[1] = float((self.accel_data[1]) * self.a_res) - self.accel_bias[1]
+		self.accel_data[2] = float((self.accel_data[2]) * self.a_res) - self.accel_bias[2]
 
-		self.mag_data[0] = float((self.mag_data[0] - self.mag_bias[0]) * self.m_res)
-		self.mag_data[1] = float((self.mag_data[1] - self.mag_bias[1]) * self.m_res)
-		self.mag_data[2] = float((self.mag_data[2] - self.mag_bias[2]) * self.m_res)
+		self.mag_data[0] = float((self.mag_data[0]) * self.m_res * self.mag_calibration[0]) - self.mag_bias[0]
+		self.mag_data[1] = float((self.mag_data[1]) * self.m_res * self.mag_calibration[1]) - self.mag_bias[1]
+		self.mag_data[2] = float((self.mag_data[2]) * self.m_res * self.mag_calibration[2]) - self.mag_bias[2]
 
-		self.gyro_data[0] = float((self.gyro_data[0] - self.gyro_bias[0]) * self.g_res)
-		self.gyro_data[1] = float((self.gyro_data[1] - self.gyro_bias[1]) * self.g_res)
-		self.gyro_data[2] = float((self.gyro_data[2] - self.gyro_bias[2]) * self.g_res)
+		self.gyro_data[0] = float((self.gyro_data[0]) * self.g_res) - self.gyro_bias[0]
+		self.gyro_data[1] = float((self.gyro_data[1]) * self.g_res) - self.gyro_bias[1]
+		self.gyro_data[2] = float((self.gyro_data[2]) * self.g_res) - self.gyro_bias[2]
 
 	def dataConv(self, data1, data2):
 		value = data1 | (data2 << 8)
@@ -361,7 +360,7 @@ class MPU9250:
 
 		while i < 2000:
 			if self.is_data_ready():
-				self.read_gyro()
+				self.update()
 				i = i + 1
 				for j in range(len(self.gyro_data)):
 					data[j] = self.gyro_data[j] + data[j]
@@ -385,7 +384,7 @@ class MPU9250:
 
 		while i < 1000:
 			if self.is_data_ready():
-				self.read_accel()
+				self.update()
 				data_0 = data_0 + self.accel_data[0]
 				i = i + 1
 		data_0 = data_0/1000
@@ -398,7 +397,7 @@ class MPU9250:
 
 		while i < 1000:
 			if self.is_data_ready():
-				self.read_accel()
+				self.update()
 				data_1 = data_1 + self.accel_data[0]
 				i = i + 1
 
@@ -416,7 +415,7 @@ class MPU9250:
 
 		while i	< 1000:
 			if self.is_data_ready():
-				self.read_accel()
+				self.update()
 				data_0 = data_0 + self.accel_data[1]
 				i = i + 1
 		data_0 = data_0/1000
@@ -429,7 +428,7 @@ class MPU9250:
 
 		while i < 1000:
 			if self.is_data_ready():
-				self.read_accel()
+				self.update()
 				data_1 = data_1 + self.accel_data[1]
 				i = i + 1
 		data_1 = data_1/1000
@@ -446,7 +445,7 @@ class MPU9250:
 
 		while i < 1000:
 			if self.is_data_ready():
-				self.read_accel()
+				self.update()
 				data_0 = data_0 + self.accel_data[2]
 				i = i + 1
 		data_0 = data_0/1000
@@ -459,7 +458,7 @@ class MPU9250:
 
 		while i < 1000:
 			if self.is_data_ready():
-				self.read_accel()
+				self.update()
 				data_1 = data_1 + self.accel_data[2]
 				i = i + 1
 		data_1 = data_1/1000
@@ -476,8 +475,8 @@ class MPU9250:
 		#function written only for soft iron magbiases
 		#hard iron bias is a confusion because of mag_scale
 
-		mag_min[3] = np.zeroes((3,))
-		mag_max[3] = np.zeroes((3,))
+		mag_min = np.array([32767, 32767, 32767])
+		mag_max = np.array([-32767, -32767, -32767])
 		sample_count = 2000
 		print "Magnetometer Calibration Initiated."
 		print "Wave Device in a figure 8 until done"
@@ -488,17 +487,17 @@ class MPU9250:
 
 		while i < sample_count:
 			if self.is_data_ready():
-				self.read_mag()
+				self.update()
 
 				if mag_min[0] > self.mag_data[0]:
 					mag_min[0] = self.mag_data[0]
-				
+
 				if mag_max[0] < self.mag_data[0]:
 					mag_max[0] = self.mag_data[0]
 
 				if mag_min[1] > self.mag_data[1]:
 					mag_min[1] = self.mag_data[1]
-				
+
 				if mag_max[1] < self.mag_data[1]:
 					mag_max[1] = self.mag_data[1]
 
@@ -507,7 +506,7 @@ class MPU9250:
 
 				if mag_max[2] < self.mag_data[2]:
 					mag_max[2] = self.mag_data[2]
-				
+
 				i = i + 1
 
 		#store soft iron biases in the magbiases
@@ -638,13 +637,14 @@ class MPU9250:
 			self.reset_mpu()
 			if self.init_mpu():
 				if self.init_ak8963():
-					self.load_accel_bias()
-					self.load_gyro_bias()
-					print("Ready!")
 					self.get_ares()
 					self.get_mres()
 					self.get_gres()
 
+					self.load_accel_bias()
+					self.load_gyro_bias()
+					self.load_mag_bias()
+					print("Ready!")
 		else:
 			print("Failed")
 

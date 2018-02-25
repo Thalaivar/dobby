@@ -1,10 +1,8 @@
 #include "pwm.h"
 
-int main(void){
-	initialize_pru();
-	write_pwm_pulse_us(1, 2000);
-	while( true ){}
-	disable_pru();
+Motors motors;
 
-	return 0;
+int main(void){
+			scanf("%d %d %d %d", &motors.channel_val[0], &motors.channel_val[1], &motors.channel_val[2], &motors.channel_val[3]);
+			motors.update();
 }

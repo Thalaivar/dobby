@@ -10,7 +10,7 @@ pruss.cfg.standbyreq = False
 
 pruss.core1.full_reset()
 
-with open('../../bin/dobby_pwm.bin', 'rb') as f:
+with open('../pwm_src/pwm.bin', 'rb') as f:
 	pruss.iram1.write( f.read() )
 
 channel_width = [8*int(x) for x in input("Enter 4 Ch vals: ").split()]

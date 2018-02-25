@@ -1,24 +1,16 @@
-ODIR= ../../obj
-LDIR= ../../lib
-BDIR= ../../bin
+CC = g++
+LIBS = -lpthread -lprussdrv
+CFLAGS = -o
 
-CC= gcc
-CFLAGS= -I$(LDIR)
-CSRC= $(wildcard *.c)
-OBJ= $(CSRC:.c=.o)
+CSRC = pwm.cpp
+CSRC_ESC = calibrate_esc.cpp
 
-LDFLAGS= -lpthread -lprussdrv
-DEPS= $(wildcard $(LDIR)/ *.h)
+TARGETS = calibrate_esc
 
-$(ODIR)/%.o: %.c $(DEPS)
-		$(CC) -c -o $@ $< $(CFLAGS) $(LDFLAGS)
-
-test_dobby_pwm: $(OBJ)
-		$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
-		rm *.o
+$(TARGETS): $(CSRC) $(CSRC_ESC)
+	$(CC) $^ $(CFLAGS) $@ $(LIBS)
 
 .PHONY: clean
 
 clean:
-		rm -f *.o test_dobby_pwm
-		rm -f $(ODIR)/*.o
+	rm $(TARGETS)

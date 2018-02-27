@@ -39,7 +39,7 @@ class Motors {
     u32 channel_val[4];
     bool is_initialized;
 
-	Motors();
+	  Motors();
 };
 
 

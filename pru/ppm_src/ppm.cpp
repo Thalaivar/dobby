@@ -231,7 +231,7 @@ int Receiver::calibrate_radio(){
 
     // calibrate pitch channel
     cout << "Keep pitch at minimum\nEnter \"y\" to continue: ";
-    cin >> choice
+    cin >> choice;
 
     if(choice == 'y'){
         for(int i = 0; i < 1000; i++){
@@ -309,12 +309,13 @@ int Receiver::calibrate_radio(){
     }
 
     this->cal_throttle = (temp_low + temp_high)/2;
-  }
+  
 
     if(this->save_radio_cal() < 0) return -1;
     this->is_calibrated = true;
 
     return 0;
+  }
 
   else{
     cout << "Calibration not done!\n";

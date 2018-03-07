@@ -1,28 +1,28 @@
 #include "smc.h"
 
-SMC::SMC(IMU* imu_ptr, Motors* motors_ptr){
+SMC::SMC(/*Motors* motors_ptr*/){
 
-  // link imu and motors classes to smc controller
-  this->imu = imu_ptr;
-  this->motors = motors_ptr;
+  // link and motors classes to smc controller
+ // this->motors = motors_ptr;
 
 }
 
 
-flightMode::flightMode(Receiver *recv_ptr){
+flightMode::flightMode(Receiver *recv_ptr, IMU *imu_ptr){
 
   // link reciever class to get latest reciever data
   this->recv = recv_ptr;
+  this->imu = imu_ptr;
 }
 
 void flightMode::get_error(error_struct *error){
 
   // check what current flight mode is
-  switch(this->current_mode){
+/*  switch(this->current_mode){
 
     case STABILIZE_ANGLE:
 
-  }
+  }*/
 }
 
 void flightMode::flight_mode_update(){

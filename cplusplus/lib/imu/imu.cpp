@@ -38,7 +38,7 @@ int IMU::init_imu(){
 
     if(rc_initialize_imu_dmp(&data, config) < 0){
       printf("DMP init failed!\n");
-      reutnr -1;
+      return -1;
     }
 
     this->is_initialized = true;

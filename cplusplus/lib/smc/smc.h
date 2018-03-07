@@ -30,22 +30,21 @@
 #define angle_to_rate_pitch 0
 #define angle_to_rate_yaw 0
 
-typedef struct error_struct{
+struct error_struct{
   float attitude_error[3];
   float attitude_rate_error[3];
 };
 
 class SMC{
   private:
-    IMU *imu;
-    Motors *motors;
+ //   Motors *motors;
     error_struct error;
 
     // allow error calculation function to access error variables
 
   public:
     void run_smc_controller();
-    SMC(IMU* imu_ptr, Motors* motors_ptr);
+    SMC(/*Motors* motors_ptr*/);
 };
 
 typedef enum flight_modes{
@@ -57,7 +56,7 @@ typedef enum flight_modes{
 class flightMode{
   public:
     void get_error(error_struct *error);
-    flightMode(Receiver *recv_ptr);
+    flightMode(Receiver *recv_ptr, IMU *imu_ptr);
 
   private:
     // to access the receiver signals
@@ -72,6 +71,7 @@ class flightMode{
 
     void set_flight_mode();
     void flight_mode_update();
-
-}
+	
+    IMU *imu;
+};
 #endif

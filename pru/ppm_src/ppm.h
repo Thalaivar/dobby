@@ -6,7 +6,9 @@
 #include <pruss_intc_mapping.h>
 #include <stdint.h>
 #include <fstream>
-#include <string>
+#include <iostream>
+#include <chrono>
+#include <thread>
 
 #define PRU_CYCLES_TO_US 0.01
 #define PPM_PRU 0

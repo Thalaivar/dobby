@@ -50,9 +50,11 @@ class Receiver {
     u32 recv_channel[6];
     bool is_initialized;
     bool is_calibrated;
+    // calibration holds the mean value (to subtract when caculating setpoints)
     int cal_roll, cal_pitch, cal_yaw, cal_throttle;
 
     int init_radio();
+    // calibration currently calculates the appropriate mean value (assuming linear)
     int calibrate_radio();
     Receiver();
 };

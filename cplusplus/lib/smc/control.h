@@ -35,16 +35,21 @@ struct error_struct{
   float attitude_rate_error[3];
 };
 
-class SMC{
+class Control{
   private:
- //   Motors *motors;
+    Motors *motors;
+    flightMode *mode;
     error_struct error;
 
-    // allow error calculation function to access error variables
+    // to get attitude error
+    void get_attitude_error();
+
+    // to get attitude_rate_error
+    void get_attitude_rate_error();
 
   public:
     void run_smc_controller();
-    SMC(/*Motors* motors_ptr*/);
+    Control(Motors* motors_ptr, flightMode* flightMode_ptr);
 };
 
 typedef enum flight_modes{
@@ -55,12 +60,19 @@ typedef enum flight_modes{
 
 class flightMode{
   public:
-    void get_error(error_struct *error);
     flightMode(Receiver *recv_ptr, IMU *imu_ptr);
+    // to set current flight mode
+    void set_flight_mode();
+
+    // to get latest desired trajectory/attitude
+    void flight_mode_update();
 
   private:
     // to access the receiver signals
     Receiver *recv;
+
+    // to access imu data
+    IMU *imu;
 
     // holds current mode setting
     flight_mode current_mode;
@@ -69,9 +81,7 @@ class flightMode{
     float desired_attitude[3];
     float desired_attitude_rates[3];
 
-    void set_flight_mode();
-    void flight_mode_update();
-	
-    IMU *imu;
+    // controller needs access to desired trajectory/attitude
+    friend class Control;
 };
 #endif

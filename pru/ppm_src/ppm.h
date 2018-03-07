@@ -48,7 +48,8 @@ class Receiver {
     int disable_pru();
     int update();
     u32 recv_channel[6];
-    bool is_initialized;
+    bool is_pru_initialized;
+    bool is_radio_initialized;
     bool is_calibrated;
     // calibration holds the mean value (to subtract when caculating setpoints)
     int cal_roll, cal_pitch, cal_yaw, cal_throttle;

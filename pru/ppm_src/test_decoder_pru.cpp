@@ -8,8 +8,8 @@
 Receiver recv;
 
 int main(){
-  if(recv.init_radio()<0) cout << "FAIL!" << endl;
-  if(recv.is_initialized){
+  if(recv.init_radio() < 0) cout << "FAIL!" << endl;
+  if(recv.is_radio_initialized){
    for(int i = 0; i < NUM_LOOPS; i++){
       recv.update();
 	  printf("%d | %d | %d | %d | %d | %d |\n", recv.recv_channel[0], recv.recv_channel[1], recv.recv_channel[2], \

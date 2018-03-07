@@ -46,5 +46,6 @@ class IMU{
     IMU();
     int init_imu();
     void print_tb_angles();
+    bool is_initialized;
 };
 #endif

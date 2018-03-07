@@ -6,15 +6,18 @@
 #include <pruss_intc_mapping.h>
 #include <string.h>
 #include <stdint.h>
+#include <chrono>
+#include <thread>
 
 #define PWM_PRU 1
 #define PWM_CHANNELS 6
-#define PULSE_TO_PRU_CYCLES 10
+#define PULSE_TO_PRU_CYCLES 100/3.482
 #define PWM_PERIOD 20000
 #define ESC_LOW 1000
 #define ESC_HIGH 2000
 
 typedef uint32_t u32;
+
 
 struct channelPtr {
     u32 ch1;

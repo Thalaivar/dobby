@@ -80,10 +80,10 @@ int Motors::update(){
 	}
 
 	//load latest PWM signals into PRU DRAM
-	channels->ch1 = this->channel_val[0];
-	channels->ch2 = this->channel_val[1];
-	channels->ch3 = this->channel_val[2];
-	channels->ch4 = this->channel_val[3];
+	channels->ch1 = this->channel_val[0]*PULSE_TO_PRU_CYCLES;
+	channels->ch2 = this->channel_val[1]*PULSE_TO_PRU_CYCLES;
+	channels->ch3 = this->channel_val[2]*PULSE_TO_PRU_CYCLES;
+	channels->ch4 = this->channel_val[3]*PULSE_TO_PRU_CYCLES;
 
 	return 0;
 }
@@ -98,7 +98,7 @@ Motors::Motors(void){
 	if(this->initialize_pru() < 0) printf("Could not initialize PRU for PWM!!\n");
 
 	// load pwm period into PRU DRAM
-	channels->pwm_period = PWM_PERIOD;
+	channels->pwm_period = PWM_PERIOD*PULSE_TO_PRU_CYCLES;
 
 }
 
@@ -115,20 +115,22 @@ int Motors::calibrate_esc(){
 
 	//begin sending low pulse
 	printf("Sending 1000us pulse to all channels!\n");
-	channels->ch1 = ESC_LOW;
-	channels->ch2 = ESC_LOW;
-	channels->ch3 = ESC_LOW;
-	channels->ch4 = ESC_LOW;
+	channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 	printf("Connect ESCs and enter Y to send high pulse: ");
 	scanf("%c", &response);
 
 	if(response == 'Y'){
 			printf("Sending 2000us pulse to all channels!\n");
-			channels->ch1 = ESC_HIGH;
-			channels->ch2 = ESC_HIGH;
-			channels->ch3 = ESC_HIGH;
-			channels->ch4 = ESC_HIGH;
+			channels->ch1 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+			channels->ch2 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+			channels->ch3 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+			channels->ch4 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
 	}
+	
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 	//set all channels to 0
 	channels->ch1 = 0;

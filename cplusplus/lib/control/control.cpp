@@ -22,9 +22,9 @@ void flightMode::flight_mode_update(){
 
     case STABILIZE_ANGLE:
     // get desired angles from pilot in degrees
-      this->desired_attitude[0] = (recv->recv_channel[ROLL_CHANNEL] - recv->cal_roll)*recv_signal_to_roll;
-      this->desired_attitude[1] = (recv->recv_channel[PITCH_CHANNEL] - recv->cal_pitch)*recv_signal_to_pitch;
-      this->desired_attitude[2] = (recv->recv_channel[YAW_CHANNEL] - recv->cal_yaw)*recv_signal_to_yaw;
+      this->desired_attitude[0] = (recv->recv_channel[ROLL_CHANNEL] - recv->cal_roll)*recv_signal_to_roll_angle;
+      this->desired_attitude[1] = (recv->recv_channel[PITCH_CHANNEL] - recv->cal_pitch)*recv_signal_to_pitch_angle;
+      this->desired_attitude[2] = (recv->recv_channel[YAW_CHANNEL] - recv->cal_yaw)*recv_signal_to_yaw_angle;
 
     // get desired angular rates (by passing through simple P controller)
       this->desired_attitude_rates[0] = (imu->data.fused_TaitBryan[TB_ROLL_Y]*RAD_TO_DEG - this->desired_attitude[0])*angle_to_rate_roll;
@@ -57,6 +57,6 @@ void Control::run_smc_controller(){
 
   // run standard smc if mode is simple stabilise mode with pilot inputs as angles
   if(mode->current_mode == STABILIZE_ANGLE){
-    
+
   }
 }

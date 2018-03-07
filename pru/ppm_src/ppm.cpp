@@ -48,11 +48,6 @@ int Receiver::disable_pru(){
 		return -1;
 	}
 
-	//first zero out all PWM channels
-	//memset(channels, 0, PWM_CHANNELS*4);
-	//printf("zeroing out all PWM channels!\n");
-
-	//reset channels pointer to NULL so it doesn't point somewhere bad
 	channels = NULL;
 
 	//diable PRU
@@ -76,8 +71,8 @@ int Receiver::update(){
 	this->recv_channel[1] = channels->ch2*PRU_CYCLES_TO_US;
 	this->recv_channel[2] = channels->ch3*PRU_CYCLES_TO_US;
 	this->recv_channel[3] = channels->ch4*PRU_CYCLES_TO_US;
-  this->recv_channel[4] = channels->ch5*PRU_CYCLES_TO_US;
-  this->recv_channel[5] = channels->ch6*PRU_CYCLES_TO_US;
+  	this->recv_channel[4] = channels->ch5*PRU_CYCLES_TO_US;
+  	this->recv_channel[5] = channels->ch6*PRU_CYCLES_TO_US;
 
   return 0;
 }
@@ -88,7 +83,7 @@ Receiver::Receiver(void){
 	this->channels = &this->p;
 
 	this->is_initialized = false;
-  this->is_calibrated = false;
+  	this->is_calibrated = false;
 
 
 }
@@ -101,10 +96,11 @@ int Receiver::init_radio(){
   }
 
   // check if radio is calibrated
-  if(this->load_radio_cal() < 0){
+ /* if(this->load_radio_cal() < 0){
     cout << "Radio not calibrated!\nRunning radio cal now... \n";
-    if(this->calibrate_radio() < 0) return -1;
-  }
+    if(this->calibrate_radio() < 0) return -1; }*/
+
+	this->is_initialized = true;
 }
 int Receiver::load_radio_cal(){
   // set all calibration vals to 0, will be loaded if calibration has been done

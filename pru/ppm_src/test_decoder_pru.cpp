@@ -8,7 +8,7 @@
 Receiver recv;
 
 int main(){
-
+  if(recv.init_radio()<0) cout << "FAIL!" << endl;
   if(recv.is_initialized){
    for(int i = 0; i < NUM_LOOPS; i++){
       recv.update();

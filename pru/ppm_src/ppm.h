@@ -25,7 +25,7 @@ using namespace std;
 
 typedef uint32_t u32;
 
-struct channelPtr {
+struct recv_channelPtr {
   u32 ch1;
   u32 ch2;
   u32 ch3;
@@ -36,8 +36,8 @@ struct channelPtr {
 
 class Receiver {
   private:
-    channelPtr p;
-    channelPtr volatile *channels;
+    recv_channelPtr p;
+    recv_channelPtr volatile *channels;
 
     // calibration stuff
     int save_radio_cal();

@@ -1,7 +1,12 @@
 #include <pthread.h>
 //This can be the main thread that is run when testing:
-//this main : calibarates the imu, sets esc, and updates flight mode
-// Setting just for blinking led right now
+//this main 
+//calibarates the imu, sets esc, and updates flight mode
+//waits for arming:
+//then runs controller, and arming check in background
+// if controller exits with error, then esc values are set to 1000 and mode is set to default and arming state is false
+// if controller exits safely ? figid it out:
+
 
 void *heartbeat(){
 	//write heartbeat code here

@@ -33,8 +33,7 @@ void flightMode::flight_mode_update(){
       break;
 
     default:
-      cout << "INCORRECT FLIGHT MODE!!";
-      this->current_mode = INCORRECT;
+      cout << "FLIGHT MODE NOT SET!!\n";
       break;
   }
 }
@@ -58,5 +57,23 @@ void Control::run_smc_controller(){
   // run standard smc if mode is simple stabilise mode with pilot inputs as angles
   if(mode->current_mode == STABILIZE_ANGLE){
 
+  }
+}
+
+void flightMode::set_flight_mode(flight_mode desired_mode){
+  switch(desired_mode){
+
+    case STABILIZE_ANGLE:
+      this->current_mode = STABILIZE_ANGLE;
+      break;
+
+    case STABILIZE_RATES:
+      this->current_mode = STABILIZE_RATES;
+      break;
+
+    default:
+      cout << "INVALID MODE SETTING!\n";
+      this->current_mode = NOT_SET;
+      break;
   }
 }

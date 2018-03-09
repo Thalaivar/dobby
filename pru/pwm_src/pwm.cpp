@@ -36,9 +36,11 @@ int Motors::initialize_pru(){
 		return -1;
 	}
 
-	//zero out all PWM channels
-	//memset(channels, 0, PWM_CHANNELS*4);
-	//printf("zeroing out all PWM channels!\n");
+	// need to send low pulse on all pwm channels before loading
+	channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 
 	//load PRU firmware
 	prussdrv_exec_program (PWM_PRU, "./pwm.bin");
@@ -55,14 +57,16 @@ int Motors::disable_pru(){
 		return -1;
 	}
 
-	//first zero out all PWM channels
-	//memset(channels, 0, PWM_CHANNELS*4);
-	//printf("zeroing out all PWM channels!\n");
+	// need to send low pulse on all pwm channels before loading
+	channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 
 	//reset channels pointer to NULL so it doesn't point somewhere bad
 	channels = NULL;
 
-	//diable PRU
+	//disable PRU
 	prussdrv_pru_disable(PWM_PRU);
 	prussdrv_exit ();
 
@@ -88,11 +92,17 @@ int Motors::update(){
 	return 0;
 }
 
-Motors::Motors(void){
+Motors::Motors(Receiver *recv_ptr){
 
 	// make channel pointer point to struct
 	this->channels = &this->p;
+
+	// set all flags to false
 	this->is_initialized = false;
+	this->is_armed = false;
+
+	// link Receiver
+	this->recv = recv_ptr;
 
 	// initialize the PRU for PWM
 	if(this->initialize_pru() < 0) printf("Could not initialize PRU for PWM!!\n");
@@ -129,7 +139,7 @@ int Motors::calibrate_esc(){
 			channels->ch3 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
 			channels->ch4 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
 	}
-	
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 	//set all channels to 0
@@ -140,4 +150,67 @@ int Motors::calibrate_esc(){
 
 	printf("ESCs calibrated successfully!\n");
 	return 0;
+}
+
+int Motors::arm_motors(){
+
+	// exit if motors already armed
+	if(this->is_armed){
+		cout << "Motors already armed!\n";
+		return 0;
+	}
+
+	// wait for user to move sticks to arm configuration
+	while(recv->recv_channel[2] > 1050 && recv->recv_channel[3] < 1990 && \
+				recv->recv_channel[1] > 1050 && recv->recv_channel[0] < 1990){
+
+				}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] > 1990 && \
+		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] > 1990){
+			 this->is_armed = true;
+			 cout << "Motors armed!\n";
+			 this->set_motors_spool_rate();
+			 return 0;
+		 }
+
+	 else return -1;
+}
+
+int Motors::disarm_motors(){
+	// exit if motors already armed
+	if(!this->is_armed){
+		cout << "Motors already disarmed!\n";
+		return 0;
+	}
+
+	// wait for user to move sticks to arm configuration
+	while(recv->recv_channel[2] > 1050 && recv->recv_channel[3] > 1050 && \
+				recv->recv_channel[1] > 1050 && recv->recv_channel[0] > 1050){
+
+				}
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] < 1050 && \
+		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] < 1050){
+			 this->is_armed = true;
+			 cout << "Motors armed!\n";
+			 return 0;
+		 }
+	else return -1;
+}
+
+void Motors::set_motors_spool_rate(){
+
+	// set all motor channels to spool rate
+	this->channel_val[0] = MOTOR_SPOOL_RATE;
+	this->channel_val[1] = MOTOR_SPOOL_RATE;
+	this->channel_val[2] = MOTOR_SPOOL_RATE;
+	this->channel_val[3] = MOTOR_SPOOL_RATE;
+
+	// set motors to spin at spool rate
+	this->update();
 }

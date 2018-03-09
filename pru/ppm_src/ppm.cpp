@@ -97,12 +97,14 @@ int Receiver::init_radio(){
   }
 
   // check if radio is calibrated
-  /*if(this->load_radio_cal() < 0){
+  if(this->load_radio_cal() < 0){
     cout << "Radio not calibrated!\nRunning radio cal now... \n";
-    if(this->calibrate_radio() < 0) return -1; }*/
+    if(this->calibrate_radio() < 0) return -1; }
 
-	this->is_radio_initialized = true;
-  return 0;
+  if(this->is_pru_initialized && this->is_calibrated){
+    this->is_radio_initialized = true;
+    return 0;
+  }
 }
 
 int Receiver::load_radio_cal(){

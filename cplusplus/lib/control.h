@@ -55,14 +55,14 @@ class Control{
 typedef enum flight_modes{
    STABILIZE_ANGLE = 0,
    STABILIZE_RATES,
-   INCORRECT
+   NOT_SET
 }flight_mode;
 
 class flightMode{
   public:
     flightMode(Receiver *recv_ptr, IMU *imu_ptr);
     // to set current flight mode
-    void set_flight_mode();
+    void set_flight_mode(flight_mode desired_mode);
 
     // to get latest desired trajectory/attitude
     void flight_mode_update();

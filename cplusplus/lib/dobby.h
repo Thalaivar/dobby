@@ -8,6 +8,8 @@
 #include "control.h"
 #include "imu.h"
 
+using namespace std;
+
 // to keep track of dobby's state
 
 /**********************************************************************************
@@ -15,14 +17,18 @@
   * FLYING = Currently in air
   * ARMED = State before FLYING, can only be set if previous state was READY_TO_FLY
   * DISARMED = State usually after flying, device still ready for take off
-  * NOT_READY = pre flight checks (and others?) need to be done
+  * NOT_READY_TO_FLY = pre flight checks (and others?) need to be done
+  * RUNNING = main program execution has begun, dobby's state is set to this at the very start
+  * EXITING = main program execution over, set when all flying is over
 /**********************************************************************************/
 typedef enum dobby_status{
   READY_TO_FLY = 0,
   FLYING,
   ARMED,
   DISARMED,
-  NOT_READY
+  NOT_READY_TO_FLY,
+  RUNNING,
+  EXITING
 }dobby_status;
 
 /***********************************************************
@@ -33,9 +39,9 @@ class Dobby{
 
     // define all dobby peripherals
     IMU imu;
-    Receiver recv;
-    Motors motors = Motors(&recv);
-    flightMode mode = flightMode(&recv, &imu);
+    Receiver radio;
+    Motors motors = Motors(&radio);
+    flightMode mode = flightMode(&radio, &imu);
     Control control = Control(&motors, &mode);
 
     // holds current status of dobby
@@ -46,14 +52,16 @@ class Dobby{
     // pre flight checks
     int pre_flight_checks();
 
-    // runs on separate thread, keeps checking for disarm signal
+    // runs on separate thread, keeps checking for disarm signal,
+    // once signal is received, disables motors (and any other things??)
     int disarm_check();
 
     // setup function
-    void setup();
+    int setup();
 
     // main loop
-    
-    Dobby();
+    void control_loop();
+
+
 }
 #endif

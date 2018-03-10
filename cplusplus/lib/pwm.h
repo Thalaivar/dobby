@@ -38,15 +38,29 @@ class Motors {
    // sets the motors to spool rate (used after dobby is armed)
    void set_motors_spool_rate();
 
+   // to get desired pulses from torques
+   void demux_torques_to_pwm();
+
    public:
     int initialize_pru();
     int disable_pru();
+
+    // to send latest pulse to motors
     int update();
+
+    // for calibrating esc when required
     int calibrate_esc();
+
+    // checks if user gives signal to arm, returns -1 if signal was not to arm
     int arm_motors();
 
-    // this will be accessed by smc controller, loading it
-    // with latest PWM values
+    // sends 1000us pulse to all 4 motors
+    int disable_motors();
+
+    // this will be accessed by smc controller to set desired torques
+    float torques[3];
+
+    // holds the pwm values to be sent
     u32 channel_val[4];
 
     bool is_pru_initialized;

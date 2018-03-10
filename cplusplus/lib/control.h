@@ -2,6 +2,7 @@
 #define SMC_H
 
 #include <stdint.h>
+#include <cmath>
 #include "pwm.h"
 #include "imu.h"
 #include "ppm.h"
@@ -30,10 +31,25 @@
 #define angle_to_rate_pitch 0
 #define angle_to_rate_yaw 0
 
+/***************************************************************
+                    quadcopter dynamics params
+***************************************************************/
+#define Ixx 0
+#define Iyy 0
+#define Izz 0
+#define thrust_coeff 0
+#define drag_coeff 0
+
 struct error_struct{
   float attitude_error[3];
   float attitude_rate_error[3];
 };
+
+typedef enum attribute {
+  ROLL = 0,
+  PITCH,
+  YAW
+}attirubute;
 
 class Control{
   private:
@@ -41,11 +57,23 @@ class Control{
     flightMode *mode;
     error_struct error;
 
+    // holds outputs of controller
+    float control_signal[4];
+
+    // angle rates in euler frames
+    float euler_rates[3];
+
     // to get attitude error
     void get_attitude_error();
 
     // to get attitude_rate_error
     void get_attitude_rate_error();
+
+    // to convert control signals to torques (to be sent to motors)
+    void demux_control_signal();
+
+    // body rates to euler rates
+    void body_to_euler_rates();
 
   public:
     void run_smc_controller();
@@ -84,4 +112,6 @@ class flightMode{
     // controller needs access to desired trajectory/attitude
     friend class Control;
 };
+
+int sign(float x);
 #endif

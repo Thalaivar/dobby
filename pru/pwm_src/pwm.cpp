@@ -57,7 +57,7 @@ int Motors::disable_pru(){
 		return -1;
 	}
 
-	// need to send low pulse on all pwm channels before loading
+	// need to send low pulse on all pwm channels before disabling
 	channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 	channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
@@ -83,6 +83,9 @@ int Motors::update(){
 		return -1;
 	}
 
+	// convert required torques to PWM signals
+	this->demux_torques_to_pwm();
+
 	//load latest PWM signals into PRU DRAM
 	channels->ch1 = this->channel_val[0]*PULSE_TO_PRU_CYCLES;
 	channels->ch2 = this->channel_val[1]*PULSE_TO_PRU_CYCLES;
@@ -92,6 +95,14 @@ int Motors::update(){
 	return 0;
 }
 
+void Motors::demux_torques_to_pwm(){
+
+	this->channel_val[0] = (1/4)*((recv->recv_channel[2]) - torques[2] - (torques[1] + torques[0]));
+	this->channel_val[1] = (1/4)*((recv->recv_channel[2]) - torques[2] + (torques[1] + torques[0]));
+	this->channel_val[2] = (1/4)*((recv->recv_channel[2]) + torques[2] + (torques[0] - torques[1]));
+	this->channel_val[3] = (1/4)*((recv->recv_channel[2]) + torques[2] - (torques[0] - torques[1]));
+
+}
 Motors::Motors(Receiver *recv_ptr){
 
 	// make channel pointer point to struct
@@ -103,9 +114,6 @@ Motors::Motors(Receiver *recv_ptr){
 
 	// link Receiver
 	this->recv = recv_ptr;
-
-	// initialize the PRU for PWM
-	if(this->initialize_pru() < 0) printf("Could not initialize PRU for PWM!!\n");
 
 	// load pwm period into PRU DRAM
 	channels->pwm_period = PWM_PERIOD*PULSE_TO_PRU_CYCLES;
@@ -156,61 +164,55 @@ int Motors::arm_motors(){
 
 	// exit if motors already armed
 	if(this->is_armed){
-		cout << "Motors already armed!\n";
+		cerr << "Motors already armed!\n";
 		return 0;
 	}
 
-	// wait for user to move sticks to arm configuration
-	while(recv->recv_channel[2] > 1050 && recv->recv_channel[3] < 1990 && \
-				recv->recv_channel[1] > 1050 && recv->recv_channel[0] < 1990){
-
-				}
+	// if user sends arm signal
+	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] > 1990 && \
+		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] > 1990){
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
+	// check if arm signal was really arm signal
 	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] > 1990 && \
 		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] > 1990){
 			 this->is_armed = true;
-			 cout << "Motors armed!\n";
+			 cerr << "Motors armed!\n";
 			 this->set_motors_spool_rate();
 			 return 0;
 		 }
+	 }
 
-	 else return -1;
-}
-
-int Motors::disarm_motors(){
-	// exit if motors already armed
-	if(!this->is_armed){
-		cout << "Motors already disarmed!\n";
-		return 0;
-	}
-
-	// wait for user to move sticks to arm configuration
-	while(recv->recv_channel[2] > 1050 && recv->recv_channel[3] > 1050 && \
-				recv->recv_channel[1] > 1050 && recv->recv_channel[0] > 1050){
-
-				}
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] < 1050 && \
-		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] < 1050){
-			 this->is_armed = true;
-			 cout << "Motors armed!\n";
-			 return 0;
-		 }
-	else return -1;
+	 // if it wasnt arm signal, or if nothing was sent, dont arm
+	 return -1;
 }
 
 void Motors::set_motors_spool_rate(){
 
 	// set all motor channels to spool rate
-	this->channel_val[0] = MOTOR_SPOOL_RATE;
-	this->channel_val[1] = MOTOR_SPOOL_RATE;
-	this->channel_val[2] = MOTOR_SPOOL_RATE;
-	this->channel_val[3] = MOTOR_SPOOL_RATE;
+	this->channel_val[0] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
+	this->channel_val[1] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
+	this->channel_val[2] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
+	this->channel_val[3] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
 
 	// set motors to spin at spool rate
 	this->update();
+}
+
+int Motors::disable_motors(){
+
+	// cannot disable motors when they are armed
+	if(this->is_armed){
+		std::cerr << "Motors armed! cannot disable!" << '\n';
+		return -1;
+	}
+
+	// send low pulse on all channels
+	channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+
+	return -1;
 }

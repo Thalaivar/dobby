@@ -16,10 +16,17 @@ IMU::IMU(void){
     config.show_warnings = 0;
 
     this->is_initialized = false;
+    this->is_calibrated = false;
 }
 
 
 int IMU::init_imu(){
+
+    if(this->is_initialized){
+      std::cerr << "IMU already initialized!" << '\n';
+      return 0;
+    }
+    
     if(rc_is_gyro_calibrated() == 0){
       printf("Gyro needs calibration!\nRunning gyro calibration routine....\n");
       if(rc_calibrate_gyro_routine() < 0) {
@@ -34,6 +41,10 @@ int IMU::init_imu(){
         printf("Mag calibration failed!\n");
         return -1;
       }
+    }
+
+    if(rc_is_mag_calibrated() == 1 && rc_is_gyro_calibrated == 1){
+      this->is_calibrated = true;
     }
 
     if(rc_initialize_imu_dmp(&data, config) < 0){

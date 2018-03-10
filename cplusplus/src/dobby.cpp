@@ -4,25 +4,25 @@ int Dobby::pre_flight_checks(){
 
   // check current state
   if(this->state == READY_TO_FLY){
-    cout << "DOBBY IS READY!";
+    cerr << "DOBBY IS READY!";
     return 0;
   }
 
   // check IMU
   if(!imu.is_initialized){
-    cout << "IMU not initialized!\n";
+    cerr << "IMU not initialized!\n";
     return -1;
   }
 
   // check Receiver
-  if(!recv.is_initialized){
-    cout << "Receiver not initialized!\n";
+  if(!radio.is_initialized){
+    cerr << "Receiver not initialized!\n";
     return -1;
   }
 
   // check if flight mode is set
   if(mode.current_mode == NOT_SET){
-    cout << "Flight mode not set, cant take off!\n";
+    cerr << "Flight mode not set, cant take off!\n";
     return -1;
   }
 
@@ -30,13 +30,47 @@ int Dobby::pre_flight_checks(){
 
   // check Motors
   if(!motors.is_initialized){
-    cout << "Motors not initialized\n";
+    std::cerr << "Motors are not initialized" << '\n';
     return -1;
   }
 
+  // check if IMU is calibrated
+  if(!imu.is_calibrated){
+    std::cerr << "IMU not calibrated!" << '\n';
+    return -1;
+  }
+
+  // check if radio calibrated
+  if(!radio.is_calibrated){
+    std::cerr << "Receiver not calibrated!" << '\n';
+    return -1;
+  }
 
   // if everything checks out, ready to fly!
-  cout << "DOBBY IS READY!";
+  cerr << "DOBBY IS READY!";
   this->status = READY_TO_FLY;
+  return 0;
+}
+
+int Dobby::setup(){
+
+  // initialize the radio
+  if(radio.init_radio() < 0){
+    std::cerr << "Radio failed to initialize!" << '\n';
+    return -1;
+  }
+
+  // initialize the Motors
+  if(motors.initialize_pru() < 0){
+    std::cerr << "Motors failed to initialize!" << '\n';
+    return -1;
+  }
+
+  //initialize the IMU
+  if(imu.init_imu() < 0){
+    std::cerr << "IMU failed to initialize" << '\n';
+    return -1;
+  }
+
   return 0;
 }

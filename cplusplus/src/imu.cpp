@@ -26,7 +26,7 @@ int IMU::init_imu(){
       std::cerr << "IMU already initialized!" << '\n';
       return 0;
     }
-    
+
     if(rc_is_gyro_calibrated() == 0){
       printf("Gyro needs calibration!\nRunning gyro calibration routine....\n");
       if(rc_calibrate_gyro_routine() < 0) {
@@ -43,7 +43,7 @@ int IMU::init_imu(){
       }
     }
 
-    if(rc_is_mag_calibrated() == 1 && rc_is_gyro_calibrated == 1){
+    if(rc_is_mag_calibrated() == 1 && rc_is_gyro_calibrated() == 1){
       this->is_calibrated = true;
     }
 

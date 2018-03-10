@@ -2,14 +2,14 @@
 
 int Motors::initialize_pru(){
 
-	if(this->is_initialized){
+	if(this->is_pru_initialized){
 		printf("PRU already initialised\n");
 		return -1;
 	}
 
 	//reset channels pointer to NULL so it doesn't point somewhere bad
 	channels = NULL;
-	this->is_initialized = false;
+	this->is_pru_initialized = false;
 
 	// Initialise driver
 	prussdrv_init ();
@@ -45,14 +45,14 @@ int Motors::initialize_pru(){
 	//load PRU firmware
 	prussdrv_exec_program (PWM_PRU, "./pwm.bin");
 
-	this->is_initialized = true;
+	this->is_pru_initialized = true;
 	return 0;
 }
 
 int Motors::disable_pru(){
 
 	//check if PRU already disabled
-	if(!this->is_initialized){
+	if(!this->is_pru_initialized){
 		printf("PRU already disabled!\n");
 		return -1;
 	}
@@ -70,7 +70,7 @@ int Motors::disable_pru(){
 	prussdrv_pru_disable(PWM_PRU);
 	prussdrv_exit ();
 
-	this->is_initialized = false;
+	this->is_pru_initialized = false;
 	printf("PRU disabled succesfully!\n");
 	return 0;
 }
@@ -78,7 +78,7 @@ int Motors::disable_pru(){
 int Motors::update(){
 
 	//check if pru has been initialised properly
-	if(channels == NULL || !this->is_initialized){
+	if(channels == NULL || !this->is_pru_initialized){
 		printf("ERROR: PRU PWM Controller not initialized\n");
 		return -1;
 	}
@@ -109,7 +109,7 @@ Motors::Motors(Receiver *recv_ptr){
 	this->channels = &this->p;
 
 	// set all flags to false
-	this->is_initialized = false;
+	this->is_pru_initialized = false;
 	this->is_armed = false;
 
 	// link Receiver
@@ -121,7 +121,7 @@ Motors::Motors(Receiver *recv_ptr){
 }
 
 int Motors::calibrate_esc(){
-	if(!this->is_initialized){
+	if(!this->is_pru_initialized){
 		printf("PRU not initialised!\n");
 		return -1;
 	}

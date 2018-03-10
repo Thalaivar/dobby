@@ -40,6 +40,9 @@
 #define thrust_coeff 0
 #define drag_coeff 0
 
+// forward declaration to avoid error
+class flightMode;
+
 struct error_struct{
   float attitude_error[3];
   float attitude_rate_error[3];

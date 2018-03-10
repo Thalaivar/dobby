@@ -1,4 +1,4 @@
-#include "Control.h"
+#include "control.h"
 
 Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr){
 
@@ -89,7 +89,7 @@ void Control::run_smc_controller(){
   // run standard smc if mode is simple stabilise mode with pilot inputs as angles
   if(mode->current_mode == STABILIZE_ANGLE){
     control_signal[ROLL] = -f2*sin(psi) + f1*cos(psi) - g2*sin(psi) + g1*cos(psi) + \
-                          cos(theta)*(-smc_roll_lambda*error.attitude_rate_error[ROLL]) - smc_roll_eta*sign(s_roll)
+                          cos(theta)*(-smc_roll_lambda*error.attitude_rate_error[ROLL]) - smc_roll_eta*sign(s_roll);
     control_signal[PITCH] = f2*cos(psi) + f1*sin(psi) + g2*cos(psi) + g1*sin(psi) - smc_pitch_lambda*error.attitude_rate_error[PITCH] \
                               - smc_pitch_eta*sign(s_pitch);
     control_signal[YAW] = tan(theta)*((f2 + g2)*sin(psi) - (f1 + g1)*cos(psi)) + f3 - smc_yaw_lambda*error.attitude_rate_error[YAW] \
@@ -139,7 +139,7 @@ void Control::body_to_euler_rates(){
 
   // get attitude from imu, it is in terms of euler angles
   phi = mode->imu->data.fused_TaitBryan[TB_ROLL_Y];
-  pitch = mode->imu->data.fused_TaitBryan[TB_PITCH_X];
+  theta = mode->imu->data.fused_TaitBryan[TB_PITCH_X];
   psi = mode->imu->data.fused_TaitBryan[TB_YAW_Z];
 
   // get euler rates from body rates

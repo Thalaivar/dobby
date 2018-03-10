@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <chrono>
 #include <thread>
+#include "ppm.h"
 
 #define PWM_PRU 1
 #define PWM_CHANNELS 6

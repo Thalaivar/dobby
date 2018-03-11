@@ -31,7 +31,9 @@
 #include <arpa/inet.h>	// udp socket
 #include <ctype.h>		// for isprint()
 #include <sys/select.h>	// for read timeout
+#include <iostream>
 
+using namespace std;
 #define RAD_TO_DEG		57.295779513
 
 #define TB_PITCH_X	0

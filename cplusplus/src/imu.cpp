@@ -23,7 +23,7 @@ IMU::IMU(void){
 int IMU::init_imu(){
 
     if(this->is_initialized){
-      std::cerr << "IMU already initialized!" << '\n';
+      cerr << "IMU already initialized!" << '\n';
       return 0;
     }
 

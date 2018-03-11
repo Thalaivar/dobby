@@ -1,4 +1,7 @@
 #include "dobby.h"
+#include <iostream>
+
+using namespace std;
 
 Dobby dobby;
 
@@ -11,12 +14,11 @@ int main(){
 
   dobby.pre_flight_checks();
 
-  while(dobby.state == READY_TO_FLY){
-    if(dobby.motors.arm_motors()) dobby.state = ARMED;
-    while(dobby.state == ARMED){
-      imu.print_tb_angles();
-    }
+  cout << dobby.state << endl;
 
+  while(true){
+  	
+	dobby.imu.print_tb_angles();
   }
   return 0;
 }

@@ -5,7 +5,7 @@ Dobby dobby;
 int main(){
 
   // program has started
-  dobby.state = RUNNING;
+  dobby.state = RUN;
 
   dobby.setup();
 

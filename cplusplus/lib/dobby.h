@@ -35,19 +35,14 @@ typedef enum dobby_status{
                       main dobby class
 ***********************************************************/
 class Dobby{
-  private:
+  public:
 
     // define all dobby peripherals
     IMU imu;
     Receiver radio;
     Motors motors = Motors(&radio);
     flightMode mode = flightMode(&radio, &imu);
-    Control control = Control(&motors, &mode);
-
-    // holds current status of dobby
-    dobby_status state;
-
-  public:
+    Control control = Control(&motors, &mode);\
 
     // pre flight checks
     int pre_flight_checks();
@@ -62,6 +57,8 @@ class Dobby{
     // main loop
     void control_loop();
 
+    // holds current status of dobby
+    dobby_status state;
 
 };
 #endif

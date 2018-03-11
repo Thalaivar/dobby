@@ -27,8 +27,8 @@ typedef enum dobby_status{
   ARMED,
   DISARMED,
   NOT_READY_TO_FLY,
-  RUNNING,
-  EXITING
+  RUN,
+  EXIT
 }dobby_status;
 
 /***********************************************************
@@ -63,5 +63,5 @@ class Dobby{
     void control_loop();
 
 
-}
+};
 #endif

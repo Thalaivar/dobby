@@ -15,7 +15,7 @@ int Dobby::pre_flight_checks(){
   }
 
   // check Receiver
-  if(!radio.is_initialized){
+  if(!radio.is_radio_initialized){
     cerr << "Receiver not initialized!\n";
     return -1;
   }
@@ -29,7 +29,7 @@ int Dobby::pre_flight_checks(){
   // any checks for controller?
 
   // check Motors
-  if(!motors.is_initialized){
+  if(!motors.is_pru_initialized){
     std::cerr << "Motors are not initialized" << '\n';
     return -1;
   }
@@ -48,7 +48,7 @@ int Dobby::pre_flight_checks(){
 
   // if everything checks out, ready to fly!
   cerr << "DOBBY IS READY!";
-  this->status = READY_TO_FLY;
+  this->state = READY_TO_FLY;
   return 0;
 }
 
@@ -88,5 +88,5 @@ void Dobby::control_loop(){
 
   // update motors
   motors.update();
-  
+
 }

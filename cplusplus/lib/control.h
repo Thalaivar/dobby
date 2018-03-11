@@ -98,15 +98,15 @@ class flightMode{
     // to get latest desired trajectory/attitude
     void flight_mode_update();
 
+    // holds current mode setting
+    flight_mode current_mode;
+
   private:
     // to access the receiver signals
     Receiver *recv;
 
     // to access imu data
     IMU *imu;
-
-    // holds current mode setting
-    flight_mode current_mode;
 
     // holds latest desired values
     float desired_attitude[3];

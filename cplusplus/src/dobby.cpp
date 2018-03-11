@@ -74,3 +74,19 @@ int Dobby::setup(){
 
   return 0;
 }
+
+void Dobby::control_loop(){
+
+  // get latest radio signals
+  radio.update();
+
+  // get latest desired things
+  mode.flight_mode_update();
+
+  // run smc controller
+  control.run_smc_controller();
+
+  // update motors
+  motors.update();
+  
+}

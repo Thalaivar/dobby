@@ -1,5 +1,8 @@
 #include "dobby.h"
 
+using namespace Receiver;
+using namespace Motors;
+
 int Dobby::pre_flight_checks(){
 
   // check current state

@@ -167,14 +167,14 @@ int Motors::arm_motors(){
 	}
 	cout << recv->recv_channel[0] << " | " << recv->recv_channel[1] << " | " << recv->recv_channel[2] << " | " << recv->recv_channel[3] << " | " << endl;
 	// if user sends arm signal
-	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] > 1990 && \
-		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] > 1990){
-	
+	if(recv->recv_channel[2] < recv->cal_throttle[0] + 30 && recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
+		 recv->recv_channel[1] < recv->cal_pitch[0] + 30 && recv->recv_channel[0] > recv->cal_roll[1] - 30]){
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 	// check if arm signal was really arm signal
-	if(recv->recv_channel[2] < 1050 && recv->recv_channel[3] > 1990 && \
-		 recv->recv_channel[1] < 1050 && recv->recv_channel[0] > 1990){
+	if(recv->recv_channel[2] < recv->cal_throttle[0] + 30 && recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
+		 recv->recv_channel[1] < recv->cal_pitch[0] + 30 && recv->recv_channel[0] > recv->cal_roll[1] - 30]){
 			 this->is_armed = true;
 			 cerr << "Motors armed!\n";
 			 this->set_motors_spool_rate();

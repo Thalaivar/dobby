@@ -59,7 +59,13 @@ class Dobby{
 
     // holds current status of dobby
     dobby_status state;
-	
+
+    // debug functions, to be deleted after testing
+    void print_desired_attitude();
+    void print_attitude_error();
+    void print_desired_attitude_rates();
+    void print_attitude_rate_error();
+    
 	Dobby();
 };
 #endif

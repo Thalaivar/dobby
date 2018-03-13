@@ -22,9 +22,9 @@ void flightMode::flight_mode_update(){
 
     case STABILIZE_ANGLE:
     // get desired angles from pilot in degrees
-      this->desired_attitude[ROLL] = (recv->recv_channel[ROLL_CHANNEL] - recv->cal_roll)*recv_signal_to_roll_angle;
-      this->desired_attitude[PITCH] = (recv->recv_channel[PITCH_CHANNEL] - recv->cal_pitch)*recv_signal_to_pitch_angle;
-      this->desired_attitude[YAW] = (recv->recv_channel[YAW_CHANNEL] - recv->cal_yaw)*recv_signal_to_yaw_angle;
+      this->desired_attitude[ROLL] = (recv->recv_channel[ROLL_CHANNEL] - (recv->cal_roll[0] + recv->cal_roll[1])/2)*recv_signal_to_roll_angle;
+      this->desired_attitude[PITCH] = (recv->recv_channel[PITCH_CHANNEL] - (recv->cal_pitch[0] + recv->cal_pitch[1])/2)*recv_signal_to_pitch_angle;
+      this->desired_attitude[YAW] = (recv->recv_channel[YAW_CHANNEL] - (recv->cal_yaw[0] + recv->cal_yaw[1])/2)*recv_signal_to_yaw_angle;
 
     // get desired angular rates (by passing through simple P controller)
       this->desired_attitude_rates[ROLL] = (imu->data.fused_TaitBryan[TB_ROLL_Y]*RAD_TO_DEG - this->desired_attitude[ROLL])*angle_to_rate_roll;

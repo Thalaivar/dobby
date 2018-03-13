@@ -1,8 +1,5 @@
 #include "dobby.h"
 
-using namespace Receiver;
-using namespace Motors;
-
 int Dobby::pre_flight_checks(){
 
   // check current state
@@ -78,6 +75,30 @@ int Dobby::setup(){
   return 0;
 }
 
+void Dobby::print_desired_attitude(){
+
+  cout << mode.desired_attitude[0] << " | " << mode.desired_attitude[1] << " | " << mode.desired_attitude[2] << endl;
+}
+
+void Dobby::print_desired_attitude_rates(){
+
+  cout << mode.desired_attitude_rates[0] << " | " << mode.desired_attitude_rates[1] << " | " << mode.desired_attitude_rates[2] << endl;
+}
+
+void Dobby::print_attitude_error(){
+
+  control.get_attitude_error();
+
+  cout << control.error.attitude_error[ROLL] << " | " << control.error.attitude_error[PITCH] << " | " << control.error.attitude_error[YAW] << endl;
+}
+
+void Dobby::print_attitude_error(){
+
+  control.get_attitude_rate_error();
+
+  cout << control.error.attitude_rate_error[ROLL] << " | " << control.error.attitude_rate_error[PITCH] << " | " << control.error.attitude_rate_error[YAW] << endl;
+}
+
 void Dobby::control_loop(){
 
   // get latest radio signals
@@ -87,11 +108,7 @@ void Dobby::control_loop(){
   mode.flight_mode_update();
 
   // run smc controller
-  control.run_smc_controller();
-
-  // update motors
-  motors.update();
-
+  this->print_desired_attitude();
 }
 
 Dobby::Dobby(){

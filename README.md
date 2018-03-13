@@ -14,10 +14,16 @@ Tasks to do:
 * ~~Write Motor driver.~~
 * Write AHRS algorithm. (delegated to the DMP, not enough skill to write own algorithm)
 * ~~PRU PPM and PWM libraries.~~
-* Write the remote comms.
 * ~~Write accel_calibration function.~~
 * ~~Write gyro_calibration function~~
 * ~~Write mag_calibration function~~
 * Write failsafes and arm checks
-* Test the PRU and PWM outputs
+* Test the ~~PPM~~ and PWM outputs
 
+Status:
+--------
+Still writing up the low level controller code base.
+
+Next major test:
+----------------
+Attitude Controller testing

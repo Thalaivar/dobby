@@ -93,3 +93,6 @@ void Dobby::control_loop(){
   motors.update();
 
 }
+
+Dobby::Dobby(){
+}

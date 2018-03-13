@@ -13,12 +13,26 @@ int main(){
   dobby.setup();
 
   dobby.pre_flight_checks();
-
+  
+  char resp;
+  
   cout << dobby.state << endl;
+  cout << "Enter \"y\" to continue: ";
+  cin >> resp;
 
-  while(true){
-  	
-	dobby.imu.print_tb_angles();
+  if(resp == 'y'){
+    while(dobby.state == READY_TO_FLY){
+      dobby.radio.update();
+	  dobby.motors.arm_motors();
+	  if(dobby.motors.is_armed) dobby.state = ARMED;
+	  while(dobby.state == ARMED){
+	  dobby.radio.update();
+      dobby.motors.channel_val[0] = dobby.radio.recv_channel[2];
+	  dobby.motors.channel_val[1] = dobby.radio.recv_channel[2];
+	  dobby.motors.channel_val[2] = dobby.radio.recv_channel[2];
+	  dobby.motors.channel_val[3] = dobby.radio.recv_channel[2];
+	  dobby.motors.update();}
+	}
   }
   return 0;
 }

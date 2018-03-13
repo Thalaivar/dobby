@@ -52,7 +52,7 @@ class Receiver {
     bool is_radio_initialized;
     bool is_calibrated;
     // calibration holds the mean value (to subtract when caculating setpoints)
-    int cal_roll, cal_pitch, cal_yaw, cal_throttle;
+    int cal_roll[2], cal_pitch[2], cal_yaw[2], cal_throttle[2];
 
     int init_radio();
     // calibration currently calculates the appropriate mean value (assuming linear)

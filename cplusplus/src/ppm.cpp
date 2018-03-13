@@ -95,7 +95,7 @@ int Receiver::init_radio(){
     cout << "Could not initialize PRU for PPM!!\n";
     return -1;
   }
-	
+
   // check if radio is calibrated
   if(this->load_radio_cal() < 0){
     cout << "Radio not calibrated!\nRunning radio cal now... \n";
@@ -109,10 +109,14 @@ int Receiver::init_radio(){
 
 int Receiver::load_radio_cal(){
   // set all calibration vals to 0, will be loaded if calibration has been done
-  this->cal_roll = 0;
-  this->cal_pitch = 0;
-  this->cal_yaw = 0;
-  this->cal_throttle = 0;
+  this->cal_roll[0] = 0;
+  this->cal_pitch[0] = 0;
+  this->cal_yaw[0] = 0;
+  this->cal_throttle[0] = 0;
+  this->cal_roll[1] = 0;
+  this->cal_pitch[1] = 0;
+  this->cal_yaw[1] = 0;
+  this->cal_throttle[1] = 0;
 
   // load calibration values
   ifstream saveFile;
@@ -124,11 +128,11 @@ int Receiver::load_radio_cal(){
     return -1;
   }
 
-  saveFile >> this->cal_roll;
-  saveFile >> this->cal_pitch;
-  saveFile >> this->cal_yaw;
-  saveFile >> this->cal_throttle;
-  
+  saveFile >> this->cal_roll[0] >> this->cal_roll[1];
+  saveFile >> this->cal_pitch[0] >> this->cal_pitch[1];
+  saveFile >> this->cal_yaw[0] >> this->cal_yaw[1];
+  saveFile >> this->cal_throttle[0] >> this->cal_throttle[1];
+
   this->is_calibrated = true;
 
   saveFile.close();
@@ -146,10 +150,14 @@ int Receiver::save_radio_cal(){
     return -1;
   }
 
-  saveFile << this->cal_roll << '\n';
-  saveFile << this->cal_pitch << '\n';
-  saveFile << this->cal_yaw << '\n';
-  saveFile << this->cal_throttle << '\n';
+  saveFile << this->cal_roll[0] << '\n';
+  saveFile << this->cal_roll[1] << '\n';
+  saveFile << this->cal_pitch[0] << '\n';
+  saveFile << this->cal_pitch[1] << '\n';
+  saveFile << this->cal_yaw[0] << '\n';
+  saveFile << this->cal_yaw[1] << '\n';
+  saveFile << this->cal_throttle[0] << '\n';
+  saveFile << this->cal_throttle[1] << '\n';
 
   return 0;
 }
@@ -194,7 +202,7 @@ int Receiver::calibrate_radio(){
 	   i++;
     }
     i = 0;
-	
+
 
     while(this->recv_channel[2] >= 1050){
       if(i == 0) printf("Keep throttle at 0!\n");
@@ -239,7 +247,8 @@ int Receiver::calibrate_radio(){
         temp_high = temp_high/1000;
     }
 
-    this->cal_roll = (temp_low + temp_high)/2;
+    this->cal_roll[0] = temp_low;
+    this->cal_roll[1] = temp_high;
 
     // calibrate pitch channel
     cout << "Keep pitch at minimum\nEnter \"y\" to continue: ";
@@ -266,7 +275,8 @@ int Receiver::calibrate_radio(){
         temp_high = temp_high/1000;
     }
 
-    this->cal_pitch = (temp_low + temp_high)/2;
+    this->cal_pitch[0] = temp_low;
+    this->cal_pitch[1] = temp_high;
 
     // calibrate yaw channel
     cout << "Keep yaw at minimum\nEnter \"y\" to continue: ";
@@ -293,7 +303,8 @@ int Receiver::calibrate_radio(){
         temp_high = temp_high/1000;
     }
 
-    this->cal_yaw = (temp_low + temp_high)/2;
+    this->cal_yaw[0] = temp_low;
+    this->cal_yaw[1] = temp_high;
 
     // calibrate throttle channel
     cout << "Keep throttle at minimum\nEnter \"y\" to continue: ";
@@ -320,7 +331,8 @@ int Receiver::calibrate_radio(){
         temp_high = temp_high/1000;
     }
 
-    this->cal_throttle = (temp_low + temp_high)/2;
+    this->cal_throttle[0] = temp_low;
+    this->cal_throttle[1] = temp_high;
 
 
     if(this->save_radio_cal() < 0) return -1;

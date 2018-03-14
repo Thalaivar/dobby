@@ -80,11 +80,12 @@ void Dobby::control_loop(){
   // get latest radio signals
   radio.update();
 
-  // get latest desired things
-  mode.flight_mode_update();
+  motors.channel_val[0] = radio.recv_channel[2];
+  motors.channel_val[1] = radio.recv_channel[2];
+  motors.channel_val[2] = radio.recv_channel[2];
+  motors.channel_val[3] = radio.recv_channel[2];
 
-  // run smc controller
-  mode.print_desired_attitude();
+  motors.update();
 }
 
 Dobby::Dobby(){

@@ -20,7 +20,7 @@
 /***************************************************************
               recv signal conversion to desired values
 ***************************************************************/
-#define recv_signal_to_roll_angle 0.07f
+#define recv_signal_to_roll_angle 0.1f
 #define recv_signal_to_pitch_angle 0.07f
 #define recv_signal_to_yaw_angle 0.07f
 
@@ -39,6 +39,10 @@
 #define Izz 0
 #define thrust_coeff 0
 #define drag_coeff 0
+
+#define IMU_ROLL 1
+#define IMU_PITCH 0
+#define IMU_YAW 2
 
 // forward declaration to avoid error
 class flightMode;
@@ -84,7 +88,7 @@ class Control{
     // debug functions , can be deleted later
     void print_attitude_error();
     void print_attitude_rate_error();
-    
+
     Control(Motors* motors_ptr, flightMode* flightMode_ptr);
 };
 

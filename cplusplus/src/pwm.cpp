@@ -42,10 +42,16 @@ int Motors::initialize_pru(){
 	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 	channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 
+	// load pwm period into PRU DRAM
+	channels->pwm_period = PWM_PERIOD*PULSE_TO_PRU_CYCLES;
+
 	//load PRU firmware
-	prussdrv_exec_program (PWM_PRU, "./pwm.bin");
+	prussdrv_exec_program(PWM_PRU, "./pwm.bin");
+	
+	cout << channels->pwm_period  << endl;
 
 	this->is_pru_initialized = true;
+	
 	return 0;
 }
 
@@ -113,9 +119,6 @@ Motors::Motors(Receiver *recv_ptr){
 	// link Receiver
 	this->recv = recv_ptr;
 
-	// load pwm period into PRU DRAM
-	channels->pwm_period = PWM_PERIOD*PULSE_TO_PRU_CYCLES;
-
 }
 
 int Motors::calibrate_esc(){
@@ -170,9 +173,9 @@ int Motors::arm_motors(){
 	int i = 0;
 	while(recv->recv_channel[2] < recv->cal_throttle[0] + 30 && recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
 		recv->recv_channel[1] < recv->cal_pitch[0] + 30 && recv->recv_channel[0] > recv->cal_roll[1] - 30){
-		
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		
+
 		i++;
 		cout << i << endl;
 		if (i == 10){
@@ -182,7 +185,7 @@ int Motors::arm_motors(){
 
 		else if(i > 10) break;
 	}
-	
+
 	if (this->is_armed){
 		cout << "Motors armed!\n";
 		this->set_motors_spool_rate();
@@ -195,10 +198,10 @@ int Motors::arm_motors(){
 void Motors::set_motors_spool_rate(){
 
 	// set all motor channels to spool rate
-	this->channel_val[0] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
-	this->channel_val[1] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
-	this->channel_val[2] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
-	this->channel_val[3] = MOTOR_SPOOL_RATE*PULSE_TO_PRU_CYCLES;
+	this->channel_val[0] = MOTOR_SPOOL_RATE;
+	this->channel_val[1] = MOTOR_SPOOL_RATE;
+	this->channel_val[2] = MOTOR_SPOOL_RATE;
+	this->channel_val[3] = MOTOR_SPOOL_RATE;
 
 	// set motors to spin at spool rate
 	this->update();

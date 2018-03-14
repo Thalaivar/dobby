@@ -40,16 +40,16 @@ void flightMode::flight_mode_update(){
 
 void Control::get_attitude_error(){
   // <angle>_error = current_<angle> - desired_<angle>
-  error.attitude_error[ROLL] = mode->imu->data.fused_TaitBryan[ROLL]*RAD_TO_DEG - mode->desired_attitude[ROLL];
-  error.attitude_error[PITCH] = mode->imu->data.fused_TaitBryan[PITCH]*RAD_TO_DEG - mode->desired_attitude[PITCH];
-  error.attitude_error[YAW] = mode->imu->data.fused_TaitBryan[YAW]*RAD_TO_DEG - mode->desired_attitude[YAW];
+  error.attitude_error[ROLL] = mode->imu->data.fused_TaitBryan[IMU_ROLL]*RAD_TO_DEG - mode->desired_attitude[ROLL];
+  error.attitude_error[PITCH] = mode->imu->data.fused_TaitBryan[IMU_PITCH]*RAD_TO_DEG - mode->desired_attitude[PITCH];
+  error.attitude_error[YAW] = mode->imu->data.fused_TaitBryan[IMU_YAW]*RAD_TO_DEG - mode->desired_attitude[YAW];
 }
 
 void Control::get_attitude_rate_error(){
   // <angle>_rate_error = current_<angle>_rate - desired_<angle>_rate
-  error.attitude_rate_error[ROLL] = mode->imu->data.gyro[ROLL] - mode->desired_attitude_rates[ROLL];
-  error.attitude_rate_error[PITCH] = mode->imu->data.gyro[PITCH] - mode->desired_attitude_rates[PITCH];
-  error.attitude_rate_error[YAW] = mode->imu->data.gyro[YAW] - mode->desired_attitude_rates[YAW];
+  error.attitude_rate_error[ROLL] = mode->imu->data.gyro[IMU_ROLL] - mode->desired_attitude_rates[ROLL];
+  error.attitude_rate_error[PITCH] = mode->imu->data.gyro[IMU_PITCH] - mode->desired_attitude_rates[PITCH];
+  error.attitude_rate_error[YAW] = mode->imu->data.gyro[IMU_YAW] - mode->desired_attitude_rates[YAW];
 }
 
 void Control::run_smc_controller(){

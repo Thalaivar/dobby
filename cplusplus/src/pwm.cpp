@@ -1,7 +1,6 @@
 #include "pwm.h"
 
 int Motors::initialize_pru(){
-
 	if(this->is_pru_initialized){
 		printf("PRU already initialised\n");
 		return -1;
@@ -47,11 +46,9 @@ int Motors::initialize_pru(){
 
 	//load PRU firmware
 	prussdrv_exec_program(PWM_PRU, "./pwm.bin");
-	
-	cout << channels->pwm_period  << endl;
 
 	this->is_pru_initialized = true;
-	
+
 	return 0;
 }
 

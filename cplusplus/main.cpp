@@ -7,13 +7,12 @@ Dobby dobby;
 
 void exit_Handler(int a){
  	cout << endl << "Exit Handler Reached!" << endl;
-	dobby.motors.disable_pru();
 	exit(0);
  }
 
 
 int main(){
-  
+
   signal(SIGINT, exit_Handler);
 
   // program has started

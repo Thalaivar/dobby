@@ -37,7 +37,7 @@ struct recv_channelPtr {
 class Receiver {
   private:
     recv_channelPtr p;
-    recv_channelPtr volatile *channels;
+    recv_channelPtr volatile *ppm_channels;
 
     // calibration stuff
     int save_radio_cal();

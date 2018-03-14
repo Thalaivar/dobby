@@ -7,7 +7,7 @@ int Receiver::initialize_pru(){
 	}
 
   //reset channels pointer to NULL so it doesn't point somewhere bad
-	channels = NULL;
+	ppm_channels = NULL;
 	this->is_pru_initialized = false;
 
   // Initialise driver
@@ -26,9 +26,9 @@ int Receiver::initialize_pru(){
 
   // start mmaping dram memory into channelPtr struct
 	printf("mmaping PRU0 DRAM memory\n");
-	prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, (void**) &channels);
+	prussdrv_map_prumem(PRUSS0_PRU0_DATARAM, (void**) &ppm_channels);
 
-  if(channels == NULL){
+  if(ppm_channels == NULL){
 		printf("Pointer to DRAM failed to initialize!\n");
 		return -1;
 	}
@@ -48,7 +48,7 @@ int Receiver::disable_pru(){
 		return -1;
 	}
 
-	channels = NULL;
+	ppm_channels = NULL;
 
 	//diable PRU
 	prussdrv_pru_disable(PPM_PRU);
@@ -61,18 +61,18 @@ int Receiver::disable_pru(){
 
 int Receiver::update(){
   //check if pru has been initialised properly
-	if(channels == NULL || !this->is_pru_initialized){
+	if(ppm_channels == NULL || !this->is_pru_initialized){
 		printf("ERROR: PRU PPM decoder not initialized\n");
 		return -1;
 	}
 
   //load latest PPM values from PRU0 DRAM
-	this->recv_channel[0] = channels->ch1*PRU_CYCLES_TO_US;
-	this->recv_channel[1] = channels->ch2*PRU_CYCLES_TO_US;
-	this->recv_channel[2] = channels->ch3*PRU_CYCLES_TO_US;
-	this->recv_channel[3] = channels->ch4*PRU_CYCLES_TO_US;
-	this->recv_channel[4] = channels->ch5*PRU_CYCLES_TO_US;
-  	this->recv_channel[5] = channels->ch6*PRU_CYCLES_TO_US;
+	this->recv_channel[0] = ppm_channels->ch1*PRU_CYCLES_TO_US;
+	this->recv_channel[1] = ppm_channels->ch2*PRU_CYCLES_TO_US;
+	this->recv_channel[2] = ppm_channels->ch3*PRU_CYCLES_TO_US;
+	this->recv_channel[3] = ppm_channels->ch4*PRU_CYCLES_TO_US;
+	this->recv_channel[4] = ppm_channels->ch5*PRU_CYCLES_TO_US;
+  	this->recv_channel[5] = ppm_channels->ch6*PRU_CYCLES_TO_US;
 
   return 0;
 }
@@ -80,7 +80,7 @@ int Receiver::update(){
 Receiver::Receiver(void){
 
 	// make channel pointer point to struct
-	this->channels = &this->p;
+	this->ppm_channels = &this->p;
 
 	this->is_pru_initialized = false;
     this->is_radio_initialized = false;

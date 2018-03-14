@@ -9,7 +9,7 @@
 #define LED_RED (1<<2)
 #define DELAY_TIME 10000000
 
-#define PRU0_R31_VEC_VALID 32
+#define PRU1_R31_VEC_VALID 32
 #define PRU_EVTOUT_0 3
 
 .macro ledon

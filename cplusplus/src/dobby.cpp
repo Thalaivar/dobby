@@ -86,6 +86,9 @@ void Dobby::control_loop(){
   motors.channel_val[3] = radio.recv_channel[2];
 
   motors.update();
+
+  mode.flight_mode_update();
+  control.print_attitude_error();
 }
 
 Dobby::Dobby(){

@@ -80,6 +80,11 @@ class Control{
 
   public:
     void run_smc_controller();
+
+    // debug functions , can be deleted later
+    void print_attitude_error();
+    void print_attitude_rate_error();
+    
     Control(Motors* motors_ptr, flightMode* flightMode_ptr);
 };
 
@@ -100,6 +105,10 @@ class flightMode{
 
     // holds current mode setting
     flight_mode current_mode;
+
+    // debug functions, can be deleted angle_to_rate_roll
+    void print_desired_attitude();
+    void print_desired_attitude_rates();
 
   private:
     // to access the receiver signals

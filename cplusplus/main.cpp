@@ -28,12 +28,8 @@ int main(){
 	  while(dobby.state == ARMED){
     if(dobby.radio.recv_channel[2] > 1200) dobby.state == FLYING;
      while(dobby.state == FLYING){
-       dobby.radio.update();
-       dobby.motors.channel_val[0] = dobby.radio.recv_channel[2];
-	     dobby.motors.channel_val[1] = dobby.radio.recv_channel[2];
-       dobby.motors.channel_val[2] = dobby.radio.recv_channel[2];
-       dobby.motors.channel_val[3] = dobby.radio.recv_channel[2];
-       dobby.motors.update();
+          dobby.mode.flight_mode_update();
+          dobby.print_desired_attitude();
       }
     }
 	 }

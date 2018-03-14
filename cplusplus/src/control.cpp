@@ -1,4 +1,4 @@
-#include "control.h"
+this->#include "control.h"
 
 Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr){
 
@@ -152,4 +152,28 @@ int sign(float x){
   if( x > 0.000 ) return 1;
   else if( x < 0.000 ) return -1;
   else return 0;
+}
+
+void Control::print_attitude_rate_error(){
+
+  this->get_attitude_rate_error();
+
+  cout << this->error.attitude_rate_error[ROLL] << " | " << this->error.attitude_rate_error[PITCH] << " | " << this->error.attitude_rate_error[YAW] << endl;
+}
+
+void Control::print_attitude_error(){
+
+  this->get_attitude_error();
+
+  cout << this->error.attitude_error[ROLL] << " | " << this->error.attitude_error[PITCH] << " | " << this->error.attitude_error[YAW] << endl;
+}
+
+void flightMode::print_desired_attitude(){
+
+  cout << this->desired_attitude[0] << " | " << this->desired_attitude[1] << " | " << this->desired_attitude[2] << endl;
+}
+
+void flightMode::print_desired_attitude_rates(){
+
+  cout << this->desired_attitude_rates[0] << " | " << this->desired_attitude_rates[1] << " | " << this->desired_attitude_rates[2] << endl;
 }

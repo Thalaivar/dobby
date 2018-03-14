@@ -1,4 +1,4 @@
-this->#include "control.h"
+#include "control.h"
 
 Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr){
 
@@ -22,9 +22,9 @@ void flightMode::flight_mode_update(){
 
     case STABILIZE_ANGLE:
     // get desired angles from pilot in degrees
-      this->desired_attitude[ROLL] = (recv->recv_channel[ROLL_CHANNEL] - (recv->cal_roll[0] + recv->cal_roll[1])/2)*recv_signal_to_roll_angle;
-      this->desired_attitude[PITCH] = (recv->recv_channel[PITCH_CHANNEL] - (recv->cal_pitch[0] + recv->cal_pitch[1])/2)*recv_signal_to_pitch_angle;
-      this->desired_attitude[YAW] = (recv->recv_channel[YAW_CHANNEL] - (recv->cal_yaw[0] + recv->cal_yaw[1])/2)*recv_signal_to_yaw_angle;
+      this->desired_attitude[ROLL] = (float)((int)recv->recv_channel[ROLL_CHANNEL] - (recv->cal_roll[0] + recv->cal_roll[1])/2)*recv_signal_to_roll_angle;
+      this->desired_attitude[PITCH] = (float)((int)recv->recv_channel[PITCH_CHANNEL] - (recv->cal_pitch[0] + recv->cal_pitch[1])/2)*recv_signal_to_pitch_angle;
+      this->desired_attitude[YAW] = (float)((int)recv->recv_channel[YAW_CHANNEL] - (recv->cal_yaw[0] + recv->cal_yaw[1])/2)*recv_signal_to_yaw_angle;
 
     // get desired angular rates (by passing through simple P controller)
       this->desired_attitude_rates[ROLL] = (imu->data.fused_TaitBryan[TB_ROLL_Y]*RAD_TO_DEG - this->desired_attitude[ROLL])*angle_to_rate_roll;
@@ -40,9 +40,9 @@ void flightMode::flight_mode_update(){
 
 void Control::get_attitude_error(){
   // <angle>_error = current_<angle> - desired_<angle>
-  error.attitude_error[ROLL] = mode->imu->data.fused_TaitBryan[TB_ROLL_Y]*RAD_TO_DEG - mode->desired_attitude[ROLL];
-  error.attitude_error[PITCH] = mode->imu->data.fused_TaitBryan[TB_PITCH_X]*RAD_TO_DEG - mode->desired_attitude[PITCH];
-  error.attitude_error[YAW] = mode->imu->data.fused_TaitBryan[TB_YAW_Z]*RAD_TO_DEG - mode->desired_attitude[YAW];
+  error.attitude_error[ROLL] = mode->imu->data.fused_TaitBryan[ROLL]*RAD_TO_DEG - mode->desired_attitude[ROLL];
+  error.attitude_error[PITCH] = mode->imu->data.fused_TaitBryan[PITCH]*RAD_TO_DEG - mode->desired_attitude[PITCH];
+  error.attitude_error[YAW] = mode->imu->data.fused_TaitBryan[YAW]*RAD_TO_DEG - mode->desired_attitude[YAW];
 }
 
 void Control::get_attitude_rate_error(){

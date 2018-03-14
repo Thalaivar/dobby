@@ -47,7 +47,7 @@ int Dobby::pre_flight_checks(){
   }
 
   // if everything checks out, ready to fly!
-  cerr << "DOBBY IS READY!";
+  cerr << "DOBBY IS READY!\n";
   this->state = READY_TO_FLY;
   return 0;
 }
@@ -84,7 +84,7 @@ void Dobby::control_loop(){
   mode.flight_mode_update();
 
   // run smc controller
-  this->print_desired_attitude();
+  mode.print_desired_attitude();
 }
 
 Dobby::Dobby(){

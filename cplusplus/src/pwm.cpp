@@ -165,27 +165,29 @@ int Motors::arm_motors(){
 		cerr << "Motors already armed!\n";
 		return 0;
 	}
-	cout << recv->recv_channel[0] << " | " << recv->recv_channel[1] << " | " << recv->recv_channel[2] << " | " << recv->recv_channel[3] << " | " << endl;
-	// if user sends arm signal
 
+	// if user sends arm signal
 	int i = 0;
-	while(!this->is_armed){
-		if(recv->recv_channel[2] < recv->cal_throttle[0] + 30 && recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
-			recv->recv_channel[1] < recv->cal_pitch[0] + 30 && recv->recv_channel[0] > recv->cal_roll[1] - 30]){
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			i++;
-			if (i == 10){
-				this->is_armed = true;
-				break;
-			}
+	while(recv->recv_channel[2] < recv->cal_throttle[0] + 30 && recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
+		recv->recv_channel[1] < recv->cal_pitch[0] + 30 && recv->recv_channel[0] > recv->cal_roll[1] - 30){
+		
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		
+		i++;
+		cout << i << endl;
+		if (i == 10){
+			this->is_armed = true;
+			break;
 		}
-		else
-			i = 0;
+
+		else if(i > 10) break;
 	}
-	cerr << "Motors armed!\n";
- 	this->set_motors_spool_rate();
-	if (this->is_armed)
+	
+	if (this->is_armed){
+		cout << "Motors armed!\n";
+		this->set_motors_spool_rate();
 		return 0;
+	 }
 	else
 		return -1;
 }

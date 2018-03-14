@@ -20,9 +20,9 @@
 /***************************************************************
               recv signal conversion to desired values
 ***************************************************************/
-#define recv_signal_to_roll_angle 0
-#define recv_signal_to_pitch_angle 0
-#define recv_signal_to_yaw_angle 0
+#define recv_signal_to_roll_angle 0.07f
+#define recv_signal_to_pitch_angle 0.07f
+#define recv_signal_to_yaw_angle 0.07f
 
 /***************************************************************
           angle error to rate error conversion params

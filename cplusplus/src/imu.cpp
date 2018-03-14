@@ -57,6 +57,6 @@ int IMU::init_imu(){
 }
 
 void IMU::print_tb_angles(){
-    printf("Roll: %f | Pitch: %f | Yaw: %f\n", data.dmp_TaitBryan[0]*RAD_TO_DEG, data.dmp_TaitBryan[1]*RAD_TO_DEG\
+    printf("Roll: %f | Pitch: %f | Yaw: %f\n", data.dmp_TaitBryan[1]*RAD_TO_DEG, data.dmp_TaitBryan[0]*RAD_TO_DEG\
                                                , data.dmp_TaitBryan[TB_YAW_Z]*RAD_TO_DEG);
 }

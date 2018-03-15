@@ -60,3 +60,30 @@ void IMU::print_tb_angles(){
     printf("Roll: %f | Pitch: %f | Yaw: %f\n", data.dmp_TaitBryan[1]*RAD_TO_DEG, data.dmp_TaitBryan[0]*RAD_TO_DEG\
                                                , data.dmp_TaitBryan[TB_YAW_Z]*RAD_TO_DEG);
 }
+
+void IMU::update(){
+
+  // populate euler angles with latest data
+  euler_angles[ROLL]  = data.fused_TaitBryan[IMU_ROLL]*RAD_TO_DEG;
+  euler_angles[PITCH] = data.fused_TaitBryan[IMU_PITCH]*RAD_TO_DEG;
+  euler_angles[YAW]   = data.fused_TaitBryan[IMU_YAW]*RAD_TO_DEG;
+
+  body_to_euler_rates();
+
+}
+
+void IMU::body_to_euler_rates(){
+
+  // state variables
+  float theta, phi, psi;
+
+  // get attitude from imu, it is in terms of euler angles
+  phi = euler_angles[IMU_ROLL];
+  theta = euler_angles[IMU_PITCH];
+  psi = 0;
+
+  // get euler rates from body rates
+  euler_rates[ROLL] = (cos(psi)/cos(theta))*data.gyro[IMU_ROLL] - (sin(psi)/cos(theta))*data.gyro[IMU_PITCH];
+  euler_rates[PITCH] = sin(psi)*data.gyro[IMU_ROLL] + cos(psi)*data.gyro[IMU_PITCH];
+  euler_rates[YAW] = -cos(psi)*tan(theta)*data.gyro[IMU_ROLL] + sin(psi)*tan(theta)*data.gyro[IMU_PITCH] + data.gyro[IMU_YAW];
+}

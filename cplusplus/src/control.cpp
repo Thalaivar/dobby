@@ -1,10 +1,11 @@
 #include "control.h"
 
-Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr){
+Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr){
 
-  // link and motors and flight_mode classes to controller
+  // link imu, motors and flight_mode classes to controller
   this->motors = motors_ptr;
   this->mode = flightMode_ptr;
+  this->imu = imu_ptr;
 }
 
 
@@ -49,9 +50,9 @@ void flightMode::flight_mode_update(){
       }
 
     // get desired angular rates (by passing through simple P controller)
-      this->desired_attitude_rates[ROLL] = (imu->data.fused_TaitBryan[IMU_ROLL]*RAD_TO_DEG - this->desired_attitude[ROLL])*angle_to_rate_roll;
-      this->desired_attitude_rates[PITCH] = (imu->data.fused_TaitBryan[IMU_PITCH]*RAD_TO_DEG - this->desired_attitude[PITCH])*angle_to_rate_pitch;
-      this->desired_attitude_rates[YAW] = (imu->data.fused_TaitBryan[IMU_YAW]*RAD_TO_DEG - this->desired_attitude[YAW])*angle_to_rate_yaw;
+      this->desired_attitude_rates[ROLL] = (imu->euler_angles[ROLL]*RAD_TO_DEG - this->desired_attitude[ROLL])*angle_to_rate_roll;
+      this->desired_attitude_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - this->desired_attitude[PITCH])*angle_to_rate_pitch;
+      this->desired_attitude_rates[YAW] = (imu->euler_angles[YAW]*RAD_TO_DEG - this->desired_attitude[YAW])*angle_to_rate_yaw;
       break;
 
     default:
@@ -62,16 +63,16 @@ void flightMode::flight_mode_update(){
 
 void Control::get_attitude_error(){
   // <angle>_error = current_<angle> - desired_<angle>
-  error.attitude_error[ROLL] = mode->imu->data.fused_TaitBryan[IMU_ROLL]*RAD_TO_DEG - mode->desired_attitude[ROLL];
-  error.attitude_error[PITCH] = mode->imu->data.fused_TaitBryan[IMU_PITCH]*RAD_TO_DEG - mode->desired_attitude[PITCH];
-  error.attitude_error[YAW] = mode->imu->data.fused_TaitBryan[IMU_YAW]*RAD_TO_DEG - mode->desired_attitude[YAW];
+  error.attitude_error[ROLL] = imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_attitude[ROLL];
+  error.attitude_error[PITCH] = imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_attitude[PITCH];
+  error.attitude_error[YAW] = /*imu->euler_angles[YAW]*/ 0*RAD_TO_DEG - mode->desired_attitude[YAW];
 }
 
 void Control::get_attitude_rate_error(){
   // <angle>_rate_error = current_<angle>_rate - desired_<angle>_rate
-  error.attitude_rate_error[ROLL] = mode->imu->data.gyro[IMU_ROLL] - mode->desired_attitude_rates[ROLL];
-  error.attitude_rate_error[PITCH] = mode->imu->data.gyro[IMU_PITCH] - mode->desired_attitude_rates[PITCH];
-  error.attitude_rate_error[YAW] = mode->imu->data.gyro[IMU_YAW] - mode->desired_attitude_rates[YAW];
+  error.attitude_rate_error[ROLL] = imu->data.gyro[IMU_ROLL] - mode->desired_attitude_rates[ROLL];
+  error.attitude_rate_error[PITCH] = imu->data.gyro[IMU_PITCH] - mode->desired_attitude_rates[PITCH];
+  error.attitude_rate_error[YAW] = imu->data.gyro[IMU_YAW] - mode->desired_attitude_rates[YAW];
 }
 
 void Control::run_smc_controller(){
@@ -82,25 +83,22 @@ void Control::run_smc_controller(){
   // declare state variables
   float phi, theta, psi, phi_dot, theta_dot, psi_dot;
 
-  // get euler euler_rates
-  this->body_to_euler_rates();
-  
   // assign state variables
-  phi = mode->imu->data.fused_TaitBryan[IMU_ROLL];
-  theta = mode->imu->data.fused_TaitBryan[IMU_PITCH];
-  psi = mode->imu->data.fused_TaitBryan[IMU_YAW];
-  phi_dot = this->euler_rates[ROLL];
-  theta_dot = this->euler_rates[PITCH];
-  psi_dot = this->euler_rates[YAW];
- 
+  phi = imu->euler_angles[ROLL];
+  theta = imu->euler_angles[PITCH];
+  psi = /*imu->euler_angles[YAW]*/ 0;
+  phi_dot = imu->euler_rates[ROLL];
+  theta_dot = imu->euler_rates[PITCH];
+  psi_dot = imu->euler_rates[YAW];
+
   // assign representative variables
   f1 = theta_dot*psi_dot*cos(psi) - theta_dot*phi_dot*sin(theta)*cos(psi) \
            - psi_dot*phi_dot*cos(theta)*sin(psi);
   f2 = phi_dot*theta_dot*sin(theta)*sin(psi) - phi_dot*psi_dot*cos(theta)*cos(psi) \
            - theta_dot*psi_dot*sin(psi);
   f3 = phi_dot*theta_dot*cos(theta);
-  g1 = ((Izz - Iyy)/Ixx)*mode->imu->data.gyro[IMU_PITCH]*mode->imu->data.gyro[IMU_YAW];
-  g2 = ((Ixx - Izz)/Iyy)*mode->imu->data.gyro[IMU_ROLL]*mode->imu->data.gyro[IMU_YAW];
+  g1 = ((Izz - Iyy)/Ixx)*imu->data.gyro[IMU_PITCH]*imu->data.gyro[IMU_YAW];
+  g2 = ((Ixx - Izz)/Iyy)*imu->data.gyro[IMU_ROLL]*imu->data.gyro[IMU_YAW];
 
   // get errors
   get_attitude_error();
@@ -146,31 +144,16 @@ void flightMode::set_flight_mode(flight_mode desired_mode){
 void Control::demux_control_signal(){
 
   // Τ_x = I_x*(u_theta*sin(psi) + u_phi*cos(psi))
-  motors->torques[ROLL] = Ixx*(control_signal[PITCH]*sin(mode->imu->data.fused_TaitBryan[TB_YAW_Z]) \
-                             + control_signal[ROLL]*cos(mode->imu->data.fused_TaitBryan[TB_YAW_Z]));
+  motors->torques[ROLL] = Ixx*(control_signal[PITCH]*sin(imu->euler_angles[YAW]) \
+                             + control_signal[ROLL]*cos(imu->euler_angles[YAW]));
 
   // Τ_y = I_y*(u_theta*cos(psi) - u_phi*sin(psi))
-  motors->torques[PITCH] = Iyy*(control_signal[PITCH]*cos(mode->imu->data.fused_TaitBryan[TB_YAW_Z]) \
-                              - control_signal[ROLL]*sin(mode->imu->data.fused_TaitBryan[TB_YAW_Z]));
+  motors->torques[PITCH] = Iyy*(control_signal[PITCH]*cos(imu->euler_angles[YAW]) \
+                              - control_signal[ROLL]*sin(imu->euler_angles[YAW]));
 
   // T_z = I_z*(u_psi + tan(theta)*u_phi)
   motors->torques[YAW] = Izz*(control_signal[YAW] + \
-                            tan(mode->imu->data.fused_TaitBryan[TB_PITCH_X])*control_signal[ROLL]);
-}
-
-void Control::body_to_euler_rates(){
-  // state variables
-  float theta, phi, psi;
-
-  // get attitude from imu, it is in terms of euler angles
-  phi = mode->imu->data.fused_TaitBryan[IMU_ROLL];
-  theta = mode->imu->data.fused_TaitBryan[IMU_PITCH];
-  psi = mode->imu->data.fused_TaitBryan[IMU_YAW];
-
-  // get euler rates from body rates
-  this->euler_rates[ROLL] = (cos(psi)/cos(theta))*mode->imu->data.gyro[IMU_ROLL] - (sin(psi)/cos(theta))*mode->imu->data.gyro[IMU_PITCH];
-  this->euler_rates[PITCH] = sin(psi)*mode->imu->data.gyro[IMU_ROLL] + cos(psi)*mode->imu->data.gyro[IMU_PITCH];
-  this->euler_rates[YAW] = -cos(psi)*tan(theta)*mode->imu->data.gyro[IMU_ROLL] + sin(psi)*tan(theta)*mode->imu->data.gyro[IMU_PITCH] + mode->imu->data.gyro[IMU_YAW];
+                            tan(imu->euler_angles[PITCH])*control_signal[ROLL]);
 }
 
 int sign(float x){

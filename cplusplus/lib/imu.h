@@ -36,18 +36,36 @@
 using namespace std;
 #define RAD_TO_DEG		57.295779513
 
-#define TB_PITCH_X	0
-#define TB_ROLL_Y	1
-#define TB_YAW_Z	2
+// IMU is mounted with y-axis as forward
+#define IMU_PITCH	0
+#define IMU_ROLL	1
+#define IMU_YAW	2
+
+#define ROLL 0
+#define PITCH 1
+#define YAW 2
 
 class IMU{
   public:
     rc_imu_config_t config;
     rc_imu_data_t   data;
 
+    // angle rates in euler frames
+    float euler_rates[3];
+
+    // euler euler_angles
+    float euler_angles[3];
+
     IMU();
     int init_imu();
     void print_tb_angles();
+
+    // call this to get latest euler angles
+    void update();
+
+    // body gyro rates to euler rates
+    void body_to_euler_rates();
+
     bool is_initialized;
     bool is_calibrated;
 };

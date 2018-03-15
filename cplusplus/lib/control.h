@@ -41,10 +41,6 @@
 #define thrust_coeff 0
 #define drag_coeff 0
 
-#define IMU_ROLL 1
-#define IMU_PITCH 0
-#define IMU_YAW 2
-
 // forward declaration to avoid error
 class flightMode;
 
@@ -63,13 +59,14 @@ class Control{
   private:
     Motors *motors;
     flightMode *mode;
+
+    // to access IMU data
+    IMU *imu;
+
     error_struct error;
 
     // holds outputs of controller
     float control_signal[4];
-
-    // angle rates in euler frames
-    float euler_rates[3];
 
     // to get attitude error
     void get_attitude_error();
@@ -80,9 +77,6 @@ class Control{
     // to convert control signals to torques (to be sent to motors)
     void demux_control_signal();
 
-    // body rates to euler rates
-    void body_to_euler_rates();
-
   public:
     void run_smc_controller();
 
@@ -90,7 +84,7 @@ class Control{
     void print_attitude_error();
     void print_attitude_rate_error();
 
-    Control(Motors* motors_ptr, flightMode* flightMode_ptr);
+    Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
 typedef enum flight_modes{

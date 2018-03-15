@@ -59,6 +59,6 @@ class Dobby{
 
     // holds current status of dobby
     dobby_status state;
-	Dobby(); 
+	Dobby();
 };
 #endif

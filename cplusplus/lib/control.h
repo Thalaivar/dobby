@@ -34,9 +34,10 @@
 /***************************************************************
                     quadcopter dynamics params
 ***************************************************************/
-#define Ixx 0
-#define Iyy 0
-#define Izz 0
+//              battery  +    ESCs    +  motors   +   frame
+#define Ixx (0.000081599 + 0.00032233 + 0.0133609 + 0.0044966)
+#define Iyy (0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
+#define Izz (0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
 #define thrust_coeff 0
 #define drag_coeff 0
 

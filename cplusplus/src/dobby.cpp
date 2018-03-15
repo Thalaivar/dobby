@@ -80,16 +80,20 @@ void Dobby::control_loop(){
   // get latest radio signals
   radio.update();
 
-  motors.channel_val[0] = radio.recv_channel[2];
-  motors.channel_val[1] = radio.recv_channel[2];
-  motors.channel_val[2] = radio.recv_channel[2];
-  motors.channel_val[3] = radio.recv_channel[2];
-
-  motors.update();
-  
- // cout << radio.recv_channel[0] << endl;
+  // get desired stuff
   mode.flight_mode_update();
-  mode.print_desired_attitude();
+
+  // call smc controller
+  control.run_smc_controller();
+
+  // get desired toruqes
+  control.demux_control_signal();
+
+  // get pwm signals
+  motors.demux_torques_to_pwm();
+
+  cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
+       << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;
 }
 
 Dobby::Dobby(){

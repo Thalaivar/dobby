@@ -27,9 +27,9 @@
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll 0
-#define angle_to_rate_pitch 0
-#define angle_to_rate_yaw 0
+#define angle_to_rate_roll 0.02
+#define angle_to_rate_pitch 0.02
+#define angle_to_rate_yaw 0.02
 
 /***************************************************************
                     quadcopter dynamics params

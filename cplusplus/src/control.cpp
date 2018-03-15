@@ -21,10 +21,32 @@ void flightMode::flight_mode_update(){
   switch(this->current_mode){
 
     case STABILIZE_ANGLE:
-    // get desired angles from pilot in degrees
+    // deadband for receiver
+    if(recv->recv_channel[ROLL_CHANNEL] < 1510 && recv->recv_channel[ROLL_CHANNEL] > 1480){
+      this->desired_attitude[ROLL] = 0;
+    }
+    // get desired angle from pilot in degrees
+    else{
       this->desired_attitude[ROLL] = (float)((int)recv->recv_channel[ROLL_CHANNEL] - (recv->cal_roll[0] + recv->cal_roll[1])/2)*recv_signal_to_roll_angle;
-      this->desired_attitude[PITCH] = (float)((int)recv->recv_channel[PITCH_CHANNEL] - (recv->cal_pitch[0] + recv->cal_pitch[1])/2)*recv_signal_to_pitch_angle;
-      this->desired_attitude[YAW] = (float)((int)recv->recv_channel[YAW_CHANNEL] - (recv->cal_yaw[0] + recv->cal_yaw[1])/2)*recv_signal_to_yaw_angle;
+     }
+
+     // deadband for receiver
+     if(recv->recv_channel[PITCH_CHANNEL] < 1510 && recv->recv_channel[PITCH_CHANNEL] > 1480){
+       this->desired_attitude[PITCH] = 0;
+     }
+
+     // get desired angle from pilot in degrees
+     else{
+         this->desired_attitude[PITCH] = (float)((int)recv->recv_channel[PITCH_CHANNEL] - (recv->cal_pitch[0] + recv->cal_pitch[1])/2)*recv_signal_to_pitch_angle;
+     }
+
+     if(recv->recv_channel[YAW_CHANNEL] < 1510 && recv->recv_channel[YAW_CHANNEL] > 1480){
+       this->desired_attitude[YAW] = 0;
+     }
+
+      else{
+        this->desired_attitude[YAW] = (float)((int)recv->recv_channel[YAW_CHANNEL] - (recv->cal_yaw[0] + recv->cal_yaw[1])/2)*recv_signal_to_yaw_angle;
+      }
 
     // get desired angular rates (by passing through simple P controller)
       this->desired_attitude_rates[ROLL] = (imu->data.fused_TaitBryan[TB_ROLL_Y]*RAD_TO_DEG - this->desired_attitude[ROLL])*angle_to_rate_roll;

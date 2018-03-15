@@ -86,14 +86,11 @@ void Dobby::control_loop(){
   // call smc controller
   control.run_smc_controller();
 
-  // get desired toruqes
-  control.demux_control_signal();
-
   // get pwm signals
   motors.demux_torques_to_pwm();
 
-  cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
-       << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;
+/*  cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
+       << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;*/
 }
 
 Dobby::Dobby(){

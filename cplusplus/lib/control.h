@@ -10,12 +10,12 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-#define smc_roll_lambda 0
-#define smc_pitch_lambda 0
-#define smc_yaw_lambda 0
-#define smc_roll_eta 0
-#define smc_pitch_eta 0
-#define smc_yaw_eta 0
+#define smc_roll_lambda  1
+#define smc_pitch_lambda 1
+#define smc_yaw_lambda   1
+#define smc_roll_eta     1
+#define smc_pitch_eta    1
+#define smc_yaw_eta      1
 
 /***************************************************************
               recv signal conversion to desired values

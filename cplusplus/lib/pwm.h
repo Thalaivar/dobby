@@ -39,9 +39,6 @@ class Motors {
    // sets the motors to spool rate (used after dobby is armed)
    void set_motors_spool_rate();
 
-   // to get desired pulses from torques
-   void demux_torques_to_pwm();
-
    public:
     int initialize_pru();
     int disable_pru();
@@ -57,6 +54,9 @@ class Motors {
 
     // sends 1000us pulse to all 4 motors
     int disable_motors();
+
+    // to get desired pulses from torques
+    void demux_torques_to_pwm();
 
     // this will be accessed by smc controller to set desired torques
     float torques[3];

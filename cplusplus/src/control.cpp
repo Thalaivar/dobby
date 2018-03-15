@@ -92,7 +92,7 @@ void Control::run_smc_controller(){
   phi_dot = this->euler_rates[ROLL];
   theta_dot = this->euler_rates[PITCH];
   psi_dot = this->euler_rates[YAW];
-
+ 
   // assign representative variables
   f1 = theta_dot*psi_dot*cos(psi) - theta_dot*phi_dot*sin(theta)*cos(psi) \
            - psi_dot*phi_dot*cos(theta)*sin(psi);

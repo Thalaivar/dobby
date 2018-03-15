@@ -37,14 +37,9 @@ int main(){
 	  dobby.radio.update();
       if(dobby.radio.recv_channel[2] > 1200) dobby.state = FLYING;
      	while(dobby.state == FLYING){
-	   		dobby.radio.update();
-			dobby.motors.channel_val[0] = dobby.radio.recv_channel[2];
-			dobby.motors.channel_val[1] = dobby.radio.recv_channel[2];
-			dobby.motors.channel_val[2] = dobby.radio.recv_channel[2];
-			dobby.motors.channel_val[3] = dobby.radio.recv_channel[2];
-
-			dobby.control_loop(); 
-			dobby.motors.update();
+			dobby.imu.print_tb_angles();
+			//dobby.control_loop(); 
+			//std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	   }
       }
 	 }

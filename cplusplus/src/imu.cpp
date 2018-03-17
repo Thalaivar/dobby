@@ -66,7 +66,7 @@ void IMU::update(){
   // populate euler angles with latest data
   euler_angles[ROLL]  = data.fused_TaitBryan[IMU_ROLL];
   euler_angles[PITCH] = data.fused_TaitBryan[IMU_PITCH];
-  euler_angles[YAW]   = data.fused_TaitBryan[IMU_YAW];
+  euler_angles[YAW]   = this->get_calYaw(data.fused_TaitBryan[IMU_YAW]);
 
   // populate body rates with latest data
   body_rates[ROLL]  = data.gyro[IMU_ROLL];
@@ -91,4 +91,33 @@ void IMU::body_to_euler_rates(){
   euler_rates[ROLL] = (cos(psi)/cos(theta))*body_rates[ROLL] - (sin(psi)/cos(theta))*body_rates[PITCH];
   euler_rates[PITCH] = sin(psi)*body_rates[ROLL] + cos(psi)*body_rates[PITCH];
   euler_rates[YAW] = -cos(psi)*tan(theta)*body_rates[ROLL] + sin(psi)*tan(theta)*body_rates[PITCH] + body_rates[YAW];
+}
+
+// Adding InitialYaw Function Definitions:
+void IMU::set_initialYaw(){
+	// Propose to Average Yaw Reading for 10 seconds
+	// and set Yaw Angle
+	float sumYaw = 0.0;
+	if (this->is_initialized){
+		for(int i =0; i < 50; i++){
+			sumYaw += data.fused_TaitBryan[IMU_YAW];
+			//I think we should put a wait here: just so that data is refreshed!
+		}
+		
+		this->initialYaw = (float)sumYaw/50.0;
+		cout << endl << "Yaw Set to :" << this->initialYaw << endl ;
+
+	}
+	else {
+		cout << end << "IMU was not initialised. Yaw Angle not Calibrated" << endl;
+	}
+}
+
+float IMU::get_calYaw(float rawYaw){
+	if(rawYaw < this-> initialYaw){
+		return rawYaw - this->initialYaw + 360.0f
+	}
+	else{
+		return rawYaw - this->initialYaw ;
+	}
 }

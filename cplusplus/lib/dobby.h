@@ -20,7 +20,7 @@ using namespace std;
   * NOT_READY_TO_FLY = pre flight checks (and others?) need to be done
   * RUNNING = main program execution has begun, dobby's state is set to this at the very start
   * EXITING = main program execution over, set when all flying is over
-/**********************************************************************************/
+**********************************************************************************/
 typedef enum dobby_status{
   READY_TO_FLY = 0,
   FLYING,
@@ -43,7 +43,7 @@ class Dobby{
     Motors motors = Motors(&radio);
     flightMode mode = flightMode(&radio, &imu);
     Control control = Control(&motors, &mode, &imu);\
-
+	
     // pre flight checks
     int pre_flight_checks();
 

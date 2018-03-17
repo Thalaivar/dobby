@@ -1,7 +1,7 @@
 CC = g++-6
 LIB = lib
 SRC = src
-LFLAGS = -lroboticscape -lprussdrv
+LFLAGS = -lroboticscape -lprussdrv -lrt -Wall
 CFLAGS = -I$(LIB)/
 
 DEPS = $(wildcard $(LIB)/*.h)

@@ -65,9 +65,17 @@ class IMU{
 
     // call this to get latest euler angles
     void update();
-
-    // body gyro rates to euler rates
+	
+	// to get the initial yaw heading
+	void set_initialYaw();
+	
+	// get yaw calibrated to initial yaw
+	float get_calYaw(float rawYaw);
+    
+	// body gyro rates to euler rates
     void body_to_euler_rates();
+	
+	float initialYaw;
 
     bool is_initialized;
     bool is_calibrated;

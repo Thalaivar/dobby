@@ -51,7 +51,7 @@ struct error_struct{
   float body_rate_error[3];
 };
 
-timespec t;
+clock_t t;
 
 class Control{
   private:
@@ -60,10 +60,9 @@ class Control{
 
     // to access IMU data
     IMU *imu;
-
     error_struct error;
 
-    long prev_time;
+    clock_t prev_time;
 
     // holds outputs of controller
     float control_signal[4];

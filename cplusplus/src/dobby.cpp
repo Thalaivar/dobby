@@ -71,12 +71,14 @@ int Dobby::setup(){
     std::cerr << "IMU failed to initialize" << '\n';
     return -1;
   }
+  
+  imu.set_initialYaw();
 
   return 0;
 }
 
 void Dobby::control_loop(){
-
+ 
   // get latest radio signals
   radio.update();
 

@@ -37,6 +37,7 @@ int main(){
 	  dobby.radio.update();
       if(dobby.radio.recv_channel[2] > 1200) dobby.state = FLYING;
      	while(dobby.state == FLYING){
+			dobby.imu.update();
 			dobby.imu.print_tb_angles();
 			//dobby.control_loop(); 
 			//std::this_thread::sleep_for(std::chrono::milliseconds(100));

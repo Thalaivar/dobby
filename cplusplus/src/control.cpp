@@ -95,10 +95,9 @@ void Control::get_body_rate_error(){
 void Control::run_smc_controller(){
 
   // get loop time (will be a fixed time later on)
-  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
-  long current_time = t.tv_nsec;
-  long dt = (current_time - prev_time)/1000000000;
-  prev_time = current_time;
+  t = clock();
+  float  dt = (float)(t - prev_time)/CLOCKS_PER_SEC;
+  prev_time = t;
 
   // declare state variables
   float wx = imu->body_rates[ROLL];

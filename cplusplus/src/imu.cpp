@@ -105,17 +105,17 @@ void IMU::set_initialYaw(){
 		}
 		
 		this->initialYaw = (float)sumYaw/50.0;
-		cout << endl << "Yaw Set to :" << this->initialYaw << endl ;
+		cout << "Yaw Set to :" << this->initialYaw << endl ;
 
 	}
 	else {
-		cout << end << "IMU was not initialised. Yaw Angle not Calibrated" << endl;
+		cout << "IMU was not initialised. Yaw Angle not Calibrated" << endl;
 	}
 }
 
 float IMU::get_calYaw(float rawYaw){
 	if(rawYaw < this-> initialYaw){
-		return rawYaw - this->initialYaw + 360.0f
+		return rawYaw - this->initialYaw + 360.0f;
 	}
 	else{
 		return rawYaw - this->initialYaw ;

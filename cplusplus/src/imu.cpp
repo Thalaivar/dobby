@@ -64,9 +64,14 @@ void IMU::print_tb_angles(){
 void IMU::update(){
 
   // populate euler angles with latest data
-  euler_angles[ROLL]  = data.fused_TaitBryan[IMU_ROLL]*RAD_TO_DEG;
-  euler_angles[PITCH] = data.fused_TaitBryan[IMU_PITCH]*RAD_TO_DEG;
-  euler_angles[YAW]   = data.fused_TaitBryan[IMU_YAW]*RAD_TO_DEG;
+  euler_angles[ROLL]  = data.fused_TaitBryan[IMU_ROLL];
+  euler_angles[PITCH] = data.fused_TaitBryan[IMU_PITCH];
+  euler_angles[YAW]   = data.fused_TaitBryan[IMU_YAW];
+
+  // populate body rates with latest data
+  body_rates[ROLL]  = data.gyro[IMU_ROLL];
+  body_rates[PITCH] = data.gyro[IMU_PITCH];
+  body_rates[YAW]   = data.gyro[IMU_YAW];
 
   body_to_euler_rates();
 
@@ -78,12 +83,12 @@ void IMU::body_to_euler_rates(){
   float theta, phi, psi;
 
   // get attitude from imu, it is in terms of euler angles
-  phi = euler_angles[IMU_ROLL];
-  theta = euler_angles[IMU_PITCH];
-  psi = 0;
+  phi = euler_angles[ROLL];
+  theta = euler_angles[PITCH];
+  psi = euler_angles[YAW];
 
   // get euler rates from body rates
-  euler_rates[ROLL] = (cos(psi)/cos(theta))*data.gyro[IMU_ROLL] - (sin(psi)/cos(theta))*data.gyro[IMU_PITCH];
-  euler_rates[PITCH] = sin(psi)*data.gyro[IMU_ROLL] + cos(psi)*data.gyro[IMU_PITCH];
-  euler_rates[YAW] = -cos(psi)*tan(theta)*data.gyro[IMU_ROLL] + sin(psi)*tan(theta)*data.gyro[IMU_PITCH] + data.gyro[IMU_YAW];
+  euler_rates[ROLL] = (cos(psi)/cos(theta))*body_rates[ROLL] - (sin(psi)/cos(theta))*body_rates[PITCH];
+  euler_rates[PITCH] = sin(psi)*body_rates[ROLL] + cos(psi)*body_rates[PITCH];
+  euler_rates[YAW] = -cos(psi)*tan(theta)*body_rates[ROLL] + sin(psi)*tan(theta)*body_rates[PITCH] + body_rates[YAW];
 }

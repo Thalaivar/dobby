@@ -45,15 +45,10 @@
 class flightMode;
 
 struct error_struct{
-  float attitude_error[3];
-  float attitude_rate_error[3];
+  // integral body rate error
+  float ie_body_rate[3];
+  float body_rate_error[3];
 };
-
-typedef enum attribute {
-  ROLL = 0,
-  PITCH,
-  YAW
-}attirubute;
 
 class Control{
   private:
@@ -65,24 +60,28 @@ class Control{
 
     error_struct error;
 
+    float dt, prev_time;
+
     // holds outputs of controller
     float control_signal[4];
 
-    // to get attitude error
-    void get_attitude_error();
-
     // to get attitude_rate_error
-    void get_attitude_rate_error();
+    void get_body_rate_error();
 
     // to convert control signals to torques (to be sent to motors)
     void demux_control_signal();
+
+    // get desired body rates from desired euler rates
+    void get_desired_body_rates();
 
   public:
     void run_smc_controller();
 
     // debug functions , can be deleted later
     void print_attitude_error();
-    void print_attitude_rate_error();
+
+    // desired body rates
+    float desired_body_rates[3];
 
     Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
@@ -117,8 +116,8 @@ class flightMode{
     IMU *imu;
 
     // holds latest desired values
-    float desired_attitude[3];
-    float desired_attitude_rates[3];
+    float desired_euler[3];
+    float desired_euler_rates[3];
 
     // controller needs access to desired trajectory/attitude
     friend class Control;

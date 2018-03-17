@@ -53,8 +53,11 @@ class IMU{
     // angle rates in euler frames
     float euler_rates[3];
 
-    // euler euler_angles
+    // euler angles in radians
     float euler_angles[3];
+
+    // body rates in DPS
+    float body_rates[3];
 
     IMU();
     int init_imu();

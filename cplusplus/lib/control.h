@@ -6,6 +6,7 @@
 #include "pwm.h"
 #include "imu.h"
 #include "ppm.h"
+#include <time.h>
 
 /***************************************************************
                             smc params
@@ -50,6 +51,8 @@ struct error_struct{
   float body_rate_error[3];
 };
 
+timespec t;
+
 class Control{
   private:
     Motors *motors;
@@ -60,7 +63,7 @@ class Control{
 
     error_struct error;
 
-    float dt, prev_time;
+    long prev_time;
 
     // holds outputs of controller
     float control_signal[4];

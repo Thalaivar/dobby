@@ -94,16 +94,16 @@ void Control::get_body_rate_error(){
 
 void Control::run_smc_controller(){
 
+  // get loop time (will be a fixed time later on)
+  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
+  long current_time = t.tv_nsec;
+  long dt = (current_time - prev_time)/1000000000;
+  prev_time = current_time;
+
   // declare state variables
   float wx = imu->body_rates[ROLL];
   float wy = imu->body_rates[PITCH];
   float wz = imu->body_rates[YAW];
-  /*
-  // get loop time (will be a fixed time later on)
-  float current_time = get time here
-  dt = current_time - prev_time;
-  prev_time = current_time;
-  */
 
   // get latest desired body rates
   get_desired_body_rates();

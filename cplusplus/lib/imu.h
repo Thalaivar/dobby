@@ -50,7 +50,7 @@ class IMU{
     rc_imu_config_t config;
     rc_imu_data_t   data;
 
-    // angle rates in euler frames
+    // angle rates in euler frames in DPS
     float euler_rates[3];
 
     // euler angles in radians

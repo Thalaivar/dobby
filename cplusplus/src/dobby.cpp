@@ -73,26 +73,33 @@ int Dobby::setup(){
   }
   
   imu.set_initialYaw();
-
+  
+  imu.zero_initial_attitude();
+  
   return 0;
 }
 
 void Dobby::control_loop(){
- 
+  
+  // get latest imu data
+  imu.update();
+
   // get latest radio signals
   radio.update();
-
+  
   // get desired stuff
   mode.flight_mode_update();
 
   // call smc controller
   control.run_smc_controller();
-
+  
   // get pwm signals
-  motors.demux_torques_to_pwm();
+  motors.demux_torques_to_pwm(); 
 
-/*  cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
-       << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;*/
+  cout << imu.body_rates_rotated[ROLL] << " | " << imu.body_rates_rotated[PITCH] << " | " << imu.body_rates_rotated[YAW] << endl;
+ // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
+ // cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
+       << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;
 }
 
 Dobby::Dobby(){

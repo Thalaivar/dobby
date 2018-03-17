@@ -32,6 +32,8 @@
 #include <ctype.h>		// for isprint()
 #include <sys/select.h>	// for read timeout
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 #define RAD_TO_DEG		57.295779513
@@ -58,10 +60,14 @@ class IMU{
 
     // body rates in DPS
     float body_rates[3];
-
-    IMU();
-    int init_imu();
-    void print_tb_angles();
+	
+	float body_rates_rotated[3];
+    
+	IMU();
+    
+	int init_imu();
+    
+	void print_tb_angles();
 
     // call this to get latest euler angles
     void update();
@@ -69,13 +75,16 @@ class IMU{
 	// to get the initial yaw heading
 	void set_initialYaw();
 	
+	// to get initial roll and pitch offsets
+	void zero_initial_attitude();
+
 	// get yaw calibrated to initial yaw
 	float get_calYaw(float rawYaw);
     
 	// body gyro rates to euler rates
-    void body_to_euler_rates();
+    void yaw_rotated_body_rates();
 	
-	float initialYaw;
+	float initialYaw, initialRoll, initialPitch;
 
     bool is_initialized;
     bool is_calibrated;

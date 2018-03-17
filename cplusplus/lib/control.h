@@ -11,12 +11,12 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-#define smc_roll_lambda  1
-#define smc_pitch_lambda 1
-#define smc_yaw_lambda   1
-#define smc_roll_eta     1
-#define smc_pitch_eta    1
-#define smc_yaw_eta      1
+#define smc_roll_lambda  7.14
+#define smc_pitch_lambda 7.14
+#define smc_yaw_lambda   12.14
+#define smc_roll_eta     15
+#define smc_pitch_eta    12
+#define smc_yaw_eta      17
 
 /***************************************************************
               recv signal conversion to desired values
@@ -28,9 +28,9 @@
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll 0.02
-#define angle_to_rate_pitch 0.02
-#define angle_to_rate_yaw 0.02
+#define angle_to_rate_roll -1.54
+#define angle_to_rate_pitch -1.54
+#define angle_to_rate_yaw -1.54
 
 /***************************************************************
                     quadcopter dynamics params
@@ -51,7 +51,6 @@ struct error_struct{
   float body_rate_error[3];
 };
 
-clock_t t;
 
 class Control{
   private:
@@ -64,7 +63,9 @@ class Control{
 
     clock_t prev_time;
 
-    // holds outputs of controller
+	clock_t t;
+    
+	// holds outputs of controller
     float control_signal[4];
 
     // to get attitude_rate_error

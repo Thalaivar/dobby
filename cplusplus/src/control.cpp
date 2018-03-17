@@ -72,16 +72,16 @@ void flightMode::flight_mode_update(){
 void Control::get_desired_body_rates(){
 
   // variables to make euler rates -> body rates transformation more readable
-  float phi = imu->euler_angles[ROLL]
-  float theta = imu->euler_angles[PITCH]
-  float psi = imu->euler_angles[YAW]
-  float phi_dot_des = mode->desired_euler_rates[ROLL]
-  float theta_dot_des = mode->desired_euler_rates[PTICH]
-  float psi_dot_des = mode->desired_euler_rates[YAW]
+  float phi = imu->euler_angles[ROLL];
+  float theta = imu->euler_angles[PITCH];
+  float psi = imu->euler_angles[YAW];
+  float phi_dot_des = mode->desired_euler_rates[ROLL];
+  float theta_dot_des = mode->desired_euler_rates[PITCH];
+  float psi_dot_des = mode->desired_euler_rates[YAW];
 
-  desired_body_rates[ROLL]  = phi_dot_des - sin(theta)*psi_dot_des
-  desired_body_rates[PITCH] = cos(psi)*theta_dot_des + sin(psi)*cos(theta)*psi_dot_des
-  desired_body_rates[YAW]   = -sin(psi)*theta_dot_des + cos(psi)*cos(theta)*psi_dot_des
+  desired_body_rates[ROLL]  = phi_dot_des - sin(theta)*psi_dot_des;
+  desired_body_rates[PITCH] = cos(psi)*theta_dot_des + sin(psi)*cos(theta)*psi_dot_des;
+  desired_body_rates[YAW]   = -sin(psi)*theta_dot_des + cos(psi)*cos(theta)*psi_dot_des;
 }
 
 void Control::get_body_rate_error(){

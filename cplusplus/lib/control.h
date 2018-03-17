@@ -35,9 +35,9 @@
                     quadcopter dynamics params
 ***************************************************************/
 //              battery  +    ESCs    +  motors   +   frame
-#define Ixx (0.000081599 + 0.00032233 + 0.0133609 + 0.0044966)
-#define Iyy (0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
-#define Izz (0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
+#define Ixx 100*(0.000081599 + 0.00032233 + 0.0133609 + 0.0044966)
+#define Iyy 100*(0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
+#define Izz 100*(0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
 #define thrust_coeff 0
 #define drag_coeff 0
 
@@ -78,7 +78,7 @@ class Control{
     void run_smc_controller();
 
     // debug functions , can be deleted later
-    void print_attitude_error();
+    void print_body_rate_error();
 
     // desired body rates
     float desired_body_rates[3];

@@ -42,7 +42,7 @@ class Dobby{
     Receiver radio;
     Motors motors = Motors(&radio);
     flightMode mode = flightMode(&radio, &imu);
-    Control control = Control(&motors, &mode);\
+    Control control = Control(&motors, &mode, &imu);\
 
     // pre flight checks
     int pre_flight_checks();

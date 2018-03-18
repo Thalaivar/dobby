@@ -10,7 +10,7 @@ IMU::IMU(void){
     config.enable_magnetometer = 1;
 
     config.dmp_sample_rate = 200;
-    config.orientation = ORIENTATION_Z_UP;
+    config.orientation = ORIENTATION_Z_DOWN;
     config.compass_time_constant = 2.0;
     config.dmp_interrupt_priority = sched_get_priority_max(SCHED_FIFO)-1;
     config.show_warnings = 0;

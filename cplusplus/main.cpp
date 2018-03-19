@@ -7,7 +7,10 @@ Dobby dobby;
 
 void exit_Handler(int a){
  	cout << endl << "Exit Handler Reached!" << endl;
-	dobby.motors.disable_motors();
+  dobby.motors.is_armed = false;
+  dobby.motors.disable_motors();
+  dobby.motors.disable_pru();
+  dobby.radio.disable_pru();
 	exit(0);
  }
 
@@ -37,7 +40,7 @@ int main(){
 	  dobby.radio.update();
       if(dobby.radio.recv_channel[2] > 1200) dobby.state = FLYING;
      	while(dobby.state == FLYING){
-			dobby.control_loop(); 
+			dobby.control_loop();
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	   }
       }

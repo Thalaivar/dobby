@@ -26,7 +26,6 @@ int Motors::initialize_pru(){
 
 	//// start mmaping dram memory into channelPtr struct
 	printf("mmaping PRU1 DRAM memory\n");
-	static void* memPointer;
 	prussdrv_map_prumem(PRUSS0_PRU1_DATARAM, (void**) &channels);
 
 
@@ -97,14 +96,14 @@ int Motors::update(){
 }
 
 void Motors::demux_torques_to_pwm(){
-	
+
 	float throttle = recv->recv_channel[2];
 
 	channel_val[0] = (1/1)*(throttle - torques[2] - (torques[1] + torques[0]));
 	channel_val[1] = (1/1)*(throttle - torques[2] + (torques[1] + torques[0]));
 	channel_val[2] = (1/1)*(throttle + torques[2] + (torques[0] - torques[1]));
 	channel_val[3] = (1/1)*(throttle + torques[2] - (torques[0] - torques[1]));
-	
+
     cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl;
 }
 
@@ -172,8 +171,8 @@ int Motors::arm_motors(){
 
 	// if user sends arm signal
 	int i = 0;
-	while(recv->recv_channel[2] < recv->cal_throttle[0] + 30 && recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
-		recv->recv_channel[1] < recv->cal_pitch[0] + 30 && recv->recv_channel[0] > recv->cal_roll[1] - 30){
+	while((int)recv->recv_channel[2] < recv->cal_throttle[0] + 30 && (int)recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
+		(int)recv->recv_channel[1] < recv->cal_pitch[0] + 30 && (int)recv->recv_channel[0] > recv->cal_roll[1] - 30){
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 

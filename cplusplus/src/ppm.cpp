@@ -65,6 +65,15 @@ int Receiver::update(){
 		printf("ERROR: PRU PPM decoder not initialized\n");
 		return -1;
 	}
+  //CAPPING PPM SIGNAL 1000-2000(Uncomment if required)
+  /*
+  for(int i=0; i<6; i++){
+    if(this->recv_channel[i] > 2000)
+      this->recv_channel[i] = 2000;
+    else if(this->recv_channel[i] < 1000)
+      this->recv_channel[i] = 1000;
+  }
+  */
 
   //load latest PPM values from PRU0 DRAM
 	this->recv_channel[0] = ppm_channels->ch1*PRU_CYCLES_TO_US;
@@ -72,7 +81,7 @@ int Receiver::update(){
 	this->recv_channel[2] = ppm_channels->ch3*PRU_CYCLES_TO_US;
 	this->recv_channel[3] = ppm_channels->ch4*PRU_CYCLES_TO_US;
 	this->recv_channel[4] = ppm_channels->ch5*PRU_CYCLES_TO_US;
-  	this->recv_channel[5] = ppm_channels->ch6*PRU_CYCLES_TO_US;
+  this->recv_channel[5] = ppm_channels->ch6*PRU_CYCLES_TO_US;
 
   return 0;
 }

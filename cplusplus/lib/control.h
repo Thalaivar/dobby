@@ -85,7 +85,7 @@ class Control{
 
     // desired body rates
     float desired_body_rates[3];
-    
+
     Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
@@ -109,7 +109,6 @@ class flightMode{
 
     // debug functions, can be deleted angle_to_rate_roll
     void print_desired_attitude();
-    void print_desired_attitude_rates();
 
   private:
     // to access the receiver signals
@@ -120,8 +119,7 @@ class flightMode{
 
     // holds latest desired values
     float desired_euler[3];
-    float desired_euler_rates[3];
-	float desired_euler_rotated[3];
+	  float desired_euler_rotated[3];
 
 	// to make sure angles are in terms of what the pilot "sees"
     void rotate_desired_euler_angles();

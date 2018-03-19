@@ -99,8 +99,7 @@ void Dobby::control_loop(){
 
  // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
  // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
- // cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
-       << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;
+//  cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
 }
 
 Dobby::Dobby(){

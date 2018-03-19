@@ -87,7 +87,7 @@ void Control::get_desired_body_rates(){
   // get desired angular rates (by passing through simple P controller)
   desired_body_rates[ROLL] = (imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_euler_rotated[ROLL])*angle_to_rate_roll;
   desired_body_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH])*angle_to_rate_pitch;
-  desired_body_rates[YAW] = (imu->euler_angles[YAW]*RAD_TO_DEG - mode->desired_euler_rotated[YAW])*angle_to_rate_yaw;
+  desired_body_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
 
  //  cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
 }
@@ -106,7 +106,7 @@ void Control::run_smc_controller(){
   t = clock();
   float  dt = (float)(t - prev_time)/CLOCKS_PER_SEC;
   prev_time = t;
-  
+
   // declare state variables
   float wx = imu->body_rates[ROLL];
   float wy = imu->body_rates[PITCH];
@@ -118,7 +118,7 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
-  cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
+ // cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
 
   // define the three sliding surfaces
   float s_phi = Ixx*error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
@@ -127,7 +127,7 @@ void Control::run_smc_controller(){
 
  // cout << s_phi << " | " << s_theta << " | " << s_psi << endl;
 
- //cout << error.ie_body_rate[ROLL] << " | " << error.ie_body_rate[PITCH] << " | " << error.ie_body_rate[YAW] << endl;
+ // cout << error.ie_body_rate[ROLL] << " | " << error.ie_body_rate[PITCH] << " | " << error.ie_body_rate[YAW] << endl;
   // get controller outputs
   float u_phi = (Izz - Iyy)*wy*wz - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*sign(s_phi);
   float u_theta = (Ixx - Izz)*wx*wz - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*sign(s_theta);
@@ -196,4 +196,3 @@ void flightMode::print_desired_attitude(){
 
   cout << this->desired_euler[0] << " | " << this->desired_euler[1] << " | " << this->desired_euler[2] << endl;
 }
-

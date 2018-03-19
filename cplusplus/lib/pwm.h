@@ -62,7 +62,7 @@ class Motors {
     float torques[3];
 
     // holds the pwm values to be sent
-    u32 channel_val[4];
+    int channel_val[4];
 
     bool is_pru_initialized;
     bool is_armed;

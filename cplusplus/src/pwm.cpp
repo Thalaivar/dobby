@@ -97,13 +97,17 @@ int Motors::update(){
 }
 
 void Motors::demux_torques_to_pwm(){
+	
+	float throttle = recv->recv_channel[2];
 
-	this->channel_val[0] = (1/4)*((recv->recv_channel[2]) - torques[2] - (torques[1] + torques[0]));
-	this->channel_val[1] = (1/4)*((recv->recv_channel[2]) - torques[2] + (torques[1] + torques[0]));
-	this->channel_val[2] = (1/4)*((recv->recv_channel[2]) + torques[2] + (torques[0] - torques[1]));
-	this->channel_val[3] = (1/4)*((recv->recv_channel[2]) + torques[2] - (torques[0] - torques[1]));
-
+	channel_val[0] = (1/1)*(throttle - torques[2] - (torques[1] + torques[0]));
+	channel_val[1] = (1/1)*(throttle - torques[2] + (torques[1] + torques[0]));
+	channel_val[2] = (1/1)*(throttle + torques[2] + (torques[0] - torques[1]));
+	channel_val[3] = (1/1)*(throttle + torques[2] - (torques[0] - torques[1]));
+	
+    cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl;
 }
+
 Motors::Motors(Receiver *recv_ptr){
 
 	// make channel pointer point to struct

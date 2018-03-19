@@ -14,9 +14,9 @@
 #define smc_roll_lambda  7.14
 #define smc_pitch_lambda 7.14
 #define smc_yaw_lambda   12.14
-#define smc_roll_eta     15
-#define smc_pitch_eta    12
-#define smc_yaw_eta      17
+#define smc_roll_eta     7
+#define smc_pitch_eta    7
+#define smc_yaw_eta      7
 
 /***************************************************************
               recv signal conversion to desired values
@@ -28,9 +28,9 @@
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll -1.54
-#define angle_to_rate_pitch -1.54
-#define angle_to_rate_yaw -1.54
+#define angle_to_rate_roll -0.54
+#define angle_to_rate_pitch -0.54
+#define angle_to_rate_yaw -0.54
 
 /***************************************************************
                     quadcopter dynamics params

@@ -10,7 +10,7 @@ IMU::IMU(void){
     config.enable_magnetometer = 1;
 
     config.dmp_sample_rate = 200;
-    config.orientation = ORIENTATION_Z_DOWN;
+    config.orientation = ORIENTATION_Z_UP;
     config.compass_time_constant = 2.0;
     config.dmp_interrupt_priority = sched_get_priority_max(SCHED_FIFO)-1;
     config.show_warnings = 0;
@@ -64,20 +64,20 @@ void IMU::print_tb_angles(){
 void IMU::update(){
 
   // populate euler angles with latest data
-  euler_angles[ROLL]  = data.fused_TaitBryan[IMU_ROLL] - initialRoll;
-  euler_angles[PITCH] = data.fused_TaitBryan[IMU_PITCH] - initialPitch;
-  euler_angles[YAW]   = get_calYaw(data.fused_TaitBryan[IMU_YAW]);
+  euler_angles[ROLL]  = data.fused_TaitBryan[ROLL] - initialRoll;
+  euler_angles[PITCH] = data.fused_TaitBryan[PITCH] - initialPitch;
+  euler_angles[YAW]   = get_calYaw(data.fused_TaitBryan[YAW]);
 
   // populate body rates with latest data
-  body_rates[ROLL]  = data.gyro[IMU_ROLL];
-  body_rates[PITCH] = data.gyro[IMU_PITCH];
-  body_rates[YAW]   = data.gyro[IMU_YAW];
+  body_rates[ROLL]  = data.gyro[ROLL];
+  body_rates[PITCH] = data.gyro[PITCH];
+  body_rates[YAW]   = data.gyro[YAW];
 
-  yaw_rotated_body_rates();
+  yaw_rotated_euler_angles();
 
 }
 
-void IMU::yaw_rotated_body_rates(){
+void IMU::yaw_rotated_euler_angles(){
 
   // state variables
   float psi;
@@ -86,9 +86,10 @@ void IMU::yaw_rotated_body_rates(){
   psi = euler_angles[YAW];
 
   // get euler rates from body rates
-  body_rates_rotated[ROLL] = cos(psi)*body_rates[ROLL] - sin(psi)*body_rates[PITCH];
-  body_rates_rotated[PITCH] = sin(psi)*body_rates[ROLL] + cos(psi)*body_rates[PITCH];
-  body_rates_rotated[YAW] = body_rates[YAW];
+  euler_angle_rotated[ROLL] = cos(psi)*euler_angles[ROLL] - sin(psi)*euler_angles[PITCH];
+  euler_angle_rotated[PITCH] = sin(psi)*euler_angles[ROLL] + cos(psi)*euler_angles[PITCH];
+  euler_angle_rotated[YAW] = euler_angles[YAW];
+
 }
 
 // Adding InitialYaw Function Definitions:
@@ -100,12 +101,12 @@ void IMU::set_initialYaw(){
 	float sumYaw = 0.0;
 	if (this->is_initialized){
 		for(int i =0; i < 100; i++){
-			sumYaw += data.fused_TaitBryan[IMU_YAW];
-//			cout << data.fused_TaitBryan[IMU_YAW]*RAD_TO_DEG << endl;
+			sumYaw += data.fused_TaitBryan[YAW];
+//			cout << data.fused_TaitBryan[YAW]*RAD_TO_DEG << endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 		}
-		
+
 		this->initialYaw = sumYaw/100.0;
 
 		cout << "Yaw Set to :" << this->initialYaw*RAD_TO_DEG << endl ;
@@ -126,19 +127,19 @@ float IMU::get_calYaw(float rawYaw){
 }
 
 void IMU:: zero_initial_attitude(){
-	
+
 	float temp_roll, temp_pitch;
-	
+
 	temp_roll = 0;
 	temp_pitch = 0;
-	
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 	if(this->is_initialized) {
 	 	for(int i = 0; i < 100; i++){
 		 	update();
-			temp_roll += data.fused_TaitBryan[IMU_ROLL];
-			temp_pitch += data.fused_TaitBryan[IMU_PITCH];
+			temp_roll += data.fused_TaitBryan[ROLL];
+			temp_pitch += data.fused_TaitBryan[PITCH];
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		 }
 

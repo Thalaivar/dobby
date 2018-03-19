@@ -38,11 +38,6 @@
 using namespace std;
 #define RAD_TO_DEG		57.295779513
 
-// IMU is mounted with y-axis as forward
-#define IMU_PITCH	0
-#define IMU_ROLL	1
-#define IMU_YAW	2
-
 #define ROLL 0
 #define PITCH 1
 #define YAW 2
@@ -60,30 +55,30 @@ class IMU{
 
     // body rates in DPS
     float body_rates[3];
-	
-	float body_rates_rotated[3];
-    
+
+	float euler_angle_rotated[3];
+
 	IMU();
-    
+
 	int init_imu();
-    
+
 	void print_tb_angles();
 
     // call this to get latest euler angles
     void update();
-	
+
 	// to get the initial yaw heading
 	void set_initialYaw();
-	
+
 	// to get initial roll and pitch offsets
 	void zero_initial_attitude();
 
 	// get yaw calibrated to initial yaw
 	float get_calYaw(float rawYaw);
-    
+
 	// body gyro rates to euler rates
-    void yaw_rotated_body_rates();
-	
+    void yaw_rotated_euler_angles();
+
 	float initialYaw, initialRoll, initialPitch;
 
     bool is_initialized;

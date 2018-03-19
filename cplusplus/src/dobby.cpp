@@ -91,14 +91,13 @@ void Dobby::control_loop(){
   mode.flight_mode_update();
 
   // call smc controller
-  //control.run_smc_controller();
-  
-  imu.print_tb_angles();
-
+  control.run_smc_controller();
+ // imu.print_tb_angles();
+	
   // get pwm signals
   motors.demux_torques_to_pwm(); 
-  
- // cout << imu.body_rates_rotated[ROLL] << " | " << imu.body_rates_rotated[PITCH] << " | " << imu.body_rates_rotated[YAW] << endl;
+
+ // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
  // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
  // cout << motors.channel_val[0] << " | " << motors.channel_val[1] << " | " \
        << motors.channel_val[2] << " | " << motors.channel_val[3] << endl;

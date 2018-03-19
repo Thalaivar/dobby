@@ -62,7 +62,7 @@ void flightMode::flight_mode_update(){
       desired_euler_rates[ROLL] = (imu->euler_angles[ROLL]*RAD_TO_DEG - desired_euler[ROLL])*angle_to_rate_roll;
       desired_euler_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - desired_euler[PITCH])*angle_to_rate_pitch;
       desired_euler_rates[YAW] = (imu->euler_angles[YAW]*RAD_TO_DEG - desired_euler[YAW])*angle_to_rate_yaw;
-
+		
 	 break;
 
     default:
@@ -81,19 +81,19 @@ void Control::get_desired_body_rates(){
   float theta_dot_des = mode->desired_euler_rates[PITCH];
   float psi_dot_des = mode->desired_euler_rates[YAW];
 
-  desired_body_rates[ROLL]  = cos(theta)*cos(psi)*phi_dot_des + sin(psi)*theta_dot_des;
-  desired_body_rates[PITCH] = -cos(theta)*sin(psi)*phi_dot_des + cos(psi)*theta_dot_des;
-  desired_body_rates[YAW]   = sin(theta)*phi_dot_des + psi_dot_des;
+  desired_body_rates[ROLL]  = cos(psi)*phi_dot_des + sin(psi)*theta_dot_des;
+  desired_body_rates[PITCH] = -sin(psi)*phi_dot_des + cos(psi)*theta_dot_des;
+  desired_body_rates[YAW]   = psi_dot_des;  
 
- // cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
+  cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
 }
 
 void Control::get_body_rate_error(){
 
   // <angle>_rate_error = current_<angle>_rate - desired_<angle>_rate
-  error.body_rate_error[ROLL]  = imu->body_rates_rotated[ROLL] - desired_body_rates[ROLL];
-  error.body_rate_error[PITCH] = imu->body_rates_rotated[PITCH] - desired_body_rates[PITCH];
-  error.body_rate_error[YAW]   = imu->body_rates_rotated[YAW] - desired_body_rates[YAW];
+  error.body_rate_error[ROLL]  = imu->body_rates[ROLL] - desired_body_rates[ROLL];
+  error.body_rate_error[PITCH] = imu->body_rates[PITCH] - desired_body_rates[PITCH];
+  error.body_rate_error[YAW]   = imu->body_rates[YAW] - desired_body_rates[YAW];
 }
 
 void Control::run_smc_controller(){
@@ -114,7 +114,7 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
-  //cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
+ //  cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
 
   // define the three sliding surfaces
   float s_phi = Ixx*error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];

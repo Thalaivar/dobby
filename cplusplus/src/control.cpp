@@ -118,7 +118,7 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
- // cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
+  cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
 
   // define the three sliding surfaces
   float s_phi = Ixx*error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];

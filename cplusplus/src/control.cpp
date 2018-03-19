@@ -57,12 +57,15 @@ void flightMode::flight_mode_update(){
         desired_euler[YAW] = (float)((int)recv->recv_channel[YAW_CHANNEL] - (recv->cal_yaw[0] + recv->cal_yaw[1])/2)*recv_signal_to_yaw_angle;
       }
 
+      // rotate desired euler angles to account for dobby's yaw
+      rotate_desired_euler_angles();
 
-   // get desired angular rates (by passing through simple P controller)
-      desired_euler_rates[ROLL] = (imu->euler_angles[ROLL]*RAD_TO_DEG - desired_euler[ROLL])*angle_to_rate_roll;
-      desired_euler_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - desired_euler[PITCH])*angle_to_rate_pitch;
-      desired_euler_rates[YAW] = (imu->euler_angles[YAW]*RAD_TO_DEG - desired_euler[YAW])*angle_to_rate_yaw;
-		
+      // get desired angular rates (by passing through simple P controller)
+      desired_euler_rates[ROLL] = (imu->euler_angles[ROLL]*RAD_TO_DEG - desired_euler_rotated[ROLL])*angle_to_rate_roll;
+      desired_euler_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - desired_euler_rotated[PITCH])*angle_to_rate_pitch;
+      desired_euler_rates[YAW] = (imu->euler_angles[YAW]*RAD_TO_DEG - desired_euler_rotated[YAW])*angle_to_rate_yaw;
+	
+	//  cout << desired_euler_rates[ROLL] << " | " << desired_euler_rates[PITCH] << " | " << desired_euler_rates[YAW] << endl;
 	 break;
 
     default:
@@ -71,21 +74,33 @@ void flightMode::flight_mode_update(){
   }
 }
 
+void flightMode::rotate_desired_euler_angles(){
+
+  // use the latest yaw to compute the rotation required
+  float psi = imu->euler_angles[YAW];
+
+  desired_euler_rotated[ROLL]  = cos(psi)*desired_euler[ROLL] + sin(psi)*desired_euler[PITCH];
+  desired_euler_rotated[PITCH] = -sin(psi)*desired_euler[ROLL] + cos(psi)*desired_euler[PITCH];
+  desired_euler_rotated[YAW]   = desired_euler[YAW];
+
+ // cout << desired_euler_rotated[ROLL] << " | " << desired_euler_rotated[PITCH] << " | " << desired_euler_rotated[YAW] << endl;
+
+}
+
 void Control::get_desired_body_rates(){
 
   // variables to make euler rates -> body rates transformation more readable
   float phi = imu->euler_angles[ROLL];
-  float theta = imu->euler_angles[PITCH];
-  float psi = imu->euler_angles[YAW];
+  float theta = imu->euler_angles[PITCH];  float psi = imu->euler_angles[YAW];
   float phi_dot_des = mode->desired_euler_rates[ROLL];
   float theta_dot_des = mode->desired_euler_rates[PITCH];
   float psi_dot_des = mode->desired_euler_rates[YAW];
 
   desired_body_rates[ROLL]  = cos(psi)*phi_dot_des + sin(psi)*theta_dot_des;
   desired_body_rates[PITCH] = -sin(psi)*phi_dot_des + cos(psi)*theta_dot_des;
-  desired_body_rates[YAW]   = psi_dot_des;  
+  desired_body_rates[YAW]   = psi_dot_des;
 
-  cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
+ //  cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
 }
 
 void Control::get_body_rate_error(){
@@ -114,7 +129,7 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
- //  cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
+  cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
 
   // define the three sliding surfaces
   float s_phi = Ixx*error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];

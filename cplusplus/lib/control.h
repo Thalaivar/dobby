@@ -64,7 +64,7 @@ class Control{
     clock_t prev_time;
 
 	clock_t t;
-    
+
 	// holds outputs of controller
     float control_signal[4];
 
@@ -85,7 +85,7 @@ class Control{
 
     // desired body rates
     float desired_body_rates[3];
-
+    
     Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
@@ -121,6 +121,10 @@ class flightMode{
     // holds latest desired values
     float desired_euler[3];
     float desired_euler_rates[3];
+	float desired_euler_rotated[3];
+
+	// to make sure angles are in terms of what the pilot "sees"
+    void rotate_desired_euler_angles();
 
     // controller needs access to desired trajectory/attitude
     friend class Control;

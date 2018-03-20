@@ -96,10 +96,11 @@ void Dobby::control_loop(){
 	
   // get pwm signals
   motors.demux_torques_to_pwm(); 
-
+  
+  motors.update();
  // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
  // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
-//  cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
+  cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
 }
 
 Dobby::Dobby(){

@@ -19,10 +19,12 @@ Tasks to do:
 * ~~Write mag_calibration function~~
 * Write failsafes and arm checks
 * Test the ~~PPM~~ and PWM outputs
+* Map thrusts to PWM
+* Get Inertia estimate
 
 Status:
 --------
-Still writing up the low level controller code base.
+Currently on the test bench.
 
 Next major test:
 ----------------

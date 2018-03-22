@@ -3,10 +3,13 @@
 
 #include <roboticscape.h>
 #include <iostream>
+#include <chrono>
 #include "ppm.h"
 #include "pwm.h"
 #include "control.h"
 #include "imu.h"
+
+#define FASTLOOP_PERIOD 5000
 
 using namespace std;
 
@@ -31,10 +34,17 @@ typedef enum dobby_status{
   EXIT
 }dobby_status;
 
+typedef chrono::high_resolution_clock timer;
+typedef chrono::high_resolution_clock::time_point dobby_time;
+typedef chrono::duration<int64_t, std::micro> deltat;
+
 /***********************************************************
                       main dobby class
 ***********************************************************/
 class Dobby{
+  private:
+    dobby_time prev_time;
+
   public:
 
     // define all dobby peripherals
@@ -43,9 +53,11 @@ class Dobby{
     Motors motors = Motors(&radio);
     flightMode mode = flightMode(&radio, &imu);
     Control control = Control(&motors, &mode, &imu);\
-	
+
     // pre flight checks
     int pre_flight_checks();
+
+    long loop_time_sum, counter;
 
     // runs on separate thread, keeps checking for disarm signal,
     // once signal is received, disables motors (and any other things??)

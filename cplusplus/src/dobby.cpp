@@ -71,36 +71,53 @@ int Dobby::setup(){
     std::cerr << "IMU failed to initialize" << '\n';
     return -1;
   }
-  
+
   imu.set_initialYaw();
-  
+
   imu.zero_initial_attitude();
-  
+
+  loop_time_sum = 0;
+  counter = 0;
+
   return 0;
 }
 
 void Dobby::control_loop(){
-  
-  // get latest imu data
-  imu.update();
 
-  // get latest radio signals
-  radio.update();
-  
-  // get desired stuff
-  mode.flight_mode_update();
+  // get dt time
+  dobby_time current_time = timer::now();
+  dt = deltat(current_time - prev_time).count();
 
-  // call smc controller
-  control.run_smc_controller();
- // imu.print_tb_angles();
-	
-  // get pwm signals
-  motors.demux_torques_to_pwm(); 
-  
-  motors.update();
- // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
- // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
-  cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
+  // if loop has entered too fast, exit
+  if(dt < FASTLOOP_PERIOD)
+        return;
+
+  else{
+    prev_time = current_time;
+
+    loop_time_sum += dt;
+    counter++;
+    // get latest imu data
+    imu.update();
+
+    // get latest radio signals
+    radio.update();
+
+    // get desired stuff
+    mode.flight_mode_update();
+
+    // call smc controller
+    control.run_smc_controller();
+    // imu.print_tb_angles();
+
+    // get pwm signals
+    motors.demux_torques_to_pwm();
+
+    motors.update();
+    // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
+    // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
+    cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
+  }
 }
 
 Dobby::Dobby(){

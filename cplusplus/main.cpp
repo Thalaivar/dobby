@@ -11,6 +11,9 @@ void exit_Handler(int a){
   dobby.motors.disable_motors();
   dobby.motors.disable_pru();
   dobby.radio.disable_pru();
+
+  cout << dobby.loop_time_sum = dobby.loop_time_sum/counter << endl;
+
 	exit(0);
  }
 

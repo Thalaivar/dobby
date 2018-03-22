@@ -112,9 +112,7 @@ void Control::get_body_rate_error(){
 void Control::run_smc_controller(){
 
   // get loop time (will be a fixed time later on)
-  t = clock();
-  float  dt = (float)(t - prev_time)/CLOCKS_PER_SEC;
-  prev_time = t;
+  int delta_time = 0;
 
   // declare state variables
   float wx = imu->body_rates[ROLL];
@@ -147,9 +145,9 @@ void Control::run_smc_controller(){
   u_psi = 0;
 
   // update the value of integral body rate error
-  error.ie_body_rate[ROLL]  += error.body_rate_error[ROLL]*dt;
-  error.ie_body_rate[PITCH] += error.body_rate_error[PITCH]*dt;
-  error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*dt;
+  error.ie_body_rate[ROLL]  += error.body_rate_error[ROLL]*delta_time;
+  error.ie_body_rate[PITCH] += error.body_rate_error[PITCH]*delta_time;
+  error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*delta_time;
 
   // update required torques
   motors->torques[ROLL] = u_phi;

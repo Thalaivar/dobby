@@ -4,6 +4,7 @@
 #include <roboticscape.h>
 #include <iostream>
 #include <chrono>
+#include <ratio>
 #include "ppm.h"
 #include "pwm.h"
 #include "control.h"
@@ -36,7 +37,8 @@ typedef enum dobby_status{
 
 typedef chrono::high_resolution_clock timer;
 typedef chrono::high_resolution_clock::time_point dobby_time;
-typedef chrono::duration<int64_t, std::micro> deltat;
+typedef chrono::microseconds us;
+typedef std::chrono::duration<double> loop_time;
 
 /***********************************************************
                       main dobby class
@@ -57,7 +59,7 @@ class Dobby{
     // pre flight checks
     int pre_flight_checks();
 
-    long loop_time_sum, counter;
+    double loop_time_sum, counter;
 
     // runs on separate thread, keeps checking for disarm signal,
     // once signal is received, disables motors (and any other things??)

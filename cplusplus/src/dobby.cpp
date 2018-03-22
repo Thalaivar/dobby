@@ -71,7 +71,7 @@ int Dobby::setup(){
     std::cerr << "IMU failed to initialize" << '\n';
     return -1;
   }
-  
+
   if(rc_set_cpu_freq(FREQ_1000MHZ) < 0){
   	std::cerr << "CPU frequency setting failed!" << '\n';
 	return -1;
@@ -83,39 +83,66 @@ int Dobby::setup(){
 
   loop_time_sum = 0;
   counter = 0;
-  
+
   return 0;
 }
 
-void Dobby::control_loop(){
-  
-  double dt;
+void Dobby::control_loop(dobby_time current_time){
 
-  // get dt time
-    // get latest imu data
-    
-    dobby_time current_time = timer::now();
-    if(counter < 1){
-  	prev_time = current_time;
-	counter++;
-	return;
-  }
-	auto loop_time = chrono::duration_cast<chrono::microseconds>(current_time - prev_time);	
-    prev_time = current_time;
-	dt = loop_time.count();
-	imu.update();
-    loop_time_sum += dt/1000000;
-    counter++;
+  auto fast_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.fast_loop_prev_time);
+  times.fast_loop_time = fast_loop.count();
 
-    // get latest radio signals
-    radio.update();
+
+  if(times.fast_loop_time < FASTLOOP_PERIOD)
+    return;
+
+  else{
+
+    times.fast_loop_prev_time = current_time;
+
+    // get latest attitude
+    imu.update();
 
     // get desired stuff
     mode.flight_mode_update();
 
     // call smc controller
     control.run_smc_controller();
-    // imu.print_tb_angles();
+
+    return;
+  }
+}
+
+void Dobby::radio_update_loop(dobby_time current_time){
+
+  auto radio_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.radio_loop_prev_time);
+  times.radio_loop_time = radio_loop.count();
+
+  if(times.radio_loop_time < RADIO_LOOP_PERIOD)
+      return;
+
+  else{
+
+    times.radio_loop_prev_time = current_time;
+
+    // get latest radio signals
+    radio.update();
+
+    return;
+  }
+}
+
+void Dobby::motor_update_loop(dobby_time current_time){
+
+  auto motor_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.motor_loop_prev_time);
+  times.motor_loop_time = motor_loop.count();
+
+  if(times.motor_loop_time < MOTOR_LOOP_PERIOD)
+      return;
+
+  else{
+
+    times.motor_loop_prev_time = current_time;
 
     // get pwm signals
     motors.demux_torques_to_pwm();
@@ -123,9 +150,17 @@ void Dobby::control_loop(){
     motors.update();
     // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
     // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
- //   cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
-  
+    // cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
+
+    return;
+  }
 }
 
-Dobby::Dobby(){
+void Dobby::reset_all_times(){
+
+  dobby_time t1 = timer::now();
+  times.fast_loop_prev_time = t1;
+  times.radio_loop_prev_time = t1;
+  times.motor_loop_prev_time = t1;
+  
 }

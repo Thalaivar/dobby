@@ -6,7 +6,6 @@
 #include "pwm.h"
 #include "imu.h"
 #include "ppm.h"
-#include <time.h>
 
 /***************************************************************
                             smc params
@@ -41,6 +40,8 @@
 #define Izz (0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
 #define thrust_coeff 0
 #define drag_coeff 0
+
+#define LOOP_TIME 0.00503
 
 // forward declaration to avoid error
 class flightMode;

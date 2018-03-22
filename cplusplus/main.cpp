@@ -9,11 +9,11 @@ void exit_Handler(int a){
  	cout << endl << "Exit Handler Reached!" << endl;
   dobby.motors.is_armed = false;
   dobby.motors.disable_motors();
-  
+
   dobby.loop_time_sum = dobby.loop_time_sum/dobby.counter;
   cout << 1/dobby.loop_time_sum << endl;
 
- 
+
 	exit(0);
  }
 
@@ -29,7 +29,10 @@ int main(){
 
   dobby.pre_flight_checks();
 
+  dobby_time current_time;
+
   char resp;
+  short i = 0;
 
   cout << "Enter \"y\" to continue: ";
   cin >> resp;
@@ -42,11 +45,17 @@ int main(){
 	  while(dobby.state == ARMED){
 	  dobby.radio.update();
       if(dobby.radio.recv_channel[2] > 1200) dobby.state = FLYING;
-		while(dobby.state == FLYING){
-			dobby.control_loop();
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	   }
-      }
+		  while(dobby.state == FLYING){
+        if(i == 0){
+          dobby.reset_all_times();
+          i++;
+        }
+        current_time = timer::now();
+        dobby.radio_update_loop(current_time);
+        dobby.control_loop(current_time);
+        dobby.motor_update_loop(current_time);
+	     }
+    }
 	 }
   }
   return 0;

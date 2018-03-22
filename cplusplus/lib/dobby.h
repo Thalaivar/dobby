@@ -11,6 +11,8 @@
 #include "imu.h"
 
 #define FASTLOOP_PERIOD 5000
+#define RADIO_LOOP 20000
+#define MOTOR_LOOP 20000
 
 using namespace std;
 
@@ -40,12 +42,23 @@ typedef chrono::high_resolution_clock::time_point dobby_time;
 typedef chrono::microseconds us;
 typedef std::chrono::duration<double> loop_time;
 
+typedef struct loop_times{
+
+  double fast_loop_time;
+  double radio_loop_time;
+  double motor_loop_time;
+  dobby_time fast_loop_prev_time;
+  dobby_time radio_loop_prev_time;
+  dobby_time motor_loop_prev_time;
+
+};
+
 /***********************************************************
                       main dobby class
 ***********************************************************/
 class Dobby{
   private:
-    dobby_time prev_time;
+    loop_times times;
 
   public:
 
@@ -59,8 +72,6 @@ class Dobby{
     // pre flight checks
     int pre_flight_checks();
 
-    double loop_time_sum, counter;
-
     // runs on separate thread, keeps checking for disarm signal,
     // once signal is received, disables motors (and any other things??)
     int disarm_check();
@@ -69,10 +80,16 @@ class Dobby{
     int setup();
 
     // main loop
-    void control_loop();
+    void control_loop(dobby_time current_time);
+
+    void radio_update_loop(dobby_time current_time);
+
+    void motor_update_loop(dobby_status current_time);
+
+    // to reset all times for the different loops, to be called just before FLYING
+    void reset_all_times();
 
     // holds current status of dobby
     dobby_status state;
-	Dobby();
 };
 #endif

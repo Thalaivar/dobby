@@ -81,9 +81,6 @@ int Dobby::setup(){
 
   imu.zero_initial_attitude();
 
-  loop_time_sum = 0;
-  counter = 0;
-
   return 0;
 }
 
@@ -97,6 +94,7 @@ void Dobby::control_loop(dobby_time current_time){
     return;
 
   else{
+	count1++;
 
     times.fast_loop_prev_time = current_time;
 
@@ -122,8 +120,7 @@ void Dobby::radio_update_loop(dobby_time current_time){
       return;
 
   else{
-
-    times.radio_loop_prev_time = current_time;
+	times.radio_loop_prev_time = current_time;
 
     // get latest radio signals
     radio.update();
@@ -156,6 +153,19 @@ void Dobby::motor_update_loop(dobby_time current_time){
   }
 }
 
+void Dobby::logging_loop(dobby_time current_time){
+	
+	auto log_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.logging_loop_prev_time);
+  	times.logging_loop_time = log_loop.count();
+
+  	if(times.motor_loop_time < MOTOR_LOOP_PERIOD)
+      return;
+	
+	else{
+		times.logging_loop_prev_time = current_time;
+		logging.log_3_axis_data(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);
+	}
+}
 void Dobby::reset_all_times(){
 
   dobby_time t1 = timer::now();

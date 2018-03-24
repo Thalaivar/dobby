@@ -10,12 +10,12 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-/*#define smc_roll_lambda  1.24
+#define smc_roll_lambda  1.24
 #define smc_pitch_lambda 1.24
 #define smc_yaw_lambda   1.24
 #define smc_roll_eta     5.3
 #define smc_pitch_eta    5.3
-#define smc_yaw_eta      5.3*/
+#define smc_yaw_eta      5.3
 
 /***************************************************************
               recv signal conversion to desired values
@@ -60,11 +60,6 @@ class Control{
 
     // to access IMU data
     IMU *imu;
-    error_struct error;
-
-    clock_t prev_time;
-
-	clock_t t;
 
 	// holds outputs of controller
     float control_signal[4];
@@ -87,7 +82,9 @@ class Control{
     // desired body rates
     float desired_body_rates[3];
 
-    Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
+    error_struct error;
+    
+	Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
 typedef enum flight_modes{

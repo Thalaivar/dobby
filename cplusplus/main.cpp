@@ -9,12 +9,10 @@ void exit_Handler(int a){
  	cout << endl << "Exit Handler Reached!" << endl;
   dobby.motors.is_armed = false;
   dobby.motors.disable_motors();
-
-  dobby.loop_time_sum = dobby.loop_time_sum/dobby.counter;
-  cout << 1/dobby.loop_time_sum << endl;
-
-
-	exit(0);
+  
+  cout << dobby.count << " | " << dobby.count1 << endl;
+  
+  exit(0);
  }
 
 
@@ -54,7 +52,8 @@ int main(){
         dobby.radio_update_loop(current_time);
         dobby.control_loop(current_time);
         dobby.motor_update_loop(current_time);
-	     }
+	  	dobby.logging_loop(current_time);
+	  }
     }
 	 }
   }

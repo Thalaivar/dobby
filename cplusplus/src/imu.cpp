@@ -64,8 +64,8 @@ void IMU::print_tb_angles(){
 void IMU::update(){
 
   // populate euler angles with latest data
-  euler_angles[ROLL]  = data.fused_TaitBryan[ROLL] - initialRoll;
-  euler_angles[PITCH] = data.fused_TaitBryan[PITCH] - initialPitch;
+  euler_angles[ROLL]  = data.fused_TaitBryan[ROLL];
+  euler_angles[PITCH] = data.fused_TaitBryan[PITCH];
   euler_angles[YAW]   = get_calYaw(data.fused_TaitBryan[YAW]);
 
   // populate body rates with latest data

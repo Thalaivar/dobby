@@ -21,8 +21,6 @@ Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr){
   error.ie_body_rate[PITCH] = 0;
   error.ie_body_rate[YAW] = 0;
 
-  prev_time = 0;
-
 }
 
 

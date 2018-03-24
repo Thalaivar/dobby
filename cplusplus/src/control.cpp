@@ -147,9 +147,9 @@ void Control::run_smc_controller(){
   error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*LOOP_TIME;
 
   // update required torques
-  motors->torques[ROLL] = u_phi;
-  motors->torques[PITCH] = u_theta;
-  motors->torques[YAW] = u_psi;
+  motors->torques[ROLL] = u_phi*1000;
+  motors->torques[PITCH] = u_theta*1000;
+  motors->torques[YAW] = u_psi*1000;
 }
 
 void flightMode::set_flight_mode(flight_mode desired_mode){

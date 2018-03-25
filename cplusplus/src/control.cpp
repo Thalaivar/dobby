@@ -1,14 +1,5 @@
 #include "control.h"
 
-#define smc_roll_lambda  1.24
-#define smc_pitch_lambda 1.24
-#define smc_yaw_lambda   1.24
-#define smc_roll_eta     5.3
-#define smc_pitch_eta    5.3
-#define smc_yaw_eta      5.3
-
-
-
 Control::Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr){
 
   // link imu, motors and flight_mode classes to controller
@@ -96,15 +87,19 @@ void Control::get_desired_body_rates(){
   desired_body_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH])*angle_to_rate_pitch;
   desired_body_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
 
+  desired_body_rates[ROLL]  = desired_body_rates[ROLL]*DEG_TO_RAD;
+  desired_body_rates[PITCH] = desired_body_rates[PITCH]*DEG_TO_RAD;
+  desired_body_rates[YAW]   = desired_body_rates[YAW]*DEG_TO_RAD;
+
  //  cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
 }
 
 void Control::get_body_rate_error(){
 
   // <angle>_rate_error = current_<angle>_rate - desired_<angle>_rate
-  error.body_rate_error[ROLL]  = imu->body_rates[ROLL]*0.6 - desired_body_rates[ROLL];
-  error.body_rate_error[PITCH] = imu->body_rates[PITCH]*0.6 - desired_body_rates[PITCH];
-  error.body_rate_error[YAW]   = imu->body_rates[YAW]*0.6 - desired_body_rates[YAW];
+  error.body_rate_error[ROLL]  = imu->body_rates[ROLL] - desired_body_rates[ROLL];
+  error.body_rate_error[PITCH] = imu->body_rates[PITCH] - desired_body_rates[PITCH];
+  error.body_rate_error[YAW]   = imu->body_rates[YAW]- desired_body_rates[YAW];
 }
 
 void Control::run_smc_controller(){
@@ -130,10 +125,11 @@ void Control::run_smc_controller(){
  // cout << s_phi << " | " << s_theta << " | " << s_psi << endl;
 
  // cout << error.ie_body_rate[ROLL] << " | " << error.ie_body_rate[PITCH] << " | " << error.ie_body_rate[YAW] << endl;
-  // get controller outputs
-  float u_phi = (Izz - Iyy)*wy*wz - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*sign(s_phi);
-  float u_theta = (Ixx - Izz)*wx*wz - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*sign(s_theta);
-  float u_psi = (Iyy - Ixx)*wy*wx - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*sign(s_psi);
+
+ // get controller outputs
+  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*sign(s_phi);
+  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*sign(s_theta);
+  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*sign(s_psi);
 
  // cout << u_phi << " | " << u_theta << " | " << u_psi << endl;
 
@@ -144,7 +140,7 @@ void Control::run_smc_controller(){
   error.ie_body_rate[PITCH] += error.body_rate_error[PITCH]*LOOP_TIME;
   error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*LOOP_TIME;
 
-  // update required torques
+  // update required torques converting kg -> gm
   motors->torques[ROLL] = u_phi*1000;
   motors->torques[PITCH] = u_theta*1000;
   motors->torques[YAW] = u_psi*1000;

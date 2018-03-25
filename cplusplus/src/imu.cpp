@@ -63,32 +63,15 @@ void IMU::print_tb_angles(){
 
 void IMU::update(){
 
-  // populate euler angles with latest data
+  // populate euler angles with latest data in rad
   euler_angles[ROLL]  = data.fused_TaitBryan[ROLL];
   euler_angles[PITCH] = data.fused_TaitBryan[PITCH];
   euler_angles[YAW]   = get_calYaw(data.fused_TaitBryan[YAW]);
 
-  // populate body rates with latest data
-  body_rates[ROLL]  = data.gyro[ROLL];
-  body_rates[PITCH] = data.gyro[PITCH];
-  body_rates[YAW]   = data.gyro[YAW];
-
-  yaw_rotated_euler_angles();
-
-}
-
-void IMU::yaw_rotated_euler_angles(){
-
-  // state variables
-  float psi;
-
-  // get attitude from imu, it is in terms of euler angles
-  psi = euler_angles[YAW];
-
-  // get euler rates from body rates
-  euler_angle_rotated[ROLL] = cos(psi)*euler_angles[ROLL] - sin(psi)*euler_angles[PITCH];
-  euler_angle_rotated[PITCH] = sin(psi)*euler_angles[ROLL] + cos(psi)*euler_angles[PITCH];
-  euler_angle_rotated[YAW] = euler_angles[YAW];
+  // populate body rates with latest data in rad/s
+  body_rates[ROLL]  = data.gyro[ROLL]*DEG_TO_RAD;
+  body_rates[PITCH] = data.gyro[PITCH]*DEG_TO_RAD;
+  body_rates[YAW]   = data.gyro[YAW]*DEG_TO_RAD;
 
 }
 
@@ -124,31 +107,4 @@ float IMU::get_calYaw(float rawYaw){
 	else{
 		return rawYaw - this->initialYaw ;
 	}
-}
-
-void IMU:: zero_initial_attitude(){
-
-	float temp_roll, temp_pitch;
-
-	temp_roll = 0;
-	temp_pitch = 0;
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-	if(this->is_initialized) {
-	 	for(int i = 0; i < 100; i++){
-		 	update();
-			temp_roll += data.fused_TaitBryan[ROLL];
-			temp_pitch += data.fused_TaitBryan[PITCH];
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		 }
-
-		initialRoll   = temp_roll/100.0f;
-		initialPitch  = temp_pitch/100.0f;
-
-		cout << "Pitch Set to :" << this->initialRoll*RAD_TO_DEG << endl;
-		cout << "Roll Set to :" << this->initialPitch*RAD_TO_DEG << endl;
-	 }
-
-	else cout << "Roll and Pitch not calibrated!" << endl;
 }

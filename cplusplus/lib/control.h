@@ -41,6 +41,8 @@
 
 #define LOOP_TIME 0.00503
 
+#define PI_BY_2_INV 0.6363
+
 // forward declaration to avoid error
 class flightMode;
 
@@ -74,14 +76,11 @@ class Control{
   public:
     void run_smc_controller();
 
-    // debug functions , can be deleted later
-    void print_body_rate_error();
-
     // desired body rates
     float desired_body_rates[3];
 
     error_struct error;
-    
+
 	Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
@@ -94,6 +93,7 @@ typedef enum flight_modes{
 class flightMode{
   public:
     flightMode(Receiver *recv_ptr, IMU *imu_ptr);
+    
     // to set current flight mode
     void set_flight_mode(flight_mode desired_mode);
 
@@ -102,9 +102,6 @@ class flightMode{
 
     // holds current mode setting
     flight_mode current_mode;
-
-    // debug functions, can be deleted angle_to_rate_roll
-    void print_desired_attitude();
 
   private:
     // to access the receiver signals

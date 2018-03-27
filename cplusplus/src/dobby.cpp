@@ -152,16 +152,18 @@ void Dobby::motor_update_loop(dobby_time current_time){
 }
 
 void Dobby::logging_loop(dobby_time current_time){
-	
+
 	auto log_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.logging_loop_prev_time);
   	times.logging_loop_time = log_loop.count();
 
   	if(times.logging_loop_time < LOG_LOOP_PERIOD)
       return;
-	
+
 	else{
 		times.logging_loop_prev_time = current_time;
-		logging.log_3_axis_data(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);
+		logging.log_attitude(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
+    logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
+    logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);
 	}
 }
 void Dobby::reset_all_times(){
@@ -170,5 +172,5 @@ void Dobby::reset_all_times(){
   times.fast_loop_prev_time = t1;
   times.radio_loop_prev_time = t1;
   times.motor_loop_prev_time = t1;
-  
+
 }

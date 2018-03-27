@@ -124,11 +124,9 @@ void Control::run_smc_controller(){
  // cout << error.ie_body_rate[ROLL] << " | " << error.ie_body_rate[PITCH] << " | " << error.ie_body_rate[YAW] << endl;
 
  // get controller outputs
-  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*atan(s_phi);
-  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*atan(s_theta);
-  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*atan(s_psi);
-
- // cout << u_phi << " | " << u_theta << " | " << u_psi << endl;
+  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*atan(s_phi)*PI_BY_2_INV;
+  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*atan(s_theta)*PI_BY_2_INV;
+  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*atan(s_psi)*PI_BY_2_INV;
 
   u_psi = 0;
 
@@ -163,35 +161,8 @@ void flightMode::set_flight_mode(flight_mode desired_mode){
   }
 }
 
-void Control::demux_control_signal(){
-
-  // Τ_x = I_x*(u_theta*sin(psi) + u_phi*cos(psi))
-  motors->torques[ROLL] = Ixx*(control_signal[PITCH]*sin(imu->euler_angles[YAW]) \
-                             + control_signal[ROLL]*cos(imu->euler_angles[YAW]));
-
-  // Τ_y = I_y*(u_theta*cos(psi) - u_phi*sin(psi))
-  motors->torques[PITCH] = Iyy*(control_signal[PITCH]*cos(imu->euler_angles[YAW]) \
-                              - control_signal[ROLL]*sin(imu->euler_angles[YAW]));
-
-  // T_z = I_z*(u_psi + tan(theta)*u_phi)
-  motors->torques[YAW] = Izz*(control_signal[YAW] + \
-                            tan(imu->euler_angles[PITCH])*control_signal[ROLL]);
-}
-
 int sign(float x){
   if( x > 0.000 ) return 1;
   else if( x < 0.000 ) return -1;
   else return 0;
-}
-
-void Control::print_body_rate_error(){
-
-  get_body_rate_error();
-
-  cout << error.body_rate_error[ROLL] << " | " << error.body_rate_error[PITCH] << " | " << error.body_rate_error[YAW] << endl;
-}
-
-void flightMode::print_desired_attitude(){
-
-  cout << this->desired_euler[0] << " | " << this->desired_euler[1] << " | " << this->desired_euler[2] << endl;
 }

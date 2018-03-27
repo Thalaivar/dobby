@@ -56,11 +56,6 @@ int IMU::init_imu(){
     return 0;
 }
 
-void IMU::print_tb_angles(){
-    printf("Roll: %f | Pitch: %f | Yaw: %f\n", euler_angles[ROLL]*RAD_TO_DEG, euler_angles[PITCH]*RAD_TO_DEG\
-                                               , euler_angles[YAW]*RAD_TO_DEG);
-}
-
 void IMU::update(){
 
   // populate euler angles with latest data in rad

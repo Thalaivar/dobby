@@ -9,7 +9,6 @@ void exit_Handler(int a){
  	cout << endl << "Exit Handler Reached!" << endl;
   dobby.motors.is_armed = false;
   dobby.motors.disable_motors();
-  
   exit(0);
  }
 

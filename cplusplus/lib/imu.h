@@ -62,8 +62,6 @@ class IMU{
 
 	  int init_imu();
 
-	  void print_tb_angles();
-
     // call this to get latest euler angles
     void update();
 
@@ -73,7 +71,7 @@ class IMU{
 	  // get yaw calibrated to initial yaw
 	  float get_calYaw(float rawYaw);
 
-	  float initialYaw, initialRoll, initialPitch;
+	  float initialYaw;
 
     bool is_initialized;
     bool is_calibrated;

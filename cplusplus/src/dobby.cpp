@@ -79,7 +79,6 @@ int Dobby::setup(){
 
   imu.set_initialYaw();
 
-  imu.zero_initial_attitude();
 
   return 0;
 }
@@ -94,7 +93,6 @@ void Dobby::control_loop(dobby_time current_time){
     return;
 
   else{
-	count1++;
 
     times.fast_loop_prev_time = current_time;
 
@@ -158,7 +156,7 @@ void Dobby::logging_loop(dobby_time current_time){
 	auto log_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.logging_loop_prev_time);
   	times.logging_loop_time = log_loop.count();
 
-  	if(times.motor_loop_time < MOTOR_LOOP_PERIOD)
+  	if(times.logging_loop_time < LOG_LOOP_PERIOD)
       return;
 	
 	else{

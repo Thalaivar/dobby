@@ -10,8 +10,6 @@ void exit_Handler(int a){
   dobby.motors.is_armed = false;
   dobby.motors.disable_motors();
   
-  cout << dobby.count << " | " << dobby.count1 << endl;
-  
   exit(0);
  }
 
@@ -52,7 +50,6 @@ int main(){
         dobby.radio_update_loop(current_time);
         dobby.control_loop(current_time);
         dobby.motor_update_loop(current_time);
-	  	dobby.logging_loop(current_time);
 	  }
     }
 	 }

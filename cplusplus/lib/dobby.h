@@ -14,6 +14,7 @@
 #define FASTLOOP_PERIOD 5000
 #define RADIO_LOOP_PERIOD 20000
 #define MOTOR_LOOP_PERIOD 20000
+#define LOG_LOOP_PERIOD 20000
 
 using namespace std;
 
@@ -63,9 +64,6 @@ class Dobby{
     loop_times times;
 
   public:
-float avg_time = 0;
-long count = 0;
-long count1 = 0;
     // define all dobby peripherals
     IMU imu;
     Receiver radio;

@@ -10,36 +10,34 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-#define smc_roll_lambda  1.24
-#define smc_pitch_lambda 1.24
-#define smc_yaw_lambda   1.24
-#define smc_roll_eta     5.3
-#define smc_pitch_eta    5.3
-#define smc_yaw_eta      5.3
+#define smc_roll_lambda  12.24
+#define smc_pitch_lambda 12.24
+#define smc_yaw_lambda   12.24
+#define smc_roll_eta     0.3
+#define smc_pitch_eta    0.3
+#define smc_yaw_eta      0.3
 
 /***************************************************************
               recv signal conversion to desired values
 ***************************************************************/
-#define recv_signal_to_roll_angle 0.069f
-#define recv_signal_to_pitch_angle 0.051f
-#define recv_signal_to_yaw_angle 0.07f
+#define recv_signal_to_roll_angle 0.169f
+#define recv_signal_to_pitch_angle 0.151f
+#define recv_signal_to_yaw_angle 0.17f
 
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll -1.8
-#define angle_to_rate_pitch -1.8
-#define angle_to_rate_yaw -1.8
+#define angle_to_rate_roll -0.8
+#define angle_to_rate_pitch -0.8
+#define angle_to_rate_yaw -0.8
 
 /***************************************************************
                     quadcopter dynamics params
 ***************************************************************/
 //              battery  +    ESCs    +  motors   +   frame
-#define Ixx (0.000081599 + 0.00032233 + 0.0133609 + 0.0044966)
-#define Iyy (0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
-#define Izz (0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
-#define thrust_coeff 0
-#define drag_coeff 0
+#define Ixx 1000*(0.000081599 + 0.00032233 + 0.0133609 + 0.0044966)
+#define Iyy 1000*(0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
+#define Izz 1000*(0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
 
 #define LOOP_TIME 0.00503
 

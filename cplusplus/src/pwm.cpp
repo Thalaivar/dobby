@@ -84,7 +84,7 @@ int Motors::update(){
 		printf("ERROR: PRU PWM Controller not initialized\n");
 		return -1;
 	}
-
+	
 	//Capping Function:
 	for(int i = 0; i<4; i++){
 		if(this->channel_val[i]>2000)
@@ -105,20 +105,20 @@ int Motors::update(){
 
 void Motors::demux_torques_to_pwm(){
 
-	float mean_thrust = (recv->recv_channel[2] - THRUST_CONST)/THRUST_COEFF;
+	float mean_thrust = (float(recv->recv_channel[2]) - THRUST_CONST)*0.367;
 	float thrusts[4];
-	
-	thrusts[0] = (1/4)*(mean_thrust - (torques[2]/DRAG_COEFF) - (torques[0] + torques[1])/MOM_COEFF);
-	thrusts[1] = (1/4)*(mean_thrust - (torques[2]/DRAG_COEFF) + (torques[0] + torques[1])/MOM_COEFF);
-	thrusts[2] = (1/4)*(mean_thrust + (torques[2]/DRAG_COEFF) + (torques[0] - torques[1])/MOM_COEFF);
-	thrusts[3] = (1/4)*(mean_thrust + (torques[2]/DRAG_COEFF) - (torques[0] - torques[1])/MOM_COEFF);
+    
+	thrusts[0] = (0.25)*(mean_thrust - (torques[2]) - (torques[0] + torques[1])*MOM_COEFF);
+	thrusts[1] = (0.25)*(mean_thrust - (torques[2]) + (torques[0] + torques[1])*MOM_COEFF);
+	thrusts[2] = (0.25)*(mean_thrust + (torques[2]) + (torques[0] - torques[1])*MOM_COEFF);
+	thrusts[3] = (0.25)*(mean_thrust + (torques[2]) - (torques[0] - torques[1])*MOM_COEFF);
 
 	channel_val[0] = thrusts[0]*THRUST_COEFF + THRUST_CONST;
 	channel_val[1] = thrusts[1]*THRUST_COEFF + THRUST_CONST;
 	channel_val[2] = thrusts[2]*THRUST_COEFF + THRUST_CONST;
 	channel_val[3] = thrusts[3]*THRUST_COEFF + THRUST_CONST;
-
- //   cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl;
+	
+	cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl; 
 }
 
 Motors::Motors(Receiver *recv_ptr){

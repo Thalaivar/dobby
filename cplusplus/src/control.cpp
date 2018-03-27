@@ -105,9 +105,6 @@ void Control::get_body_rate_error(){
 void Control::run_smc_controller(){
 
   // declare state variables
-  float wx = imu->body_rates[ROLL];
-  float wy = imu->body_rates[PITCH];
-  float wz = imu->body_rates[YAW];
 
   // get latest desired body rates
   get_desired_body_rates();
@@ -115,7 +112,7 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
- // cout << error.body_rate_error[0] << " | " << error.body_rate_error[1] << " | " << error.body_rate_error[2] << endl;
+ // cout << error.body_rate_error[0]*RAD_TO_DEG << " | " << error.body_rate_error[1]*RAD_TO_DEG << " | " << error.body_rate_error[2]*RAD_TO_DEG << endl;
 
   // define the three sliding surfaces
   float s_phi = Ixx*error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
@@ -127,9 +124,9 @@ void Control::run_smc_controller(){
  // cout << error.ie_body_rate[ROLL] << " | " << error.ie_body_rate[PITCH] << " | " << error.ie_body_rate[YAW] << endl;
 
  // get controller outputs
-  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*sign(s_phi);
-  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*sign(s_theta);
-  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*sign(s_psi);
+  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*atan(s_phi);
+  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*atan(s_theta);
+  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*atan(s_psi);
 
  // cout << u_phi << " | " << u_theta << " | " << u_psi << endl;
 
@@ -141,9 +138,11 @@ void Control::run_smc_controller(){
   error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*LOOP_TIME;
 
   // update required torques converting kg -> gm
-  motors->torques[ROLL] = u_phi*1000;
-  motors->torques[PITCH] = u_theta*1000;
-  motors->torques[YAW] = u_psi*1000;
+  motors->torques[ROLL] = u_phi;
+  motors->torques[PITCH] = u_theta;
+  motors->torques[YAW] = u_psi;
+
+  // cout << motors->torques[ROLL] << " | " << motors->torques[PITCH] << " | " << motors->torques[YAW] << endl;
 }
 
 void flightMode::set_flight_mode(flight_mode desired_mode){

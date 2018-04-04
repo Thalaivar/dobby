@@ -112,21 +112,29 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
- // cout << error.body_rate_error[0]*RAD_TO_DEG << " | " << error.body_rate_error[1]*RAD_TO_DEG << " | " << error.body_rate_error[2]*RAD_TO_DEG << endl;
-
+  
+  if(error.ie_body_rate[ROLL] > 3.0f)
+  	error.ie_body_rate[ROLL] = 3.0f;
+  else if(error.ie_body_rate[ROLL] < -3.0f)
+  	error.ie_body_rate[ROLL] = -3.0f;
+  if(error.ie_body_rate[PITCH] > 3.0f)
+  	error.ie_body_rate[PITCH] = 3.0f;
+  else if(error.ie_body_rate[PITCH] < -3.0f)
+  	error.ie_body_rate[PITCH] = -3.0f;
+  
   // define the three sliding surfaces
-  float s_phi = Ixx*error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
-  float s_theta = Iyy*error.body_rate_error[PITCH] + smc_pitch_lambda*error.ie_body_rate[PITCH];
-  float s_psi = Izz*error.body_rate_error[YAW] + smc_yaw_lambda*error.ie_body_rate[YAW];
+  s_roll = error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
+  s_pitch = error.body_rate_error[PITCH] + smc_pitch_lambda*error.ie_body_rate[PITCH];
+  s_yaw = error.body_rate_error[YAW] + smc_yaw_lambda*error.ie_body_rate[YAW];
 
  // cout << s_phi << " | " << s_theta << " | " << s_psi << endl;
 
  // cout << error.ie_body_rate[ROLL] << " | " << error.ie_body_rate[PITCH] << " | " << error.ie_body_rate[YAW] << endl;
 
  // get controller outputs
-  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*atan(s_phi)*PI_BY_2_INV;
-  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*atan(s_theta)*PI_BY_2_INV;
-  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*atan(s_psi)*PI_BY_2_INV;
+  float u_phi = (Izz - Iyy)*imu->body_rates[PITCH]*imu->body_rates[YAW] - Ixx*smc_roll_lambda*error.body_rate_error[ROLL] - smc_roll_eta*atan(s_roll)*PI_BY_2_INV;
+  float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - Iyy*smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*atan(s_pitch)*PI_BY_2_INV;
+  float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - Izz*smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*atan(s_yaw)*PI_BY_2_INV;
 
   u_psi = 0;
 

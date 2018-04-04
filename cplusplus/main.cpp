@@ -49,6 +49,7 @@ int main(){
         dobby.radio_update_loop(current_time);
         dobby.control_loop(current_time);
         dobby.motor_update_loop(current_time);
+		dobby.logging_loop(current_time);
 	  }
     }
 	 }

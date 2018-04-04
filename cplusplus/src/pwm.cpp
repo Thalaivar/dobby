@@ -105,20 +105,24 @@ int Motors::update(){
 
 void Motors::demux_torques_to_pwm(){
 
-	float mean_thrust = (float(recv->recv_channel[2]) - THRUST_CONST)*0.367;
+	float mean_thrust = 4.00f*(float(recv->recv_channel[2]) - THRUST_CONST)*0.367;
 	float thrusts[4];
     
 	thrusts[0] = (0.25)*(mean_thrust - (torques[2]) - (torques[0] + torques[1])*MOM_COEFF);
 	thrusts[1] = (0.25)*(mean_thrust - (torques[2]) + (torques[0] + torques[1])*MOM_COEFF);
 	thrusts[2] = (0.25)*(mean_thrust + (torques[2]) + (torques[0] - torques[1])*MOM_COEFF);
 	thrusts[3] = (0.25)*(mean_thrust + (torques[2]) - (torques[0] - torques[1])*MOM_COEFF);
+	
+	//cout  << thrusts[0] << " | " << thrusts[1] << " | " << thrusts[2] << " | " << thrusts[3] << endl;
 
 	channel_val[0] = thrusts[0]*THRUST_COEFF + THRUST_CONST;
 	channel_val[1] = thrusts[1]*THRUST_COEFF + THRUST_CONST;
 	channel_val[2] = thrusts[2]*THRUST_COEFF + THRUST_CONST;
 	channel_val[3] = thrusts[3]*THRUST_COEFF + THRUST_CONST;
 	
-	cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl; 
+	//cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl; 
+
+
 }
 
 Motors::Motors(Receiver *recv_ptr){
@@ -202,24 +206,7 @@ int Motors::arm_motors(){
 	      recv->update();
 	    }
 	}
-	/*
-	// if user sends arm signal
-	int i = 0;
-	while((int)recv->recv_channel[2] < recv->cal_throttle[0] + 30 && (int)recv->recv_channel[3] > recv->cal_yaw[1] - 30 && \
-		(int)recv->recv_channel[1] < recv->cal_pitch[0] + 30 && (int)recv->recv_channel[0] > recv->cal_roll[1] - 30){
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-		i++;
-		cout << i << endl;
-		if (i == 10){
-			this->is_armed = true;
-			break;
-		}
-
-		else if(i > 10) break;
-	}
-	*/
+	
 	if (this->is_armed){
 		cout << "Motors armed!\n";
 		this->set_motors_spool_rate();

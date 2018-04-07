@@ -80,20 +80,26 @@ void flightMode::rotate_desired_euler_angles(){
 
 }
 
-void Control::get_desired_body_rates(){
-
-  error.angle_error[ROLL]  = (imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_euler_rotated[ROLL]);
-  error.angle_error[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH]);
+void Control::get_desired_euler_rates(){
+  error.attitude_error[ROLL]  = (imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_euler_rotated[ROLL]);
+  error.attitude_error[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH]);
 
   // get desired angular rates (by passing through simple P controller)
-  desired_body_rates[ROLL] = error.angle_error[ROLL]*angle_to_rate_roll;
-  desired_body_rates[PITCH] = error.angle_error[PITCH]*angle_to_rate_pitch;
-  desired_body_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
+  desired_euler_rates[ROLL] = error.angle_error[ROLL]*angle_to_rate_roll;
+  desired_euler_rates[PITCH] = error.angle_error[PITCH]*angle_to_rate_pitch;
+  desired_euler_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
 
-  desired_body_rates[ROLL]  = desired_body_rates[ROLL]*DEG_TO_RAD;
-  desired_body_rates[PITCH] = desired_body_rates[PITCH]*DEG_TO_RAD;
-  desired_body_rates[YAW]   = desired_body_rates[YAW]*DEG_TO_RAD;
+  desired_euler_rates[ROLL]  = desired_euler_rates[ROLL]*DEG_TO_RAD;
+  desired_euler_rates[PITCH] = desired_euler_rates[PITCH]*DEG_TO_RAD;
+  desired_euler_rates[YAW]   = desired_euler_rates[YAW]*DEG_TO_RAD;
 
+}
+
+void Control::get_desired_body_rates(){
+
+  desired_body_rates[ROLL]  = desired_euler_rates[ROLL] - sin(imu->euler_angles[PITCH])*desired_euler_rates[YAW];
+  desired_body_rates[PITCH] = desired_euler_rates[PITCH]*cos(imu->euler_angles[ROLL]) + desired_euler_rates[YAW]*sin(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH]);
+  desired_body_rates[YAW]   = cos(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH])*desired_euler_rates[YAW] - sin(imu->euler_angles[ROLL])*desired_euler_rates[PITCH];
 }
 
 void Control::get_body_rate_error(){
@@ -106,8 +112,9 @@ void Control::get_body_rate_error(){
 
 void Control::run_smc_controller(){
 
-  // declare state variables
-
+  // get latest desired euler rates
+  get_desired_euler_rates();
+  
   // get latest desired body rates
   get_desired_body_rates();
 

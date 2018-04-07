@@ -50,7 +50,7 @@ struct error_struct{
 
   float ie_body_rate[3]; // integral body rate error
   float body_rate_error[3];
-  float angle_error[3];
+  float attitude_error[3];
 };
 
 
@@ -74,11 +74,14 @@ class Control{
     // get desired body rates from desired euler rates
     void get_desired_body_rates();
 
+    void get_desired_euler_rates();
+
   public:
     void run_smc_controller();
 
     // desired body rates
     float desired_body_rates[3];
+    float desired_euler_rates[3];
 
 	  float s_roll, s_pitch, s_yaw;
 

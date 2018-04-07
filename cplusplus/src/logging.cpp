@@ -38,7 +38,7 @@ int Logging::log_s(float sx, float sy, float sz){
 }
 
 int Logging::log_ie_body_rate_error(float ie_wx, float ie_wy, float ie_wz){
-  if(fprintf(error_data_file, "%f,%f,%f\n", ie_wx, ie_wy, ie_wz) < 0){
+  if(fprintf(ie_data_file, "%f,%f,%f\n", ie_wx, ie_wy, ie_wz) < 0){
     this->log_fail_ie_body_rate_error++;
     return -1;
   }
@@ -47,7 +47,7 @@ int Logging::log_ie_body_rate_error(float ie_wx, float ie_wy, float ie_wz){
 }
 
 int Logging::log_attitude_error(float ex, float ey, float ez){
-  if(fprintf(error_data_file, "%f,%f,%f\n", ex, ey, ez) < 0){
+  if(fprintf(attitude_error_data_file, "%f,%f,%f\n", ex, ey, ez) < 0){
     this->log_fail_attitude_error++;
     return -1;
   }
@@ -64,8 +64,8 @@ Logging::Logging(){
   ie_data_file       = fopen("ie_data_file.txt", "w");
   attitude_error_data_file = fopen("attitude_error_data_file.txt", "w");
 
-  if(attitude_data_file == NULL && channel_data_file == NULL && error_data_file == NULL\
-     s_data_file == NULL && ie_data_file == NULL && attitude_error_data_file == NULL){
+  if(attitude_data_file == NULL && channel_data_file == NULL && error_data_file == NULL \
+     && s_data_file == NULL && ie_data_file == NULL && attitude_error_data_file == NULL)
     this->is_initialised = false;
   else
     this->is_initialised = true;

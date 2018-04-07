@@ -162,8 +162,8 @@ void Dobby::logging_loop(dobby_time current_time){
 	else{
 		times.logging_loop_prev_time = current_time;
 		logging.log_s(control.s_roll, control.s_pitch, control.s_yaw);
-    logging.log_attitude_error(control.error.angle_error[ROLL], control.error.angle_error[PITCH], control.error.angle_error[YAW]);
-    logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
+    	logging.log_attitude_error(control.error.angle_error[ROLL], control.error.angle_error[PITCH], control.error.angle_error[YAW]);
+    	logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
 	}
 }
 

@@ -115,14 +115,14 @@ void Control::run_smc_controller(){
   get_body_rate_error();
 
 
-  if(error.ie_body_rate[ROLL] > 3.0f)
-  	error.ie_body_rate[ROLL] = 3.0f;
-  else if(error.ie_body_rate[ROLL] < -3.0f)
-  	error.ie_body_rate[ROLL] = -3.0f;
-  if(error.ie_body_rate[PITCH] > 3.0f)
-  	error.ie_body_rate[PITCH] = 3.0f;
-  else if(error.ie_body_rate[PITCH] < -3.0f)
-  	error.ie_body_rate[PITCH] = -3.0f;
+  if(error.ie_body_rate[ROLL] > 6.0f)
+  	error.ie_body_rate[ROLL] = 6.0f;
+  else if(error.ie_body_rate[ROLL] < -6.0f)
+  	error.ie_body_rate[ROLL] = -6.0f;
+  if(error.ie_body_rate[PITCH] > 6.0f)
+  	error.ie_body_rate[PITCH] = 6.0f;
+  else if(error.ie_body_rate[PITCH] < -6.0f)
+  	error.ie_body_rate[PITCH] = -6.0f;
 
   // define the three sliding surfaces
   s_roll = error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];

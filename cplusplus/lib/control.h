@@ -47,9 +47,10 @@
 class flightMode;
 
 struct error_struct{
-  // integral body rate error
-  float ie_body_rate[3];
+
+  float ie_body_rate[3]; // integral body rate error
   float body_rate_error[3];
+  float angle_error[3];
 };
 
 
@@ -78,12 +79,12 @@ class Control{
 
     // desired body rates
     float desired_body_rates[3];
-	
-	float s_roll, s_pitch, s_yaw;
+
+	  float s_roll, s_pitch, s_yaw;
 
     error_struct error;
 
-	Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
+	  Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
 typedef enum flight_modes{
@@ -95,7 +96,7 @@ typedef enum flight_modes{
 class flightMode{
   public:
     flightMode(Receiver *recv_ptr, IMU *imu_ptr);
-    
+
     // to set current flight mode
     void set_flight_mode(flight_mode desired_mode);
 

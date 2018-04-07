@@ -82,16 +82,18 @@ void flightMode::rotate_desired_euler_angles(){
 
 void Control::get_desired_body_rates(){
 
+  error.angle_error[ROLL]  = (imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_euler_rotated[ROLL]);
+  error.angle_error[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH]);
+
   // get desired angular rates (by passing through simple P controller)
-  desired_body_rates[ROLL] = (imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_euler_rotated[ROLL])*angle_to_rate_roll;
-  desired_body_rates[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH])*angle_to_rate_pitch;
+  desired_body_rates[ROLL] = error.angle_error[ROLL]*angle_to_rate_roll;
+  desired_body_rates[PITCH] = error.angle_error[PITCH]*angle_to_rate_pitch;
   desired_body_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
 
   desired_body_rates[ROLL]  = desired_body_rates[ROLL]*DEG_TO_RAD;
   desired_body_rates[PITCH] = desired_body_rates[PITCH]*DEG_TO_RAD;
   desired_body_rates[YAW]   = desired_body_rates[YAW]*DEG_TO_RAD;
 
- //  cout << desired_body_rates[ROLL] << " | " << desired_body_rates[PITCH] << " | " << desired_body_rates[YAW] << endl;
 }
 
 void Control::get_body_rate_error(){
@@ -112,7 +114,7 @@ void Control::run_smc_controller(){
   // get latest body rate errors
   get_body_rate_error();
 
-  
+
   if(error.ie_body_rate[ROLL] > 3.0f)
   	error.ie_body_rate[ROLL] = 3.0f;
   else if(error.ie_body_rate[ROLL] < -3.0f)
@@ -121,7 +123,7 @@ void Control::run_smc_controller(){
   	error.ie_body_rate[PITCH] = 3.0f;
   else if(error.ie_body_rate[PITCH] < -3.0f)
   	error.ie_body_rate[PITCH] = -3.0f;
-  
+
   // define the three sliding surfaces
   s_roll = error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
   s_pitch = error.body_rate_error[PITCH] + smc_pitch_lambda*error.ie_body_rate[PITCH];

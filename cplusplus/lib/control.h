@@ -10,12 +10,12 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-#define smc_roll_lambda  1.024
-#define smc_pitch_lambda 1.324
-#define smc_yaw_lambda   0.324
-#define smc_roll_eta     1.6
-#define smc_pitch_eta    2.0
-#define smc_yaw_eta      1.6
+#define smc_roll_lambda  0.934
+#define smc_pitch_lambda 1.555
+#define smc_yaw_lambda   0.0
+#define smc_roll_eta     3.1
+#define smc_pitch_eta    2.2
+#define smc_yaw_eta      0.0
 
 /***************************************************************
               recv signal conversion to desired values
@@ -30,6 +30,14 @@
 #define angle_to_rate_roll -3.8
 #define angle_to_rate_pitch -3.8
 #define angle_to_rate_yaw -3.8
+
+/***************************************************************
+				integral windup limiters
+***************************************************************/
+#define INTG_WNDP_ROLL_POS 7.0f
+#define INTG_WNDP_ROLL_NEG -7.0f
+#define INTG_WNDP_PITCH_POS 10.0f
+#define INTG_WNDP_PITCH_NEG -6.0f
 
 /***************************************************************
                     quadcopter dynamics params
@@ -108,6 +116,10 @@ class flightMode{
 
     // holds current mode setting
     flight_mode current_mode;
+	
+	float desired_euler[3];
+	float desired_euler_rotated[3];
+
 
   private:
     // to access the receiver signals
@@ -117,10 +129,7 @@ class flightMode{
     IMU *imu;
 
     // holds latest desired values
-    float desired_euler[3];
-	  float desired_euler_rotated[3];
-
-	// to make sure angles are in terms of what the pilot "sees"
+    	// to make sure angles are in terms of what the pilot "sees"
     void rotate_desired_euler_angles();
 
     // controller needs access to desired trajectory/attitude

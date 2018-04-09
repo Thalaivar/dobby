@@ -28,9 +28,10 @@ int main(){
 
   char resp;
   short i = 0;
-
+  
   cout << "Enter \"y\" to continue: ";
   cin >> resp;
+  
 
   if(resp == 'y'){
     while(dobby.state == READY_TO_FLY){

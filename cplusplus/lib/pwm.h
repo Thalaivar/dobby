@@ -17,7 +17,7 @@
 
 #define ESC_LOW 1000
 #define ESC_HIGH 2000
-#define MOTOR_SPOOL_RATE 1100
+#define MOTOR_SPOOL_RATE 1075
 
 #define MOM_COEFF 5.917
 #define THRUST_COEFF 2.724

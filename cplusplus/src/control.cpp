@@ -85,8 +85,8 @@ void Control::get_desired_euler_rates(){
   error.attitude_error[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH]);
 
   // get desired angular rates (by passing through simple P controller)
-  desired_euler_rates[ROLL] = error.angle_error[ROLL]*angle_to_rate_roll;
-  desired_euler_rates[PITCH] = error.angle_error[PITCH]*angle_to_rate_pitch;
+  desired_euler_rates[ROLL] = error.attitude_error[ROLL]*angle_to_rate_roll;
+  desired_euler_rates[PITCH] = error.attitude_error[PITCH]*angle_to_rate_pitch;
   desired_euler_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
 
   desired_euler_rates[ROLL]  = desired_euler_rates[ROLL]*DEG_TO_RAD;
@@ -97,9 +97,22 @@ void Control::get_desired_euler_rates(){
 
 void Control::get_desired_body_rates(){
 
-  desired_body_rates[ROLL]  = desired_euler_rates[ROLL] - sin(imu->euler_angles[PITCH])*desired_euler_rates[YAW];
+  error.attitude_error[ROLL]  = (imu->euler_angles[ROLL]*RAD_TO_DEG - mode->desired_euler_rotated[ROLL]);
+  error.attitude_error[PITCH] = (imu->euler_angles[PITCH]*RAD_TO_DEG - mode->desired_euler_rotated[PITCH]);
+
+  // get desired angular rates (by passing through simple P controller)
+  desired_body_rates[ROLL] = error.attitude_error[ROLL]*angle_to_rate_roll;
+  desired_body_rates[PITCH] = error.attitude_error[PITCH]*angle_to_rate_pitch;
+  desired_body_rates[YAW] = mode->desired_euler_rotated[YAW]*angle_to_rate_yaw;
+
+  desired_body_rates[ROLL]  = desired_body_rates[ROLL]*DEG_TO_RAD;
+  desired_body_rates[PITCH] = desired_body_rates[PITCH]*DEG_TO_RAD;
+  desired_body_rates[YAW]   = desired_body_rates[YAW]*DEG_TO_RAD;
+
+
+  /*desired_body_rates[ROLL]  = desired_euler_rates[ROLL] - sin(imu->euler_angles[PITCH])*desired_euler_rates[YAW];
   desired_body_rates[PITCH] = desired_euler_rates[PITCH]*cos(imu->euler_angles[ROLL]) + desired_euler_rates[YAW]*sin(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH]);
-  desired_body_rates[YAW]   = cos(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH])*desired_euler_rates[YAW] - sin(imu->euler_angles[ROLL])*desired_euler_rates[PITCH];
+  desired_body_rates[YAW]   = cos(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH])*desired_euler_rates[YAW] - sin(imu->euler_angles[ROLL])*desired_euler_rates[PITCH];*/
 }
 
 void Control::get_body_rate_error(){
@@ -122,14 +135,14 @@ void Control::run_smc_controller(){
   get_body_rate_error();
 
 
-  if(error.ie_body_rate[ROLL] > 6.0f)
-  	error.ie_body_rate[ROLL] = 6.0f;
-  else if(error.ie_body_rate[ROLL] < -6.0f)
-  	error.ie_body_rate[ROLL] = -6.0f;
-  if(error.ie_body_rate[PITCH] > 6.0f)
-  	error.ie_body_rate[PITCH] = 6.0f;
-  else if(error.ie_body_rate[PITCH] < -6.0f)
-  	error.ie_body_rate[PITCH] = -6.0f;
+  if(error.ie_body_rate[ROLL] > INTG_WNDP_ROLL_POS)
+  	error.ie_body_rate[ROLL] = INTG_WNDP_ROLL_POS;
+  else if(error.ie_body_rate[ROLL] < INTG_WNDP_ROLL_NEG)
+  	error.ie_body_rate[ROLL] = INTG_WNDP_ROLL_NEG;
+  if(error.ie_body_rate[PITCH] > INTG_WNDP_PITCH_POS)
+  	error.ie_body_rate[PITCH] = INTG_WNDP_PITCH_POS;
+  else if(error.ie_body_rate[PITCH] < INTG_WNDP_PITCH_NEG)
+  	error.ie_body_rate[PITCH] = -INTG_WNDP_PITCH_NEG;
 
   // define the three sliding surfaces
   s_roll = error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
@@ -145,7 +158,6 @@ void Control::run_smc_controller(){
   float u_theta = (Ixx - Izz)*imu->body_rates[ROLL]*imu->body_rates[YAW] - Iyy*smc_pitch_lambda*error.body_rate_error[PITCH] - smc_pitch_eta*atan(s_pitch)*PI_BY_2_INV;
   float u_psi = (Iyy - Ixx)*imu->body_rates[PITCH]*imu->body_rates[ROLL] - Izz*smc_yaw_lambda*error.body_rate_error[YAW] - smc_yaw_eta*atan(s_yaw)*PI_BY_2_INV;
 
-  u_psi = 0;
 
   // update the value of integral body rate error
   error.ie_body_rate[ROLL]  += error.body_rate_error[ROLL]*LOOP_TIME;

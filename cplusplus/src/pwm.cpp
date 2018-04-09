@@ -113,14 +113,12 @@ void Motors::demux_torques_to_pwm(){
 	thrusts[2] = (0.25)*(mean_thrust + (torques[2]) + (torques[0] - torques[1])*MOM_COEFF);
 	thrusts[3] = (0.25)*(mean_thrust + (torques[2]) - (torques[0] - torques[1])*MOM_COEFF);
 	
-	//cout  << thrusts[0] << " | " << thrusts[1] << " | " << thrusts[2] << " | " << thrusts[3] << endl;
 
 	channel_val[0] = thrusts[0]*THRUST_COEFF + THRUST_CONST;
 	channel_val[1] = thrusts[1]*THRUST_COEFF + THRUST_CONST;
 	channel_val[2] = thrusts[2]*THRUST_COEFF + THRUST_CONST;
 	channel_val[3] = thrusts[3]*THRUST_COEFF + THRUST_CONST;
 	
-	//cout << channel_val[0] << " | " << channel_val[1] << " | " << channel_val[2] << " | " << channel_val[3] << endl; 
 
 
 }
@@ -151,20 +149,20 @@ int Motors::calibrate_esc(){
 	printf("ESC Calibration begun! Take all props off!\n");
 
 	//begin sending low pulse
-	printf("Sending 1000us pulse to all channels!\n");
-	channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
-	channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
-	channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
-	channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+	printf("Sending 2000us pulse to all channels!\n");
+	channels->ch1 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+	channels->ch2 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+	channels->ch3 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+	channels->ch4 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
 	printf("Connect ESCs and enter Y to send high pulse: ");
 	scanf("%c", &response);
 
 	if(response == 'Y'){
-			printf("Sending 2000us pulse to all channels!\n");
-			channels->ch1 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
-			channels->ch2 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
-			channels->ch3 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
-			channels->ch4 = ESC_HIGH*PULSE_TO_PRU_CYCLES;
+			printf("Sending 1000us pulse to all channels!\n");
+			channels->ch1 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+			channels->ch2 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+			channels->ch3 = ESC_LOW*PULSE_TO_PRU_CYCLES;
+			channels->ch4 = ESC_LOW*PULSE_TO_PRU_CYCLES;
 	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));

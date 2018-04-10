@@ -18,6 +18,21 @@
 #define smc_yaw_eta      0.0
 
 /***************************************************************
+						PID Params
+***************************************************************/
+#define pid_roll_kp 	0.00
+#define pid_pitch_kp	0.00
+#define pid_yaw_kp 		0.00
+
+#define pid_roll_ki 	0.00
+#define pid_pitch_ki	0.00
+#define pid_yaw_ki 		0.00
+
+#define pid_roll_kd 	0.00
+#define pid_pitch_kd	0.00 
+#define pid_yaw_kd 		0.00
+
+/***************************************************************
               recv signal conversion to desired values
 ***************************************************************/
 #define recv_signal_to_roll_angle 0.119f
@@ -48,17 +63,18 @@
 #define Izz 1000*(0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
 
 #define LOOP_TIME 0.00503
-
+#define INV_LOOP_TIME 200
 #define PI_BY_2_INV 0.6363
 
 // forward declaration to avoid error
 class flightMode;
 
 struct error_struct{
-
+  float body_rate_dError[3]; // Derivative of Body rate Error
   float ie_body_rate[3]; // integral body rate error
   float body_rate_error[3];
   float attitude_error[3];
+  float Prevbody_rate_error[3] = {0,0,0};
 };
 
 
@@ -86,6 +102,7 @@ class Control{
 
   public:
     void run_smc_controller();
+	void run_pid_controller();
 
     // desired body rates
     float desired_body_rates[3];

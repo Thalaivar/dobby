@@ -172,6 +172,62 @@ void Control::run_smc_controller(){
   // cout << motors->torques[ROLL] << " | " << motors->torques[PITCH] << " | " << motors->torques[YAW] << endl;
 }
 
+
+//CHECK AND CORRECT FOR ERRORS::
+void Control::run_pid_controller(){
+		
+	// get latest desired euler rates
+	get_desired_euler_rates();
+
+	// get latest desired body rates
+	get_desired_body_rates();
+
+	// get latest body rate errors
+	get_body_rate_error();
+
+	// update the value of integral body rate error
+	error.ie_body_rate[ROLL]  += error.body_rate_error[ROLL]*LOOP_TIME;
+	error.ie_body_rate[PITCH] += error.body_rate_error[PITCH]*LOOP_TIME;
+	error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*LOOP_TIME;
+
+	// Cap the Integral Error:
+	if(error.ie_body_rate[ROLL] > INTG_WNDP_ROLL_POS)
+		error.ie_body_rate[ROLL] = INTG_WNDP_ROLL_POS;
+	else if(error.ie_body_rate[ROLL] < INTG_WNDP_ROLL_NEG)
+		error.ie_body_rate[ROLL] = INTG_WNDP_ROLL_NEG;
+	
+	if(error.ie_body_rate[PITCH] > INTG_WNDP_PITCH_POS)
+		error.ie_body_rate[PITCH] = INTG_WNDP_PITCH_POS;
+	else if(error.ie_body_rate[PITCH] < INTG_WNDP_PITCH_NEG)
+		error.ie_body_rate[PITCH] = -INTG_WNDP_PITCH_NEG;
+
+	// update the value of derivative body rate error
+	if(error.body_rate_error[ROLL] - error.Prevbody_rate_error[ROLL] != 0)
+		error.body_rate_dError[ROLL]  = (error.body_rate_error[ROLL] - error.Prevbody_rate_error[ROLL])   * INV_LOOP_TIME; 
+
+	if(error.body_rate_error[PITCH] - error.Prevbody_rate_error[PITCH] != 0)
+		error.body_rate_dError[PITCH] = (error.body_rate_error[PITCH] - error.Prevbody_rate_error[PITCH]) * INV_LOOP_TIME;
+
+	if(error.body_rate_error[YAW] - error.Prevbody_rate_error[YAW] != 0)
+		error.body_rate_dError[YAW]   = (error.body_rate_error[YAW] - error.Prevbody_rate_error[YAW])     * INV_LOOP_TIME;
+	
+	//Compute the Desired Torque Inputs:	
+	float u_phi = pid_roll_kp * error.body_rate_error[ROLL] + pid_roll_ki * error.ie_body_rate[ROLL] + pid_roll_kd * error.body_rate_dError[ROLL];	
+	float u_theta = pid_pitch_kp * error.body_rate_error[PITCH] + pid_pitch_ki * error.ie_body_rate[PITCH] + pid_pitch_kd * error.body_rate_dError[PITCH];
+	float u_psi = pid_yaw_kp * error.body_rate_error[YAW] + pid_yaw_ki * error.ie_body_rate[YAW] + pid_yaw_kd * error.body_rate_dError[YAW];
+	
+	//SET VALUES FOR NEXT LOOP
+	error.Prevbody_rate_error[ROLL] = error.body_rate_error[ROLL];
+	error.Prevbody_rate_error[PITCH] = error.body_rate_error[PITCH];
+	error.Prevbody_rate_error[YAW] = error.body_rate_error[YAW];
+
+	// update required torques converting kg -> gm
+	motors->torques[ROLL] = u_phi;
+	motors->torques[PITCH] = u_theta;
+	motors->torques[YAW] = u_psi;
+}
+
+
 void flightMode::set_flight_mode(flight_mode desired_mode){
   switch(desired_mode){
 

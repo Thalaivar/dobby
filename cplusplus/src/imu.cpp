@@ -2,7 +2,7 @@
 
 IMU::IMU(void){
 
-    config.gyro_fsr = G_FSR_500DPS;
+    config.gyro_fsr = G_FSR_1000DPS;
     config.accel_fsr = A_FSR_4G;
     config.gyro_dlpf = GYRO_DLPF_92;
     config.accel_dlpf = ACCEL_DLPF_92;

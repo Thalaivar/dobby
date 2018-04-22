@@ -1,5 +1,5 @@
-#ifndef SMC_H
-#define SMC_H
+#ifndef CONTROL_H
+#define CONTROL_H
 
 #include <stdint.h>
 #include <cmath>
@@ -29,7 +29,7 @@
 #define pid_yaw_ki 		0.00
 
 #define pid_roll_kd 	0.00
-#define pid_pitch_kd	0.00 
+#define pid_pitch_kd	0.00
 #define pid_yaw_kd 		0.00
 
 /***************************************************************
@@ -42,9 +42,9 @@
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll -3.8
-#define angle_to_rate_pitch -3.8
-#define angle_to_rate_yaw -3.8
+#define angle_to_rate_roll 3.8
+#define angle_to_rate_pitch 3.8
+#define angle_to_rate_yaw 3.8
 
 /***************************************************************
 				integral windup limiters
@@ -86,9 +86,6 @@ class Control{
     // to access IMU data
     IMU *imu;
 
-	// holds outputs of controller
-    float control_signal[4];
-
     // to get attitude_rate_error
     void get_body_rate_error();
 
@@ -98,16 +95,20 @@ class Control{
     // get desired body rates from desired euler rates
     void get_desired_body_rates();
 
+    // get desired euler rates from current euler angle error
     void get_desired_euler_rates();
+
+    // get latest integral error
+    void get_ie_body_rate_error();
 
   public:
     void run_smc_controller();
-	void run_pid_controller();
+	  void run_pid_controller();
 
     // desired body rates
     float desired_body_rates[3];
     float desired_euler_rates[3];
-
+    float u_phi, u_theta, u_psi;
 	  float s_roll, s_pitch, s_yaw;
 
     error_struct error;
@@ -133,10 +134,9 @@ class flightMode{
 
     // holds current mode setting
     flight_mode current_mode;
-	
-	float desired_euler[3];
-	float desired_euler_rotated[3];
 
+    // current desired euler angles
+	  float desired_euler[3];
 
   private:
     // to access the receiver signals
@@ -144,10 +144,6 @@ class flightMode{
 
     // to access imu data
     IMU *imu;
-
-    // holds latest desired values
-    	// to make sure angles are in terms of what the pilot "sees"
-    void rotate_desired_euler_angles();
 
     // controller needs access to desired trajectory/attitude
     friend class Control;

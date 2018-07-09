@@ -77,9 +77,6 @@ int Dobby::setup(){
 	return -1;
   }
 
-  imu.set_initialYaw();
-
-
   return 0;
 }
 

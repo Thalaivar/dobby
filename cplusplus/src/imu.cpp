@@ -6,14 +6,18 @@ IMU::IMU(void){
     config.accel_fsr =  ACCEL_FSR_4G;
     config.gyro_dlpf = GYRO_DLPF_92;
     config.accel_dlpf = ACCEL_DLPF_92;
-
+	config.i2c_bus = I2C_BUS;
+	config.i2c_addr = I2C_ADDR;
     config.enable_magnetometer = 1;
-
+    config.dmp_fetch_accel_gyro = 0;
+	config.dmp_auto_calibrate_gyro = 1;
     config.dmp_sample_rate = 200;
     config.orient = ORIENTATION_Z_UP;
     config.compass_time_constant = 2.0;
-    config.dmp_interrupt_priority = sched_get_priority_max(SCHED_FIFO)-1;
+    config.dmp_interrupt_priority = 0;
     config.show_warnings = 0;
+    config.gpio_interrupt_pin_chip = GPIO_INT_PIN_CHIP;
+    config.gpio_interrupt_pin = GPIO_INT_PIN_PIN;
 
     this->is_initialized = false;
     this->is_calibrated = false;

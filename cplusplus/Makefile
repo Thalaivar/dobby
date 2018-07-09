@@ -17,6 +17,15 @@ $(TARGET): $(OBJ) $(TARGET).o
 	@echo "$(TARGET).cpp compiled!"
 	@echo "****************************"
 
+imu_test: $(OBJ) imu_test.o
+	@$(CC) $^ -o $@ $(LFLAGS) $(CFLAGS)
+	@rm imu_test.o
+	@echo "****************************"
+	@echo "imu_test.cpp compiled!"
+	@echo "****************************"
+
+
+
 %.o: %.cpp $(DEPS)
 	@$(CC) -c $< -o $@ $(LFLAGS) $(CFLAGS)
 	@echo "Compiled: "$<

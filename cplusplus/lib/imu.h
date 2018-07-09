@@ -6,40 +6,20 @@
 #define IMU_H
 
 #include <robotcontrol.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <getopt.h>
-#include <termios.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>	// for uint8_t types etc
-#include <sys/stat.h>
-#include <time.h>		// usleep, nanosleep
-#include <math.h>		// atan2 and fabs
 #include <signal.h>		// capture ctrl-c
 #include <pthread.h>	// multi-threading
-#include <linux/input.h>// buttons
-#include <poll.h> 		// interrupt events
-#include <sys/mman.h>	// mmap for accessing eQep
-#include <sys/socket.h>	// udp socket
-#include <netinet/in.h>	// udp socket
-#include <sys/time.h>
-#include <arpa/inet.h>	// udp socket
-#include <ctype.h>		// for isprint()
-#include <sys/select.h>	// for read timeout
 #include <iostream>
-#include <thread>
-#include <chrono>
 
 using namespace std;
 
 #define ROLL 0
 #define PITCH 1
 #define YAW 2
+#define I2C_BUS 2
+#define I2C_ADDR 0x68
+#define GPIO_INT_PIN_CHIP 3
+#define GPIO_INT_PIN_PIN 21
 
 class IMU{
   public:

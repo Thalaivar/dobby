@@ -26,8 +26,8 @@ using namespace std;
   * ARMED = State before FLYING, can only be set if previous state was READY_TO_FLY
   * DISARMED = State usually after flying, device still ready for take off
   * NOT_READY_TO_FLY = pre flight checks (and others?) need to be done
-  * RUNNING = main program execution has begun, dobby's state is set to this at the very start
-  * EXITING = main program execution over, set when all flying is over
+  * RUN = main program execution has begun, dobby's state is set to this at the very start
+  * EXIT = main program execution over, set when all flying is over
 **********************************************************************************/
 typedef enum dobby_status{
   READY_TO_FLY = 0,
@@ -88,7 +88,7 @@ class Dobby{
     void radio_update_loop(dobby_time current_time);
 
     void motor_update_loop(dobby_time current_time);
-	
+
 	void logging_loop(dobby_time current_time);
 
     // to reset all times for the different loops, to be called just before FLYING

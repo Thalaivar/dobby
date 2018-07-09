@@ -5,7 +5,7 @@
 #ifndef IMU_H
 #define IMU_H
 
-#include <roboticscape.h>
+#include <robotcontrol.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -37,17 +37,14 @@
 
 using namespace std;
 
-#define RAD_TO_DEG 57.295
-#define DEG_TO_RAD 0.01745
-
 #define ROLL 0
 #define PITCH 1
 #define YAW 2
 
 class IMU{
   public:
-    rc_imu_config_t config;
-    rc_imu_data_t   data;
+    rc_mpu_config_t config;
+    rc_mpu_data_t   data;
 
     // angle rates in euler frames in DPS
     float euler_rates[3];

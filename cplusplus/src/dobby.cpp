@@ -72,7 +72,7 @@ int Dobby::setup(){
     return -1;
   }
 
-  if(rc_set_cpu_freq(FREQ_1000MHZ) < 0){
+  if(rc_cpu_set_governor(RC_GOV_PERFORMANCE)< 0){
   	std::cerr << "CPU frequency setting failed!" << '\n';
 	return -1;
   }
@@ -165,7 +165,6 @@ void Dobby::logging_loop(dobby_time current_time){
     	//logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
 		logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
 		logging.log_attitude(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
-		logging.log_desired_attitude(mode.desired_euler_rotated[ROLL], mode.desired_euler_rotated[PITCH], mode.desired_euler_rotated[YAW]);
 	}
 }
 

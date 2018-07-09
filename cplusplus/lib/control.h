@@ -103,17 +103,17 @@ class Control{
 
   public:
     void run_smc_controller();
-	  void run_pid_controller();
+	void run_pid_controller();
 
     // desired body rates
     float desired_body_rates[3];
     float desired_euler_rates[3];
     float u_phi, u_theta, u_psi;
-	  float s_roll, s_pitch, s_yaw;
+	float s_roll, s_pitch, s_yaw;
 
     error_struct error;
 
-	  Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
+	Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };
 
 typedef enum flight_modes{

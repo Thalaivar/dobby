@@ -1,7 +1,7 @@
 CC = g++-6
 LIB = lib
 SRC = src
-LFLAGS = -lroboticscape -lprussdrv -lrt -Wall
+LFLAGS = -lprussdrv -lrt -Wall -l:librobotcontrol.so.1 -pthread -lm
 CFLAGS = -I$(LIB)/
 
 DEPS = $(wildcard $(LIB)/*.h)

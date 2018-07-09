@@ -93,14 +93,14 @@ void Control::get_body_rate_error(){
   error.body_rate_error[YAW]   = desired_body_rates[YAW] - imu->body_rates[PITCH];
 }
 
-void get_ie_body_rate_error(){
+void Control::get_ie_body_rate_error(){
   // update the value of integral body rate error
   error.ie_body_rate[ROLL]  += error.body_rate_error[ROLL]*LOOP_TIME;
   error.ie_body_rate[PITCH] += error.body_rate_error[PITCH]*LOOP_TIME;
   error.ie_body_rate[YAW]   += error.body_rate_error[YAW]*LOOP_TIME;
 }
 
-void Control::run_smc_rate_controller(){
+void Control::run_smc_controller(){
 
   // get latest desired euler rates
   get_desired_euler_rates();

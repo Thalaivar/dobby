@@ -47,7 +47,14 @@ int IMU::init_imu(){
       }
     }
 
-    if(rc_mpu_is_mag_calibrated() == 1 && rc_mpu_is_gyro_calibrated() == 1){
+	if(rc_mpu_is_accel_calibrated() == 0){
+      printf("Accel needs calibration!\nRunning gyro calibration routine....\n");
+      if(rc_mpu_calibrate_accel_routine(config) < 0) {
+        printf("Accel calibration failed!\n");
+        return -1;
+      }
+    }
+    if(rc_mpu_is_mag_calibrated() == 1 && rc_mpu_is_gyro_calibrated() == 1 && rc_mpu_is_accel_calibrated() == 1){
       this->is_calibrated = true;
     }
 

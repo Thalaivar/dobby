@@ -80,6 +80,38 @@ int Dobby::setup(){
   return 0;
 }
 
+int Dobby::imu_test_setup(){
+  //initialize the IMU
+  if(imu.init_imu() < 0){
+    std::cerr << "IMU failed to initialize" << '\n';
+    return -1;
+  }
+
+  if(rc_cpu_set_governor(RC_GOV_PERFORMANCE)< 0){
+  	std::cerr << "CPU frequency setting failed!" << '\n';
+	return -1;
+  }
+
+  return 0;
+}
+
+void Dobby::imu_test_update_loop(dobby_time current_time){
+    auto imu_test_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.imu_test_update_loop_prev_time);
+    times.imu_test_update_loop_time = imu_test_loop.count();
+
+    if(times.imu_test_update_loop_time < FASTLOOP_PERIOD)
+      return;
+
+    else{
+
+      times.imu_test_update_loop_prev_time = current_time;
+
+      imu.update();
+      return;
+      
+    }
+}
+
 void Dobby::control_loop(dobby_time current_time){
 
   auto fast_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.fast_loop_prev_time);
@@ -165,6 +197,19 @@ void Dobby::logging_loop(dobby_time current_time){
 	}
 }
 
+void Dobby::imu_test_logging_loop(dobby_time current_time){
+  auto imu_test_log_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.imu_test_log_loop_prev_time);
+  	times.imu_test_log_loop_time = log_loop.count();
+
+    if(time.imu_test_log_loop_time < LOG_LOOP_PERIOD)
+      return;
+
+    else{
+      time.imu_test_log_loop_prev_time = current_time;
+      logging.log_attitude(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
+      return;
+    }
+}
 void Dobby::reset_all_times(){
 
   dobby_time t1 = timer::now();

@@ -13,47 +13,76 @@ void exit_Handler(int a){
  }
 
 
-int main(){
+int main(int argc, char** argv){
 
   signal(SIGINT, exit_Handler);
 
   // program has started
   dobby.state = RUN;
-
-  dobby.setup();
-
-  dobby.pre_flight_checks();
-
   dobby_time current_time;
-
   char resp;
   short i = 0;
-  
-  cout << "Enter \"y\" to continue: ";
-  cin >> resp;
-  
 
-  if(resp == 'y'){
-    while(dobby.state == READY_TO_FLY){
-    dobby.radio.update();
-	  dobby.motors.arm_motors();
-	  if(dobby.motors.is_armed) dobby.state = ARMED;
-	  while(dobby.state == ARMED){
-	  dobby.radio.update();
-      if(dobby.radio.recv_channel[2] > 1200) dobby.state = FLYING;
-		  while(dobby.state == FLYING){
-        if(i == 0){
-          dobby.reset_all_times();
-          i++;
-         }
-        current_time = timer::now();
-        dobby.radio_update_loop(current_time);
-        dobby.control_loop(current_time);
-        dobby.motor_update_loop(current_time);
-		dobby.logging_loop(current_time);
-	  }
+  if(opt == "-i"){
+    if(dobby.imu_test_setup() < 0){
+      cout << "****** program halted ********" << endl;
+      return 0;
     }
-	 }
+
+    if(dobby.imu.is_initialized && dobby.imu.is_calibrated)
+      dobby.state == READY_TO_FLY;
+
+    cout << "****************************\n*      Beginning IMU Test      *\n****************************"
+ << endl;
+    cout << "Enter \"y\" to continue: ";
+    cin >> resp;
+
+    if(resp == "y"){
+      while(dobby.state == READY_TO_FLY){
+          if(i == 0){
+            dobby.reset_all_times();
+            i++;
+          }
+
+          current_time = timer::now();
+          dobby.imu_test_update_loop(current_time);
+          dobby.imu_test_logging_loop(current_time);
+      }
+    }
   }
-  return 0;
+
+  else if(opt == "-r"){
+    dobby.setup();
+
+    dobby.pre_flight_checks();
+
+    cout << "Enter \"y\" to continue: ";
+    cin >> resp;
+
+
+    if(resp == 'y'){
+      while(dobby.state == READY_TO_FLY){
+      dobby.radio.update();
+  	  dobby.motors.arm_motors();
+  	  if(dobby.motors.is_armed) dobby.state = ARMED;
+  	  while(dobby.state == ARMED){
+  	  dobby.radio.update();
+        if(dobby.radio.recv_channel[2] > 1200) dobby.state = FLYING;
+  		  while(dobby.state == FLYING){
+          if(i == 0){
+            dobby.reset_all_times();
+            i++;
+           }
+          current_time = timer::now();
+          dobby.radio_update_loop(current_time);
+          dobby.control_loop(current_time);
+          dobby.motor_update_loop(current_time);
+  		dobby.logging_loop(current_time);
+  	  }
+      }
+  	 }
+    }
+
+    return 0;
+  }
 }

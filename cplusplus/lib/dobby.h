@@ -50,10 +50,14 @@ struct loop_times{
   double radio_loop_time;
   double motor_loop_time;
   double logging_loop_time;
+  double imu_test_log_loop_time;
+  double imu_test_update_loop_time;
   dobby_time fast_loop_prev_time;
   dobby_time radio_loop_prev_time;
   dobby_time motor_loop_prev_time;
   dobby_time logging_loop_prev_time;
+  dobby_time imu_test_log_loop_prev_time;
+  dobby_time imu_test_update_loop_prev_time;
 };
 
 /***********************************************************
@@ -70,7 +74,7 @@ class Dobby{
     Motors motors = Motors(&radio);
     flightMode mode = flightMode(&radio, &imu);
     Control control = Control(&motors, &mode, &imu);\
-	Logging logging;
+  	Logging logging;
 
     // pre flight checks
     int pre_flight_checks();
@@ -89,10 +93,17 @@ class Dobby{
 
     void motor_update_loop(dobby_time current_time);
 
-	void logging_loop(dobby_time current_time);
+	  void logging_loop(dobby_time current_time);
+
+    // while testing imu
+    void imu_test_logging_loop(dobby_time current_time);
+    void imu_test_update_loop(dobby_time current_time);
 
     // to reset all times for the different loops, to be called just before FLYING
     void reset_all_times();
+
+    // when imu testing is being done
+    int imu_test_setup();
 
     // holds current status of dobby
     dobby_status state;

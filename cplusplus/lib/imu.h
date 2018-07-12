@@ -42,13 +42,6 @@ class IMU{
     // call this to get latest euler angles
     void update();
 
-	  // to get the initial yaw heading
-	  void set_initialYaw();
-
-	  // get yaw calibrated to initial yaw
-	  float get_calYaw(float rawYaw);
-
-	  float initialYaw;
 
     bool is_initialized;
     bool is_calibrated;

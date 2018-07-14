@@ -20,9 +20,9 @@
 /***************************************************************
 						PID Params
 ***************************************************************/
-#define pid_roll_kp 	0.00
-#define pid_pitch_kp	0.00
-#define pid_yaw_kp 		0.00
+#define pid_roll_kp 	1.00
+#define pid_pitch_kp	1.00
+#define pid_yaw_kp 		1.00
 
 #define pid_roll_ki 	0.00
 #define pid_pitch_ki	0.00
@@ -42,9 +42,9 @@
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll  0
-#define angle_to_rate_pitch 0
-#define angle_to_rate_yaw   0
+#define angle_to_rate_roll  3
+#define angle_to_rate_pitch 3
+#define angle_to_rate_yaw   3
 
 /***************************************************************
 				integral windup limiters
@@ -109,7 +109,7 @@ class Control{
     float desired_body_rates[3];
     float desired_euler_rates[3];
     float u_phi, u_theta, u_psi;
-	  float s_roll, s_pitch, s_yaw;
+	float s_roll, s_pitch, s_yaw;
 
     error_struct error;
 

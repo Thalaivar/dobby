@@ -80,7 +80,7 @@ int Dobby::setup(){
   return 0;
 }
 
-int Dobby:one_dof_setup(){
+int Dobby::one_dof_setup(){
   // initialize the Motors
   if(motors.initialize_pru() < 0){
     std::cerr << "Motors failed to initialize!" << '\n';
@@ -129,7 +129,7 @@ int Dobby:one_dof_setup(){
   }
 
   cout << "************************\n*  Ready for 1DOF test *\n************************" << endl;
-  this->state = 1DOF_TEST_READY;
+  this->state = ONE_DOF_TEST_READY;
   return 0;
 }
 
@@ -324,10 +324,11 @@ void Dobby::logging_loop(dobby_time current_time){
 	else{
 		times.logging_loop_prev_time = current_time;
 		//logging.log_s(control.s_roll, control.s_pitch, control.s_yaw);
-    logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
+    	logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
 		logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
 		logging.log_attitude_error(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
-    logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW])    
+    	logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);    
+		logging.log_desired_body_rates(control.desired_body_rates[ROLL], control.desired_body_rates[PITCH], control.desired_body_rates[YAW]);
 	}
 }
 

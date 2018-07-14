@@ -116,7 +116,7 @@ int main(int argc, char** argv){
     return 0;
   }
 
-  else if(*opt = 't'){
+  else if(*opt == 't'){
     if(dobby.one_dof_setup() < 0){
       cout << "********* program halted! **********" << endl;
       return 0;
@@ -127,7 +127,7 @@ int main(int argc, char** argv){
 
     if(resp == 'y'){
       dobby.motors.set_motors_spool_rate();
-      while(dobby.state == 11DOF_TEST_READY){
+      while(dobby.state == ONE_DOF_TEST_READY){
         if(i == 0){
           dobby.reset_all_times();
           i++;

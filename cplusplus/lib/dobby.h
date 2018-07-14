@@ -32,7 +32,7 @@ using namespace std;
 typedef enum dobby_status{
   READY_TO_FLY = 0,
   FLYING,
-  1DOF_TEST_READY,
+  ONE_DOF_TEST_READY,
   ARMED,
   DISARMED,
   NOT_READY_TO_FLY,
@@ -86,15 +86,18 @@ class Dobby{
 
     // setup function
     int setup();
+	int one_dof_setup();
 
     // main loop
     void control_loop(dobby_time current_time);
+	void control_loop_1DOF(dobby_time current_time);
 
     void radio_update_loop(dobby_time current_time);
 
     void motor_update_loop(dobby_time current_time);
+	void motor_update_loop_1DOF(dobby_time current_time);
 
-	  void logging_loop(dobby_time current_time);
+	void logging_loop(dobby_time current_time);
 
     // while testing imu
     void imu_test_logging_loop(dobby_time current_time);

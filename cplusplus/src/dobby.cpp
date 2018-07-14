@@ -47,7 +47,7 @@ int Dobby::pre_flight_checks(){
   }
 
   // if everything checks out, ready to fly!
-  cerr << "DOBBY IS READY!\n";
+  cout << "DOBBY IS READY!\n";
   this->state = READY_TO_FLY;
   return 0;
 }
@@ -77,6 +77,59 @@ int Dobby::setup(){
 	return -1;
   }
 
+  return 0;
+}
+
+int Dobby:one_dof_setup(){
+  // initialize the Motors
+  if(motors.initialize_pru() < 0){
+    std::cerr << "Motors failed to initialize!" << '\n';
+    return -1;
+  }
+
+  //initialize the IMU
+  if(imu.init_imu() < 0){
+    std::cerr << "IMU failed to initialize" << '\n';
+    return -1;
+  }
+
+  // max CPU performance
+  if(rc_cpu_set_governor(RC_GOV_PERFORMANCE)< 0){
+  	std::cerr << "CPU frequency setting failed!" << '\n';
+	return -1;
+  }
+
+  // set flight_mode for 1DOF testing
+  mode.set_flight_mode(ONE_DOF_TEST);
+
+  // check IMU
+  if(!imu.is_initialized){
+    std::cerr << "IMU not initialized!\n";
+    return -1;
+  }
+
+  // check if flight mode is set
+  if(mode.current_mode == NOT_SET){
+    std::cerr << "Flight mode not set, cant take off!\n";
+    return -1;
+  }
+
+  // any checks for controller?
+
+  // check Motors
+  if(!motors.is_pru_initialized){
+    std::cerr << "Motors are not initialized" << '\n';
+    return -1;
+  }
+
+  // check if IMU is calibrated
+  if(!imu.is_calibrated){
+    std::cerr << "IMU not calibrated!" << '\n';
+    return -1;
+  }
+
+  cout << "************************\n*  Ready for 1DOF test *\n************************" << endl;
+  this->state = 1DOF_TEST_READY;
   return 0;
 }
 
@@ -153,6 +206,30 @@ void Dobby::control_loop(dobby_time current_time){
   }
 }
 
+void Dobby::control_loop_1DOF(dobby_time current_time){
+  auto fast_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.fast_loop_prev_time);
+  times.fast_loop_time = fast_loop.count();
+
+
+  if(times.fast_loop_time < FASTLOOP_PERIOD)
+    return;
+
+  else{
+    times.fast_loop_prev_time = current_time;
+
+    // get latest attitude
+    imu.update();
+
+    // get desired stuff
+    mode.flight_mode_update();
+
+    // call smc controller
+    control.run_pid_controller();
+
+    return;
+  }
+}
+
 void Dobby::radio_update_loop(dobby_time current_time){
 
   auto radio_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.radio_loop_prev_time);
@@ -195,6 +272,28 @@ void Dobby::motor_update_loop(dobby_time current_time){
   }
 }
 
+void Dobby::motor_update_loop_1DOF(dobby_time current_time){
+  auto motor_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.motor_loop_prev_time);
+  times.motor_loop_time = motor_loop.count();
+
+  if(times.motor_loop_time < MOTOR_LOOP_PERIOD)
+      return;
+
+  else{
+
+    times.motor_loop_prev_time = current_time;
+
+    // get pwm signals
+    motors.demux_torques_to_pwm_1DOF();
+
+    motors.update();
+    // cout << imu.body_rates[ROLL] << " | " << imu.body_rates[PITCH] << " | " << imu.body_rates[YAW] << endl;
+    // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
+    // cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
+
+    return;
+  }
+}
 void Dobby::pwm_test_loop(dobby_time current_time, int* desired_test_pwm){
   auto motor_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.motor_loop_prev_time);
   times.motor_loop_time = motor_loop.count();
@@ -224,10 +323,11 @@ void Dobby::logging_loop(dobby_time current_time){
 
 	else{
 		times.logging_loop_prev_time = current_time;
-		logging.log_s(control.s_roll, control.s_pitch, control.s_yaw);
-    	//logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
+		//logging.log_s(control.s_roll, control.s_pitch, control.s_yaw);
+    logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
 		logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
-		logging.log_attitude(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
+		logging.log_attitude_error(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
+    logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW])    
 	}
 }
 

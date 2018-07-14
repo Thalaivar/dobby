@@ -84,11 +84,11 @@ int Motors::update(){
 		printf("ERROR: PRU PWM Controller not initialized\n");
 		return -1;
 	}
-	
+
 	//Capping Function:
 	for(int i = 0; i<4; i++){
-		if(this->channel_val[i]>2000)
-			this->channel_val[i] = 2000;
+		if(this->channel_val[i]>1800)
+			this->channel_val[i] = 1800;
 
 		else if(this->channel_val[i]<1000)
 			this->channel_val[i] = 1000;
@@ -107,22 +107,37 @@ void Motors::demux_torques_to_pwm(){
 
 	float mean_thrust = 4.00f*(float(recv->recv_channel[2]) - THRUST_CONST)*0.367;
 	float thrusts[4];
-    
+
 	thrusts[0] = (0.25)*(mean_thrust - (torques[2]) - (torques[0] + torques[1])*MOM_COEFF);
 	thrusts[1] = (0.25)*(mean_thrust - (torques[2]) + (torques[0] + torques[1])*MOM_COEFF);
 	thrusts[2] = (0.25)*(mean_thrust + (torques[2]) + (torques[0] - torques[1])*MOM_COEFF);
 	thrusts[3] = (0.25)*(mean_thrust + (torques[2]) - (torques[0] - torques[1])*MOM_COEFF);
-	
+
 
 	channel_val[0] = thrusts[0]*THRUST_COEFF + THRUST_CONST;
 	channel_val[1] = thrusts[1]*THRUST_COEFF + THRUST_CONST;
 	channel_val[2] = thrusts[2]*THRUST_COEFF + THRUST_CONST;
 	channel_val[3] = thrusts[3]*THRUST_COEFF + THRUST_CONST;
-	
+
 
 
 }
 
+void Motors::demux_torques_to_pwm_1DOF(){
+	float mean_thrust = 4.00f*(float(1500) - THRUST_CONST)*0.367;
+	float thrusts[4];
+
+	thrusts[0] = (0.25)*(mean_thrust - (torques[2]) - (torques[0] + torques[1])*MOM_COEFF);
+	thrusts[1] = (0.25)*(mean_thrust - (torques[2]) + (torques[0] + torques[1])*MOM_COEFF);
+	thrusts[2] = (0.25)*(mean_thrust + (torques[2]) + (torques[0] - torques[1])*MOM_COEFF);
+	thrusts[3] = (0.25)*(mean_thrust + (torques[2]) - (torques[0] - torques[1])*MOM_COEFF);
+
+
+	channel_val[0] = thrusts[0]*THRUST_COEFF + THRUST_CONST;
+	channel_val[1] = thrusts[1]*THRUST_COEFF + THRUST_CONST;
+	channel_val[2] = thrusts[2]*THRUST_COEFF + THRUST_CONST;
+	channel_val[3] = thrusts[3]*THRUST_COEFF + THRUST_CONST;
+}
 Motors::Motors(Receiver *recv_ptr){
 
 	// make channel pointer point to struct
@@ -204,7 +219,7 @@ int Motors::arm_motors(){
 	      recv->update();
 	    }
 	}
-	
+
 	if (this->is_armed){
 		cout << "Motors armed!\n";
 		this->set_motors_spool_rate();

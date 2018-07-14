@@ -115,4 +115,31 @@ int main(int argc, char** argv){
 
     return 0;
   }
+
+  else if(*opt = 't'){
+    if(dobby.one_dof_setup() < 0){
+      cout << "********* program halted! **********" << endl;
+      return 0;
+    }
+
+    cout << "Enter \"y\" to continue and arm motors: ";
+    cin >> resp;
+
+    if(resp == 'y'){
+      dobby.motors.set_motors_spool_rate();
+      while(dobby.state == 11DOF_TEST_READY){
+        if(i == 0){
+          dobby.reset_all_times();
+          i++;
+         }
+
+        current_time = timer::now();
+        dobby.control_loop_1DOF(current_time);
+        dobby.motor_update_loop_1DOF(current_time);
+        dobby.logging_loop(current_time);
+      }
+    }
+  }
+
+  return 0;
 }

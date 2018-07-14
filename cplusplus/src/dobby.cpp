@@ -80,6 +80,21 @@ int Dobby::setup(){
   return 0;
 }
 
+int Dobby::pwm_test_setup(){
+  // initialize the Motors
+  if(motors.initialize_pru() < 0){
+    std::cerr << "Motors failed to initialize!" << '\n';
+    return -1;
+  }
+
+  if(rc_cpu_set_governor(RC_GOV_PERFORMANCE)< 0){
+    std::cerr << "CPU frequency setting failed!" << '\n';
+  return -1;
+  }
+
+  return 0;
+}
+
 int Dobby::imu_test_setup(){
   //initialize the IMU
   if(imu.init_imu() < 0){
@@ -108,7 +123,7 @@ void Dobby::imu_test_update_loop(dobby_time current_time){
 
       imu.update();
       return;
-      
+
     }
 }
 
@@ -176,6 +191,25 @@ void Dobby::motor_update_loop(dobby_time current_time){
     // cout << radio.recv_channel[0] << " | " << radio.recv_channel[1] << " | " << radio.recv_channel[2] << " | " << radio.recv_channel[3] << endl;
     // cout << motors.torques[0] << " | " << motors.torques[1] << " | " << motors.torques[2] << endl;
 
+    return;
+  }
+}
+
+void Dobby::pwm_test_loop(dobby_time current_time, int* desired_test_pwm){
+  auto motor_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.motor_loop_prev_time);
+  times.motor_loop_time = motor_loop.count();
+
+  if(times.motor_loop_time < MOTOR_LOOP_PERIOD)
+    return;
+
+  else{
+
+    times.motor_loop_prev_time = current_time;
+    motors.channel_val[0] = *desired_test_pwm[0];
+    motors.channel_val[1] = *desired_test_pwm[1];
+    motors.channel_val[2] = *desired_test_pwm[2];
+    motors.channel_val[3] = *desired_test_pwm[3];
+    motors.update();
     return;
   }
 }

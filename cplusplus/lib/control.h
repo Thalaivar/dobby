@@ -42,9 +42,9 @@
 /***************************************************************
           angle error to rate error conversion params
 ***************************************************************/
-#define angle_to_rate_roll 3.8
-#define angle_to_rate_pitch 3.8
-#define angle_to_rate_yaw 3.8
+#define angle_to_rate_roll  0
+#define angle_to_rate_pitch 0
+#define angle_to_rate_yaw   0
 
 /***************************************************************
 				integral windup limiters
@@ -70,11 +70,11 @@
 class flightMode;
 
 struct error_struct{
-  float body_rate_dError[3]; // Derivative of Body rate Error
+  float d_body_rate_error[3]; // Derivative of Body rate Error
   float ie_body_rate[3]; // integral body rate error
   float body_rate_error[3];
   float attitude_error[3];
-  float Prevbody_rate_error[3] = {0,0,0};
+  float prev_body_rate_error[3] = {0,0,0};
 };
 
 
@@ -103,13 +103,13 @@ class Control{
 
   public:
     void run_smc_controller();
-	void run_pid_controller();
+  	void run_pid_controller();
 
     // desired body rates
     float desired_body_rates[3];
     float desired_euler_rates[3];
     float u_phi, u_theta, u_psi;
-	float s_roll, s_pitch, s_yaw;
+	  float s_roll, s_pitch, s_yaw;
 
     error_struct error;
 
@@ -119,6 +119,7 @@ class Control{
 typedef enum flight_modes{
    STABILIZE_ANGLE = 0,
    STABILIZE_RATES,
+   ONE_DOF_TEST,
    NOT_SET
 }flight_mode;
 

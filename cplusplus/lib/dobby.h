@@ -107,7 +107,7 @@ class Dobby{
 
     // when PWM testing is being done
     int pwm_test_setup();
-    void pwm_test_loop(dobby_time current_time);
+    void pwm_test_loop(dobby_time current_time, int* desired_test_pwm);
     
     // holds current status of dobby
     dobby_status state;

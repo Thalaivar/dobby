@@ -203,12 +203,12 @@ void Dobby::pwm_test_loop(dobby_time current_time, int* desired_test_pwm){
     return;
 
   else{
-
+	int test_pwm[4] = {*desired_test_pwm, *(desired_test_pwm++), *(desired_test_pwm++), *(desired_test_pwm++)};
     times.motor_loop_prev_time = current_time;
-    motors.channel_val[0] = *desired_test_pwm[0];
-    motors.channel_val[1] = *desired_test_pwm[1];
-    motors.channel_val[2] = *desired_test_pwm[2];
-    motors.channel_val[3] = *desired_test_pwm[3];
+    motors.channel_val[0] = test_pwm[0];
+    motors.channel_val[1] = test_pwm[1];
+    motors.channel_val[2] = test_pwm[2];
+    motors.channel_val[3] = test_pwm[3];
     motors.update();
     return;
   }
@@ -233,13 +233,13 @@ void Dobby::logging_loop(dobby_time current_time){
 
 void Dobby::imu_test_logging_loop(dobby_time current_time){
   auto imu_test_log_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.imu_test_log_loop_prev_time);
-  	times.imu_test_log_loop_time = log_loop.count();
+  	times.imu_test_log_loop_time = imu_test_log_loop.count();
 
-    if(time.imu_test_log_loop_time < LOG_LOOP_PERIOD)
+    if(times.imu_test_log_loop_time < LOG_LOOP_PERIOD)
       return;
 
     else{
-      time.imu_test_log_loop_prev_time = current_time;
+      times.imu_test_log_loop_prev_time = current_time;
       logging.log_attitude(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
       return;
     }

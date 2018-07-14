@@ -22,8 +22,9 @@ int main(int argc, char** argv){
   dobby_time current_time;
   char resp;
   short i = 0;
+  char* opt = argv[1];
 
-  if(opt == "pwm_test"){
+  if(*opt == 'p'){
     int desired_test_pwm[4] = {1000, 1000, 1000, 1000};
 
     if(dobby.pwm_test_setup() < 0){
@@ -31,8 +32,8 @@ int main(int argc, char** argv){
       return 0;
     }
 
-    if(motors.is_pru_initialized)
-      dobby.state == READY_TO_FLY;
+    if(dobby.motors.is_pru_initialized)
+      dobby.state = READY_TO_FLY;
 
     cout << "Enter 4 PWM values: ";
     cin >> desired_test_pwm[0] >> desired_test_pwm[1] >> desired_test_pwm[2] >> desired_test_pwm[3];
@@ -40,7 +41,7 @@ int main(int argc, char** argv){
     cout << "Enter \"y\" to continue: ";
     cin >> resp;
 
-    if(resp == "y"){
+    if(resp == 'y'){
        while(dobby.state == READY_TO_FLY){
          if(i == 0){
            dobby.reset_all_times();
@@ -53,20 +54,20 @@ int main(int argc, char** argv){
     }
   }
 
-  else if(opt == "imu_test"){
+  else if(*opt == 'i'){
     if(dobby.imu_test_setup() < 0){
       cout << "****** program halted ********" << endl;
       return 0;
     }
 
     if(dobby.imu.is_initialized && dobby.imu.is_calibrated)
-      dobby.state == READY_TO_FLY;
+      dobby.state = READY_TO_FLY;
 
     cout << "****************************\n*      Beginning IMU Test      *\n****************************" << endl;
     cout << "Enter \"y\" to continue: ";
     cin >> resp;
 
-    if(resp == "y"){
+    if(resp == 'y'){
       while(dobby.state == READY_TO_FLY){
           if(i == 0){
             dobby.reset_all_times();
@@ -80,7 +81,7 @@ int main(int argc, char** argv){
     }
   }
 
-  else if(opt == "run"){
+  else if(*opt == 'r'){
     dobby.setup();
 
     dobby.pre_flight_checks();

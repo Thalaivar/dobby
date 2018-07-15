@@ -138,6 +138,13 @@ int main(int argc, char** argv){
         dobby.motor_update_loop_1DOF(current_time);
         dobby.logging_loop(current_time);
       }
+
+      if(dobby.state == DISARMED){
+        cout << "Motors are disarmed!!" << endl;
+        dobby.motors.is_armed = false;
+        dobby.motors.disable_motors();
+        exit(0);
+      }
     }
   }
 

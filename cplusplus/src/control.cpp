@@ -162,6 +162,9 @@ void Control::run_pid_controller(){
 	// get latest body rate errors
 	get_body_rate_error();
 
+  if(imu->euler_angles[PITCH] >= PID_PITCH_CUTOFF || imu->euler_angles[PITCH] <= -PID_PITCH_CUTOFF){
+    mode->current_mode = FAIL;
+  }
 	// update the value of integral body rate error
 	error.ie_body_rate[ROLL]  += error.body_rate_error[ROLL];
 	error.ie_body_rate[PITCH] += error.body_rate_error[PITCH];
@@ -214,7 +217,7 @@ void flightMode::set_flight_mode(flight_mode desired_mode){
     case ONE_DOF_TEST:
       this->current_mode = ONE_DOF_TEST;
       break;
-      
+
     default:
       cout << "INVALID MODE SETTING!\n";
       this->current_mode = NOT_SET;

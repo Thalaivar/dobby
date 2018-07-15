@@ -65,6 +65,7 @@
 #define LOOP_TIME 0.00503
 #define INV_LOOP_TIME 200
 #define PI_BY_2_INV 0.6363
+#define PID_PITCH_CUTOFF 1.22173
 
 // forward declaration to avoid error
 class flightMode;
@@ -120,7 +121,8 @@ typedef enum flight_modes{
    STABILIZE_ANGLE = 0,
    STABILIZE_RATES,
    ONE_DOF_TEST,
-   NOT_SET
+   NOT_SET.
+   FAIL
 }flight_mode;
 
 class flightMode{

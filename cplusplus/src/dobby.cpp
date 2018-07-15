@@ -207,6 +207,13 @@ void Dobby::control_loop(dobby_time current_time){
 }
 
 void Dobby::control_loop_1DOF(dobby_time current_time){
+
+  if(mode.current_mode == FAIL){
+    cout << "PID cutoff reached!!!" << endl;
+    this->state = DISARMED;
+    return;
+  }
+
   auto fast_loop = chrono::duration_cast<chrono::microseconds>(current_time - times.fast_loop_prev_time);
   times.fast_loop_time = fast_loop.count();
 
@@ -327,7 +334,7 @@ void Dobby::logging_loop(dobby_time current_time){
     	logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
 		logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
 		logging.log_attitude_error(control.error.attitude_error[ROLL], control.error.attitude_error[PITCH], control.error.attitude_error[YAW]);
-    	logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);    
+    	logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);
 		logging.log_desired_body_rates(control.desired_body_rates[ROLL], control.desired_body_rates[PITCH], control.desired_body_rates[YAW]);
 		logging.log_attitude(imu.euler_angles[ROLL], imu.euler_angles[PITCH], imu.euler_angles[YAW]);
 		logging.log_body_rates(imu.body_rates[ROLL], imu.body_rates[PITCH], imu.body_rates[YAW]);

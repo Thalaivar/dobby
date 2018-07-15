@@ -10,6 +10,16 @@ int Logging::log_attitude(float roll, float pitch, float yaw){
   return 0;
 }
 
+int Logging::log_body_rates(float p, float q, float r){
+	
+  if(fprintf(body_rates_data_file, "%f,%f,%f\n", p, q, r) < 0){
+  	this->log_fail_body_rates++;
+	return -1;
+  }
+
+  return 0;
+}
+
 int Logging::log_desired_attitude(float roll, float pitch, float yaw){
 
   if(fprintf(desired_attitude_data_file, "%f,%f,%f\n", roll, pitch, yaw) < 0){
@@ -85,6 +95,7 @@ Logging::Logging(){
   attitude_error_data_file = fopen("attitude_error_data_file.txt", "w");
   desired_attitude_data_file = fopen("desired_attitude_data_file.txt", "w");
   desired_body_rates_data_file = fopen("desired_body_rates_data_file.txt", "w");
+  body_rates_data_file = fopen("body_rates_data_file.txt", "w");
 
   if(attitude_data_file == NULL && channel_data_file == NULL && error_data_file == NULL \
      && s_data_file == NULL && ie_data_file == NULL && attitude_error_data_file == NULL && desired_attitude_data_file == NULL)

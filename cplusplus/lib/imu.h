@@ -26,14 +26,11 @@ class IMU{
     rc_mpu_config_t config;
     rc_mpu_data_t   data;
 
-    // angle rates in euler frames in DPS
-    float euler_rates[3];
-
     // euler angles in radians
     float euler_angles[3];
 
-    // body rates in DPS
-    float body_rates[3];
+    // body rates in rad/s
+    double body_rates[3];
 
 	  IMU();
 

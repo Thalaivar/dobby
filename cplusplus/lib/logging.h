@@ -13,11 +13,14 @@ class Logging{
     FILE *attitude_error_data_file;
 	FILE *desired_attitude_data_file;
 	FILE *desired_body_rates_data_file;
+	FILE *body_rates_data_file;
 
   public:
 
     // to log attitude data
     int log_attitude(float roll, float pitch, float yaw);
+	
+	int log_body_rates(float p, float q, float r);
 
 	int log_s(float sx, float sy, float sz);
 
@@ -46,6 +49,7 @@ class Logging{
     int log_fail_attitude_error = 0;
 	int log_fail_desired_attitude = 0;
 	int log_fail_desired_body_rates = 0;
+	int log_fail_body_rates = 0;
 
     // to check if logging is ready
     bool is_initialised;

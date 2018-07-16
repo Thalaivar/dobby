@@ -79,7 +79,7 @@ void Control::get_desired_euler_rates(){
   // get desired euler rates (by passing through simple P controller)
   desired_euler_rates[ROLL] = error.attitude_error[ROLL]*angle_to_rate_roll;
   desired_euler_rates[PITCH] = error.attitude_error[PITCH]*angle_to_rate_pitch;
-  desired_euler_rates[YAW] = mode->desired_euler[YAW]*angle_to_rate_yaw;
+  desired_euler_rates[YAW] = 0;//mode->desired_euler[YAW]*angle_to_rate_yaw;
 
   // desired euler rates in rad/s
   desired_euler_rates[ROLL]  = desired_euler_rates[ROLL];
@@ -93,6 +93,7 @@ void Control::get_desired_body_rates(){
   desired_body_rates[ROLL]  = desired_euler_rates[ROLL] - sin(imu->euler_angles[PITCH])*desired_euler_rates[YAW];
   desired_body_rates[PITCH] = desired_euler_rates[PITCH]*cos(imu->euler_angles[ROLL]) + desired_euler_rates[YAW]*sin(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH]);
   desired_body_rates[YAW]   = cos(imu->euler_angles[ROLL])*cos(imu->euler_angles[PITCH])*desired_euler_rates[YAW] - sin(imu->euler_angles[ROLL])*desired_euler_rates[PITCH];
+	
 }
 
 void Control::get_body_rate_error(){

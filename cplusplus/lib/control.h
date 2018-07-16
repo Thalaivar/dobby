@@ -20,9 +20,9 @@
 /***************************************************************
 						PID Params
 ***************************************************************/
-#define pid_roll_kp 	1.00
-#define pid_pitch_kp	1.00
-#define pid_yaw_kp 		1.00
+#define pid_roll_kp 	0.00
+#define pid_pitch_kp	16.00
+#define pid_yaw_kp 		0.00
 
 #define pid_roll_ki 	0.00
 #define pid_pitch_ki	0.00
@@ -130,7 +130,7 @@ typedef enum flight_modes{
    STABILIZE_ANGLE = 0,
    STABILIZE_RATES,
    ONE_DOF_TEST,
-   NOT_SET.
+   NOT_SET,
    FAIL
 }flight_mode;
 

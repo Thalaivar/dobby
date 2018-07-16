@@ -88,7 +88,7 @@ int Logging::log_attitude_error(float ex, float ey, float ez){
 
 int Logging::log_control_inputs(float u_phi, float u_theta, float u_psi){
   if(fprintf(control_input_data_file, "%f,%f,%f\n", u_phi, u_theta, u_psi) < 0){
-    this->log_fail_inputs++;
+    this->log_fail_control_inputs++;
     return -1;
   }
 

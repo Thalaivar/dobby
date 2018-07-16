@@ -162,6 +162,7 @@ void Control::run_pid_controller(){
 	// get latest body rate errors
 	get_body_rate_error();
 
+  // if pitch approaches 90 degrees
   if(imu->euler_angles[PITCH] >= PID_PITCH_CUTOFF || imu->euler_angles[PITCH] <= -PID_PITCH_CUTOFF){
     mode->current_mode = FAIL;
   }
@@ -186,10 +187,21 @@ void Control::run_pid_controller(){
   error.d_body_rate_error[PITCH] = (error.body_rate_error[PITCH] - error.prev_body_rate_error[PITCH]);
   error.d_body_rate_error[YAW]   = (error.body_rate_error[YAW] - error.prev_body_rate_error[YAW]);
 
-	//Compute the Desired Torque Inputs:
-	float u_phi = pid_roll_kp * error.body_rate_error[ROLL] + pid_roll_ki * error.ie_body_rate[ROLL] + pid_roll_kd * error.d_body_rate_error[ROLL];
-	float u_theta = pid_pitch_kp * error.body_rate_error[PITCH] + pid_pitch_ki * error.ie_body_rate[PITCH] + pid_pitch_kd * error.d_body_rate_error[PITCH];
-	float u_psi = pid_yaw_kp * error.body_rate_error[YAW] + pid_yaw_ki * error.ie_body_rate[YAW] + pid_yaw_kd * error.d_body_rate_error[YAW];
+  // PID components
+  phi_pid.pid_p = pid_roll_kp * error.body_rate_error[ROLL];
+  phi_pid.pid_i = pid_roll_ki * error.ie_body_rate[ROLL];
+  phi_pid.pid_d = pid_roll_kd * error.d_body_rate_error[ROLL];
+  theta_pid.pid_p = pid_pitch_kp * error.body_rate_error[PITCH];
+  theta_pid.pid_i = pid_pitch_ki * error.ie_body_rate[PITCH];
+  theta_pid.pid_d = pid_pitch_kd * error.d_body_rate_error[PITCH];
+  psi_pid.pid_p = pid_yaw_kp * error.body_rate_error[YAW];
+  psi_pid.pid_i = pid_yaw_ki * error.ie_body_rate[YAW];
+  psi_pid.pid_d = pid_yaw_kd * error.d_body_rate_error[YAW];
+
+  //Compute the Desired Torque Inputs:
+	u_phi = phi_pid.pid_p + phi_pid.pid_d + phi_pid.pid_i;
+	u_theta = theta_pid.pid_p + theta_pid.pid_d + theta_pid.pid_i;
+	u_psi = psi_pid.pid_p + psi_pid.pid_i + psi_pid.pid_d;
 
 	//SET VALUES FOR NEXT LOOP
 	error.prev_body_rate_error[ROLL] = error.body_rate_error[ROLL];

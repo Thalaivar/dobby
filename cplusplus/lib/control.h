@@ -78,6 +78,9 @@ struct error_struct{
   float prev_body_rate_error[3] = {0,0,0};
 };
 
+struct pid_struct{
+  float pid_p, pid_d, pid_i;
+};
 
 class Control{
   private:
@@ -106,13 +109,19 @@ class Control{
     void run_smc_controller();
   	void run_pid_controller();
 
-    // desired body rates
+
     float desired_body_rates[3];
     float desired_euler_rates[3];
     float u_phi, u_theta, u_psi;
-	float s_roll, s_pitch, s_yaw;
+	  float s_roll, s_pitch, s_yaw;
+
+    // for PID controller
+    pid_struct phi_pid;
+    pid_struct theta_pid;
+    pid_struct psi_pid;
 
     error_struct error;
+
 
 	Control(Motors* motors_ptr, flightMode* flightMode_ptr, IMU* imu_ptr);
 };

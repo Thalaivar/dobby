@@ -11,13 +11,11 @@ Tasks to do:
 
 * Write AHRS algorithm. (delegated to the DMP, not enough skill to write own algorithm)
 * Write failsafes and arm checks
-* Map thrusts to PWM
 * Get Inertia estimate
-* Fix loop times
 
 Status:
 --------
-Currently on the test bench.
+Currently on the test bench. 1-DOF PID testing successful!
 
 Next major test:
 ----------------

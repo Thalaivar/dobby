@@ -231,7 +231,7 @@ void Dobby::control_loop_1DOF(dobby_time current_time){
     mode.flight_mode_update();
 
     // call smc controller
-    control.run_pid_controller();
+    control.run_smc_controller();
 
     return;
   }
@@ -330,14 +330,13 @@ void Dobby::logging_loop(dobby_time current_time){
 
 	else{
 		times.logging_loop_prev_time = current_time;
-		//logging.log_s(control.s_roll, control.s_pitch, control.s_yaw);
-    logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
+		logging.log_s(control.s_roll, control.s_pitch, control.s_yaw);
+    	logging.log_channel_vals(motors.channel_val[0], motors.channel_val[1], motors.channel_val[2], motors.channel_val[3]);
 		logging.log_ie_body_rate_error(control.error.ie_body_rate[ROLL], control.error.ie_body_rate[PITCH], control.error.ie_body_rate[YAW]);
 		logging.log_attitude_error(control.error.attitude_error[ROLL], control.error.attitude_error[PITCH], control.error.attitude_error[YAW]);
-    logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);
-		logging.log_desired_body_rates(control.desired_body_rates[ROLL], control.desired_body_rates[PITCH], control.desired_body_rates[YAW]);
-    logging.log_control_inputs(control.u_phi, control.u_theta, control.u_psi);
-    logging.log_pid_outputs(control.theta_pid.pid_p, control.theta_pid.pid_i, control.theta_pid.pid_d);
+	    logging.log_body_rate_error(control.error.body_rate_error[ROLL], control.error.body_rate_error[PITCH], control.error.body_rate_error[YAW]);
+		//logging.log_desired_body_rates(control.desired_body_rates[ROLL], control.desired_body_rates[PITCH], control.desired_body_rates[YAW]);
+    	logging.log_control_inputs(control.u_phi, control.u_theta, control.u_psi);
 	}
 }
 

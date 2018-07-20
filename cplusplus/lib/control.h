@@ -10,26 +10,26 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-#define smc_roll_lambda  0.934
-#define smc_pitch_lambda 1.555
+#define smc_roll_lambda  0.0
+#define smc_pitch_lambda 0.6
 #define smc_yaw_lambda   0.0
-#define smc_roll_eta     3.1
-#define smc_pitch_eta    2.2
+#define smc_roll_eta     0.0
+#define smc_pitch_eta    1.1
 #define smc_yaw_eta      0.0
 
 /***************************************************************
 						PID Params
 ***************************************************************/
 #define pid_roll_kp 	0.00
-#define pid_pitch_kp	16.00
+#define pid_pitch_kp	24.00
 #define pid_yaw_kp 		0.00
 
 #define pid_roll_ki 	0.00
-#define pid_pitch_ki	0.00
+#define pid_pitch_ki	0.15
 #define pid_yaw_ki 		0.00
 
 #define pid_roll_kd 	0.00
-#define pid_pitch_kd	0.00
+#define pid_pitch_kd	4.75
 #define pid_yaw_kd 		0.00
 
 /***************************************************************
@@ -61,6 +61,13 @@
 #define Ixx 1000*(0.000081599 + 0.00032233 + 0.0133609 + 0.0044966)
 #define Iyy 1000*(0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
 #define Izz 1000*(0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
+
+#define k1 -0.57046
+#define k2 18.26143
+#define k3 0.582018
+#define k4 18.76642
+#define k5 -0.017304
+#define k6 29.18383
 
 #define LOOP_TIME 0.00503
 #define INV_LOOP_TIME 200

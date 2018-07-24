@@ -11,10 +11,12 @@
                             smc params
 ***************************************************************/
 #define smc_roll_lambda  0.0
-#define smc_pitch_lambda 0.6
+#define smc_pitch_lambda 1
 #define smc_yaw_lambda   0.0
+
+#define smc_pitch_k      1
 #define smc_roll_eta     0.0
-#define smc_pitch_eta    1.1
+#define smc_pitch_eta    0
 #define smc_yaw_eta      0.0
 
 /***************************************************************
@@ -62,12 +64,10 @@
 #define Iyy 1000*(0.000586590 + 0.00032233 + 0.0133609 + 0.0044966)
 #define Izz 1000*(0.000621150 + 0.00032968 + 0.0163521 + 0.0118809)
 
-#define k1 -0.57046
-#define k2 18.26143
-#define k3 0.582018
-#define k4 18.76642
-#define k5 -0.017304
-#define k6 29.18383
+#define k1 -10.41
+#define k3 10.92
+#define k5 -0.51
+
 
 #define LOOP_TIME 0.00503
 #define INV_LOOP_TIME 200

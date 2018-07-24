@@ -121,9 +121,9 @@ void Control::run_smc_controller(){
   if(imu->euler_angles[PITCH] >= PID_PITCH_CUTOFF || imu->euler_angles[PITCH] <= -PID_PITCH_CUTOFF){
     mode->current_mode = FAIL;
   }
-  
+
   // update the value of integral body rate error
-  get_ie_body_rate_error();	
+  get_ie_body_rate_error();
 
   // saturate the integral errors
   if(error.ie_body_rate[ROLL] > INTG_WNDP_ROLL_POS)
@@ -134,14 +134,14 @@ void Control::run_smc_controller(){
   	error.ie_body_rate[PITCH] = INTG_WNDP_PITCH_POS;
   else if(error.ie_body_rate[PITCH] < INTG_WNDP_PITCH_NEG)
   	error.ie_body_rate[PITCH] = -INTG_WNDP_PITCH_NEG;
-    
+
   s_roll = error.body_rate_error[ROLL] + smc_roll_lambda*error.ie_body_rate[ROLL];
   s_pitch = error.body_rate_error[PITCH] + smc_pitch_lambda*error.ie_body_rate[PITCH];
   s_yaw = error.body_rate_error[YAW] + smc_yaw_lambda*error.ie_body_rate[YAW];
 
-  u_phi = (k1*imu->body_rates[PITCH]*imu->body_rates[YAW] + smc_roll_lambda*error.body_rate_error[ROLL] + smc_roll_eta*tanh(s_roll))*(k2);
-  u_theta = (k3*imu->body_rates[ROLL]*imu->body_rates[YAW] + smc_pitch_lambda*error.body_rate_error[PITCH] + smc_pitch_eta*tanh(s_pitch))*(k4);
-  u_psi = (k5*imu->body_rates[PITCH]*imu->body_rates[ROLL] + smc_yaw_lambda*error.body_rate_error[YAW] + smc_yaw_eta*tanh(s_yaw))*(k6);
+  u_phi = k1*imu->body_rates[PITCH]*imu->body_rates[YAW]  + smc_roll_lambda*error.body_rate_error[ROLL] + smc_roll_eta*tanh(s_roll);
+  u_theta = k3*imu->body_rates[ROLL]*imu->body_rates[YAW] + smc_pitch_k*s_pitch + smc_pitch_lambda*error.body_rate_error[PITCH] + smc_pitch_eta*tanh(s_pitch);
+  u_psi = k5*imu->body_rates[PITCH]*imu->body_rates[ROLL] + smc_yaw_lambda*error.body_rate_error[YAW] + smc_yaw_eta*tanh(s_yaw);
 
   // update required torques
   motors->torques[ROLL] = u_phi;

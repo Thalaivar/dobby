@@ -10,12 +10,13 @@
 /***************************************************************
                             smc params
 ***************************************************************/
-#define smc_roll_lambda  0.0
-#define smc_pitch_lambda 1
+#define smc_roll_lambda  0.55
+#define smc_pitch_lambda 0
 #define smc_yaw_lambda   0.0
 
-#define smc_pitch_k      1
-#define smc_roll_eta     0.0
+#define smc_pitch_k      27
+
+#define smc_roll_eta     7.0
 #define smc_pitch_eta    0
 #define smc_yaw_eta      0.0
 
